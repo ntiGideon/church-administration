@@ -16,6 +16,7 @@ type SMTPConfig struct {
 }
 
 // sendHTMLEmail sends an email with a pre-built HTML body string.
+// When MAIL_USERNAME is empty (e.g. MailHog) no SMTP auth is performed.
 func sendHTMLEmail(to, subject, htmlBody string) error {
 	cfg := SMTPConfig{
 		Port:     os.Getenv("MAIL_PORT"),
@@ -30,7 +31,10 @@ func sendHTMLEmail(to, subject, htmlBody string) error {
 	msg += "To: " + to + "\r\n"
 	msg += "Subject: " + subject + "\r\n\r\n"
 	msg += htmlBody
-	auth := smtp.PlainAuth("", cfg.Username, cfg.Password, cfg.Host)
+	var auth smtp.Auth
+	if cfg.Username != "" {
+		auth = smtp.PlainAuth("", cfg.Username, cfg.Password, cfg.Host)
+	}
 	return smtp.SendMail(cfg.Host+":"+cfg.Port, auth, cfg.From, []string{to}, []byte(msg))
 }
 

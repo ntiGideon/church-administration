@@ -110,7 +110,8 @@
                 </div>
 
                 <div class="form-body">
-                    <form id="inviteForm" method="POST" action="/admin/churches/invite">
+                    <form id="inviteForm" method="POST" action="/invite-church">
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                         <!-- Church Name -->
                         <div class="form-section">
                             <div class="section-header">

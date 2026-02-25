@@ -41,6 +41,8 @@ func noSurf(next http.Handler) http.Handler {
 		Path:     "/",
 		Secure:   false, // set to true behind HTTPS
 	})
+	// Use actual TLS state so origin checks compare http:// against http:// locally
+	csrfHandler.SetIsTLSFunc(func(r *http.Request) bool { return r.TLS != nil })
 	return csrfHandler
 }
 
