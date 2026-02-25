@@ -1,0 +1,142 @@
+{{define "title"}}Accept Invitation | FaithConnect{{end}}
+{{define "description"}}Complete your registration to join your church on FaithConnect{{end}}
+
+{{define "main"}}
+<div class="auth-page">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="brand-logo">
+                <img src="/static/img/abc_filter.png" alt="Logo">
+            </div>
+            <h1 class="brand-name">You're Invited!</h1>
+            <p class="brand-tagline">Complete your registration to get started</p>
+        </div>
+        <div class="invite-info">
+            <div class="invite-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Access your church's member directory</span>
+            </div>
+            <div class="invite-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>View upcoming events and services</span>
+            </div>
+            <div class="invite-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Receive church announcements</span>
+            </div>
+            <div class="invite-feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Connect with your congregation</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Create Your Account</h2>
+                <p>Fill in your details to complete registration</p>
+            </div>
+
+            {{with .Form}}
+            {{if .NonFieldErrors}}
+            <div class="notification is-danger is-light mb-4">
+                <button class="delete"></button>
+                {{range .NonFieldErrors}}<p>{{.}}</p>{{end}}
+            </div>
+            {{end}}
+            {{end}}
+
+            <form action="/invite/accept" method="POST">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                <input type="hidden" name="token" value="{{with .Form}}{{.Token}}{{end}}">
+
+                <div class="columns is-mobile">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">First Name *</label>
+                            <div class="control">
+                                <input class="input {{with .Form}}{{if index .FieldErrors "first_name"}}is-danger{{end}}{{end}}"
+                                       type="text" name="first_name" placeholder="John"
+                                       value="{{with .Form}}{{.FirstName}}{{end}}" required>
+                            </div>
+                            {{with .Form}}{{with index .FieldErrors "first_name"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Last Name *</label>
+                            <div class="control">
+                                <input class="input {{with .Form}}{{if index .FieldErrors "last_name"}}is-danger{{end}}{{end}}"
+                                       type="text" name="last_name" placeholder="Doe"
+                                       value="{{with .Form}}{{.LastName}}{{end}}" required>
+                            </div>
+                            {{with .Form}}{{with index .FieldErrors "last_name"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Phone Number</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="tel" name="phone" placeholder="+233 XX XXX XXXX"
+                               value="{{with .Form}}{{.Phone}}{{end}}">
+                        <span class="icon is-left"><i class="fas fa-phone"></i></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password *</label>
+                    <div class="control has-icons-left">
+                        <input class="input {{with .Form}}{{if index .FieldErrors "password"}}is-danger{{end}}{{end}}"
+                               type="password" name="password" placeholder="Create a strong password" required>
+                        <span class="icon is-left"><i class="fas fa-lock"></i></span>
+                    </div>
+                    {{with .Form}}{{with index .FieldErrors "password"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                </div>
+
+                <div class="field">
+                    <label class="label">Confirm Password *</label>
+                    <div class="control has-icons-left">
+                        <input class="input {{with .Form}}{{if index .FieldErrors "confirm_password"}}is-danger{{end}}{{end}}"
+                               type="password" name="confirm_password" placeholder="Repeat your password" required>
+                        <span class="icon is-left"><i class="fas fa-lock"></i></span>
+                    </div>
+                    {{with .Form}}{{with index .FieldErrors "confirm_password"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                </div>
+
+                <div class="field mt-5">
+                    <button type="submit" class="button is-primary is-fullwidth is-medium" id="submitBtn">
+                        <span class="icon"><i class="fas fa-user-check"></i></span>
+                        <span>Complete Registration</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/login" class="has-text-primary">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-page { display: flex; min-height: 100vh; margin-top: -70px; }
+.auth-left { flex: 1; background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 60%, #6B2F3D 100%); display: flex; flex-direction: column; justify-content: center; padding: 3rem 4rem; color: white; }
+.auth-brand { margin-bottom: 2.5rem; }
+.brand-logo { width: 60px; height: 60px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; padding: 8px; }
+.brand-logo img { width: 100%; height: 100%; object-fit: contain; }
+.brand-name { font-size: 2rem; font-weight: 800; color: white; margin: 0; }
+.brand-tagline { font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+.invite-info { display: flex; flex-direction: column; gap: 1rem; }
+.invite-feature { display: flex; align-items: center; gap: 1rem; color: rgba(255,255,255,0.9); font-size: 0.9rem; }
+.invite-feature i { color: rgba(255,255,255,0.7); font-size: 1rem; width: 20px; text-align: center; }
+.auth-right { width: 480px; background: var(--light-bg); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.auth-card { width: 100%; max-width: 400px; background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+.auth-header { margin-bottom: 1.5rem; text-align: center; }
+.auth-header h2 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0 0 0.4rem; }
+.auth-header p { color: var(--text-light); font-size: 0.85rem; }
+.auth-footer { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-light); }
+@media (max-width: 768px) { .auth-left { display: none; } .auth-right { width: 100%; } .auth-page { margin-top: 0; } }
+</style>
+{{end}}

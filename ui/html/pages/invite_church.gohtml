@@ -1,0 +1,1299 @@
+{{define "title"}}Invite New Church | Ascension Baptist Church{{end}}
+
+{{define "description"}}Invite a new church to join our management platform{{end}}
+
+{{define "main"}}
+<div class="container">
+    <!-- Modern Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="breadcrumb-nav">
+                    <a href="/dashboard" class="breadcrumb-item">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                    <span class="breadcrumb-divider">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <a href="/admin/churches" class="breadcrumb-item">
+                        <i class="fas fa-church"></i>
+                        Churches
+                    </a>
+                    <span class="breadcrumb-divider">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span class="breadcrumb-item active">
+                        <i class="fas fa-user-plus"></i>
+                        Invite Church
+                    </span>
+                </div>
+                <h1 class="page-title">
+                    <span class="title-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </span>
+                    Invite New Church
+                </h1>
+                <p class="page-subtitle">Extend your church network by inviting new branches to join our platform</p>
+            </div>
+            <div class="header-right">
+                <a href="/admin/churches" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Churches
+                </a>
+            </div>
+        </div>
+
+        <!-- Modern Progress Steps -->
+        <div class="modern-progress">
+            <div class="progress-track">
+                <div class="progress-step active">
+                    <div class="step-indicator">
+                        <div class="step-number">1</div>
+                        <div class="step-check">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="step-info">
+                        <div class="step-title">Details</div>
+                        <div class="step-description">Enter church information</div>
+                    </div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">
+                        <div class="step-number">2</div>
+                        <div class="step-check">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="step-info">
+                        <div class="step-title">Review</div>
+                        <div class="step-description">Confirm invitation</div>
+                    </div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">
+                        <div class="step-number">3</div>
+                        <div class="step-check">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="step-info">
+                        <div class="step-title">Complete</div>
+                        <div class="step-description">Invitation sent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="columns is-desktop is-variable is-6">
+        <!-- Left Column: Modern Form -->
+        <div class="column is-8">
+            <div class="modern-form-card">
+                <div class="form-header">
+                    <div class="form-title">
+                        <div class="title-icon">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <div>
+                            <h3>Church Information</h3>
+                            <p>Fill in the details of the church you want to invite</p>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <span class="required-badge">
+                            <i class="fas fa-asterisk"></i>
+                            Required fields
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-body">
+                    <form id="inviteForm" method="POST" action="/admin/churches/invite">
+                        <!-- Church Name -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-landmark"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Church Name</h4>
+                                    <p>The official name of the church</p>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <div class="field-control">
+                                    <div class="input-group">
+                                        <span class="input-icon">
+                                            <i class="fas fa-church"></i>
+                                        </span>
+                                        <input type="text"
+                                               name="name"
+                                               class="modern-input"
+                                               placeholder="Enter church name"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Church Type -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Church Type</h4>
+                                    <p>Select the type of church you're inviting</p>
+                                </div>
+                            </div>
+                            <div class="church-type-selector">
+                                <div class="type-options">
+                                    <div class="type-option" data-value="Headquarters">
+                                        <div class="option-icon">
+                                            <i class="fas fa-crown"></i>
+                                        </div>
+                                        <div class="option-content">
+                                            <h5>Headquarters</h5>
+                                            <p>Main administrative church</p>
+                                        </div>
+                                        <div class="option-check">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="type-option selected" data-value="Branch">
+                                        <div class="option-icon">
+                                            <i class="fas fa-code-branch"></i>
+                                        </div>
+                                        <div class="option-content">
+                                            <h5>Branch Church</h5>
+                                            <p>Local branch church</p>
+                                        </div>
+                                        <div class="option-check">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="type-option" data-value="Mission">
+                                        <div class="option-icon">
+                                            <i class="fas fa-globe-africa"></i>
+                                        </div>
+                                        <div class="option-content">
+                                            <h5>Mission Church</h5>
+                                            <p>Missionary outreach church</p>
+                                        </div>
+                                        <div class="option-check">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="branch" value="Branch" required>
+                            </div>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Administrator Email</h4>
+                                    <p>This email will receive the invitation link</p>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <div class="field-control">
+                                    <div class="input-group">
+                                        <span class="input-icon">
+                                            <i class="fas fa-user-tie"></i>
+                                        </span>
+                                        <input type="email"
+                                               name="email"
+                                               class="modern-input"
+                                               placeholder="admin@church.org"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Church Address -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Church Address</h4>
+                                    <p>Complete physical address of the church</p>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <div class="field-control">
+                                    <textarea name="address"
+                                              class="modern-textarea"
+                                              rows="3"
+                                              placeholder="Enter complete church address..."
+                                              required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invitation Validity -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Invitation Validity</h4>
+                                    <p>How long the invitation link will remain valid</p>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <div class="field-control">
+                                    <div class="select-wrapper">
+                                        <select name="expires_at" class="modern-select" required>
+                                            <option value="24">24 Hours</option>
+                                            <option value="48" selected>48 Hours (Recommended)</option>
+                                            <option value="72">72 Hours</option>
+                                            <option value="168">7 Days</option>
+                                            <option value="336">14 Days</option>
+                                        </select>
+                                        <div class="select-arrow">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <div class="form-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-sticky-note"></i>
+                                </div>
+                                <div class="section-title">
+                                    <h4>Additional Notes</h4>
+                                    <p>Optional instructions or welcome message</p>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <div class="field-control">
+                                    <textarea name="notes"
+                                              class="modern-textarea"
+                                              rows="2"
+                                              placeholder="Add any special instructions or welcome message..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <div class="action-buttons">
+                                <button type="submit" class="submit-button" id="submitBtn">
+                                    <span class="button-icon">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </span>
+                                    <span class="button-text">Send Invitation</span>
+                                    <span class="button-loader">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                </button>
+                                <button type="reset" class="reset-button">
+                                    <span class="button-icon">
+                                        <i class="fas fa-eraser"></i>
+                                    </span>
+                                    Clear Form
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Modern Sidebar -->
+        <div class="column is-4">
+            <!-- Invitation Preview -->
+            <div class="sidebar-card preview-card">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Invitation Preview</h3>
+                </div>
+                <div class="card-body">
+                    <div class="preview-content">
+                        <div class="preview-header">
+                            <div class="preview-icon">
+                                <i class="fas fa-envelope-open-text"></i>
+                            </div>
+                            <h4>Church Invitation</h4>
+                            <p>Preview of what the recipient will see</p>
+                        </div>
+                        <div class="preview-details">
+                            <div class="detail-item">
+                                <span class="detail-label">To:</span>
+                                <span class="detail-value" id="previewEmail">admin@church.org</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Church:</span>
+                                <span class="detail-value" id="previewName">New Church</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Type:</span>
+                                <span class="detail-tag" id="previewType">Branch</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Expires:</span>
+                                <span class="detail-value" id="previewExpiry">48 hours</span>
+                            </div>
+                        </div>
+                        <div class="preview-message">
+                            <div class="message-header">
+                                <i class="fas fa-quote-left"></i>
+                                <span>Message Preview</span>
+                            </div>
+                            <p class="message-content">
+                                Welcome to Ascension Baptist Church Network! You've been invited to join our church management platform. This invitation includes access to member management, event planning, giving tracking, and communication tools.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Stats -->
+            <div class="sidebar-card stats-card">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-chart-network"></i>
+                    </div>
+                    <h3>Network Statistics</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon primary">
+                                <i class="fas fa-church"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="totalChurches">15</div>
+                                <div class="stat-label">Total Churches</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon secondary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="activeBranches">8</div>
+                                <div class="stat-label">Active Branches</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon accent">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="pendingInvites">3</div>
+                                <div class="stat-label">Pending Invites</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Tips -->
+            <div class="sidebar-card tips-card">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Quick Tips</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tips-list">
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h5>Verify Email</h5>
+                                <p>Ensure the email belongs to the church administrator</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h5>Choose Type Carefully</h5>
+                                <p>Select the correct church type for proper permissions</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h5>Set Expiration</h5>
+                                <p>48 hours is recommended for security purposes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modern Header */
+    .page-header {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .header-left {
+        flex: 1;
+    }
+
+    .breadcrumb-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .breadcrumb-item:hover {
+        color: var(--primary);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .breadcrumb-divider {
+        color: var(--medium-gray);
+        font-size: 0.8rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .title-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 1.5rem;
+        box-shadow: 0 4px 15px rgba(80, 34, 45, 0.2);
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        max-width: 600px;
+        line-height: 1.6;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--white);
+        border: 2px solid var(--light-gray);
+        border-radius: 10px;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateX(-5px);
+    }
+
+    /* Modern Progress */
+    .modern-progress {
+        margin-top: 2rem;
+    }
+
+    .progress-track {
+        display: flex;
+        gap: 2rem;
+        position: relative;
+    }
+
+    .progress-track::before {
+        content: '';
+        position: absolute;
+        top: 30px;
+        left: 40px;
+        right: 40px;
+        height: 2px;
+        background: var(--light-gray);
+        z-index: 1;
+    }
+
+    .progress-step {
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-indicator {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--white);
+        border: 2px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active .step-indicator {
+        border-color: var(--primary);
+        background: var(--primary);
+    }
+
+    .step-number {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .progress-step.active .step-number {
+        color: var(--white);
+    }
+
+    .step-check {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--white);
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .progress-step.completed .step-check {
+        opacity: 1;
+    }
+
+    .step-info {
+        text-align: center;
+    }
+
+    .step-title {
+        font-weight: 600;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+    }
+
+    .progress-step.active .step-title {
+        color: var(--primary);
+    }
+
+    .step-description {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+
+    /* Modern Form Card */
+    .modern-form-card {
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(80, 34, 45, 0.08);
+        overflow: hidden;
+        border: 1px solid var(--light-gray);
+    }
+
+    .form-header {
+        padding: 2rem 2rem 1.5rem;
+        border-bottom: 1px solid var(--light-gray);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-title .title-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .form-title h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .form-title p {
+        color: var(--text-light);
+        font-size: 0.95rem;
+    }
+
+    .required-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(80, 34, 45, 0.1);
+        border-radius: 20px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .form-body {
+        padding: 2rem;
+    }
+
+    /* Form Sections */
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(80, 34, 45, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .section-title h4 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .section-title p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    /* Form Fields */
+    .form-field {
+        margin-top: 1rem;
+    }
+
+    .field-control {
+        position: relative;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 1.1rem;
+        z-index: 2;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid var(--light-gray);
+        border-radius: 12px;
+        font-size: 1rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(80, 34, 45, 0.1);
+    }
+
+    .modern-textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: 12px;
+        font-size: 1rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: all 0.3s ease;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .modern-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(80, 34, 45, 0.1);
+    }
+
+    /* Church Type Selector */
+    .church-type-selector {
+        margin-top: 1rem;
+    }
+
+    .type-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .type-option {
+        padding: 1.5rem;
+        border: 2px solid var(--light-gray);
+        border-radius: 16px;
+        background: var(--white);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .type-option:hover {
+        border-color: var(--primary-light);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(80, 34, 45, 0.1);
+    }
+
+    .type-option.selected {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(80, 34, 45, 0.03) 0%, rgba(196, 195, 208, 0.03) 100%);
+        box-shadow: 0 10px 25px rgba(80, 34, 45, 0.15);
+    }
+
+    .option-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .type-option:nth-child(2) .option-icon {
+        background: var(--secondary);
+    }
+
+    .type-option:nth-child(3) .option-icon {
+        background: var(--support-purple);
+    }
+
+    .option-content h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .option-content p {
+        color: var(--text-light);
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .option-check {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.3s ease;
+    }
+
+    .type-option.selected .option-check {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Modern Select */
+    .select-wrapper {
+        position: relative;
+    }
+
+    .modern-select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: 12px;
+        font-size: 1rem;
+        color: var(--text-dark);
+        background: var(--white);
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .modern-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(80, 34, 45, 0.1);
+    }
+
+    .select-arrow {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        pointer-events: none;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        padding-top: 2rem;
+        border-top: 2px solid var(--light-gray);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .submit-button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border: none;
+        border-radius: 12px;
+        color: var(--white);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .submit-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(80, 34, 45, 0.3);
+    }
+
+    .reset-button {
+        padding: 1rem 2rem;
+        background: var(--white);
+        border: 2px solid var(--light-gray);
+        border-radius: 12px;
+        color: var(--text-dark);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .reset-button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .button-loader {
+        display: none;
+        font-size: 1.2rem;
+    }
+
+    .submit-button.loading .button-icon,
+    .submit-button.loading .button-text {
+        opacity: 0;
+    }
+
+    .submit-button.loading .button-loader {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Sidebar Cards */
+    .sidebar-card {
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(80, 34, 45, 0.08);
+        border: 1px solid var(--light-gray);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .card-header h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Preview Card */
+    .preview-content {
+        text-align: center;
+    }
+
+    .preview-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .preview-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+    }
+
+    .preview-header h4 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .preview-header p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    .preview-details {
+        background: var(--light-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        color: var(--text-medium);
+        font-size: 0.95rem;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-word;
+    }
+
+    .detail-tag {
+        padding: 0.25rem 0.75rem;
+        background: var(--primary);
+        color: var(--white);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .preview-message {
+        border-left: 4px solid var(--primary);
+        padding: 1rem;
+        background: var(--light-bg);
+        border-radius: 8px;
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .message-content {
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Stats Card */
+    .stats-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--light-bg);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.primary {
+        background: var(--primary);
+    }
+
+    .stat-icon.secondary {
+        background: var(--secondary);
+    }
+
+    .stat-icon.accent {
+        background: var(--support-purple);
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.25rem;
+    }
+
+    /* Tips Card */
+    .tips-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--light-bg);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .tip-item:hover {
+        transform: translateX(5px);
+        background: rgba(80, 34, 45, 0.05);
+    }
+
+    .tip-icon {
+        color: var(--primary);
+        font-size: 1.8rem;
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+    }
+
+    .tip-content h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.tip-content p {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .columns.is-desktop {
+        flex-direction: column;
+    }
+
+    .column {
+        width: 100%;
+    }
+
+    .type-options {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .progress-track {
+        gap: 1rem;
+    }
+
+    .progress-track::before {
+        left: 30px;
+        right: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .header-right {
+        align-self: flex-start;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .form-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .submit-button,
+    .reset-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .progress-step .step-description {
+        display: none;
+    }
+}
+    </style><script> // DOM Elements const inviteForm = document.getElementById('inviteForm'); const submitBtn = document.getElementById('submitBtn'); const typeOptions = document.querySelectorAll('.type-option'); const typeInput = document.querySelector('input[name="branch"]'); const previewEmail = document.getElementById('previewEmail'); const previewName = document.getElementById('previewName'); const previewType = document.getElementById('previewType'); const previewExpiry = document.getElementById('previewExpiry'); const churchNameInput = document.querySelector('input[name="name"]'); const emailInput = document.querySelector('input[name="email"]'); const expirySelect = document.querySelector('select[name="expires_at"]'); // Form Inputs for Preview const formInputs = [ churchNameInput, emailInput, expirySelect, document.querySelector('textarea[name="address"]'), document.querySelector('textarea[name="notes"]') ]; // Church Type Selection typeOptions.forEach(option => { option.addEventListener('click', () => { // Remove selected class from all options typeOptions.forEach(opt => opt.classList.remove('selected')); // Add selected class to clicked option option.classList.add('selected'); // Update hidden input value const value = option.getAttribute('data-value'); typeInput.value = value; // Update preview updatePreview('type', value); }); }); // Update Preview Function function updatePreview(field, value) { switch(field) { case 'name': previewName.textContent = value || 'New Church'; break; case 'email': previewEmail.textContent = value || 'admin@church.org'; break; case 'type': previewType.textContent = value; break; case 'expiry': const expiryText = { '24': '24 hours', '48': '48 hours', '72': '72 hours', '168': '7 days', '336': '14 days' }[value] || '48 hours'; previewExpiry.textContent = expiryText; break; } } // Real-time Preview Updates formInputs.forEach(input => { if (input) { input.addEventListener('input', (e) => { const field = input.name; const value = e.target.value; updatePreview(field, value); }); } }); // Expiry Select Change expirySelect.addEventListener('change', (e) => { updatePreview('expiry', e.target.value); }); // Form Submission inviteForm.addEventListener('submit', async (e) => { e.preventDefault(); // Show loading state submitBtn.classList.add('loading'); submitBtn.disabled = true; try { const formData = new FormData(inviteForm); const response = await fetch('/admin/churches/invite', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } }); const result = await response.json(); if (response.ok) { // Show success message showNotification('Invitation sent successfully!', 'success'); // Update progress steps updateProgressSteps(); // Reset form after delay setTimeout(() => { inviteForm.reset(); // Reset preview to defaults updatePreview('name', ''); updatePreview('email', ''); updatePreview('type', 'Branch'); updatePreview('expiry', '48'); // Update stats updateStats(); }, 2000); } else { throw new Error(result.message || 'Failed to send invitation'); } } catch (error) { console.error('Error:', error); showNotification(error.message || 'Failed to send invitation. Please try again.', 'error'); } finally { // Hide loading state submitBtn.classList.remove('loading'); submitBtn.disabled = false; } }); // Progress Steps Animation function updateProgressSteps() { const steps = document.querySelectorAll('.progress-step'); steps[0].classList.add('completed'); steps[1].classList.add('active'); setTimeout(() => { steps[1].classList.add('completed'); steps[2].classList.add('active'); setTimeout(() => { steps[2].classList.add('completed'); }, 1000); }, 1000); } // Update Stats Function function updateStats() { // In a real application, you would fetch these from your API // For now, we'll simulate updates const totalChurches = document.getElementById('totalChurches'); const pendingInvites = document.getElementById('pendingInvites'); // Increment counters totalChurches.textContent = parseInt(totalChurches.textContent) + 1; pendingInvites.textContent = parseInt(pendingInvites.textContent) + 1; } // Notification System function showNotification(message, type = 'info') { const notification = document.createElement('div'); notification.className = `notification notification-${type}`; notification.innerHTML = ` <div class="notification-icon"> <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> </div> <div class="notification-content"> <p>${message}</p> </div> <button class="notification-close"> <i class="fas fa-times"></i> </button> `; document.body.appendChild(notification); // Add animation setTimeout(() => { notification.classList.add('show'); }, 10); // Auto remove after 5 seconds setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { notification.remove(); }, 300); }, 5000); // Close button notification.querySelector('.notification-close').addEventListener('click', () => { notification.classList.remove('show'); setTimeout(() => { notification.remove(); }, 300); }); } // Form Reset document.querySelector('.reset-button').addEventListener('click', () => { // Reset type selection typeOptions.forEach(opt => opt.classList.remove('selected')); typeOptions[1].classList.add('selected'); // Default to Branch typeInput.value = 'Branch'; // Reset preview updatePreview('name', ''); updatePreview('email', ''); updatePreview('type', 'Branch'); updatePreview('expiry', '48'); showNotification('Form has been cleared.', 'info'); }); // Initialize preview on page load document.addEventListener('DOMContentLoaded', () => { updatePreview('name', churchNameInput.value); updatePreview('email', emailInput.value); updatePreview('type', typeInput.value); updatePreview('expiry', expirySelect.value); }); </script><style> /* Notification Styles */ .notification { position: fixed; top: 20px; right: 20px; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); padding: 1.25rem; display: flex; align-items: center; gap: 1rem; max-width: 400px; z-index: 9999; transform: translateX(calc(100% + 20px)); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-left: 4px solid var(--primary); } .notification.show { transform: translateX(0); } .notification-success { border-left-color: var(--success); } .notification-error { border-left-color: var(--danger); } .notification-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(80, 34, 45, 0.1); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; flex-shrink: 0; } .notification-success .notification-icon { background: rgba(40, 167, 69, 0.1); color: var(--success); } .notification-error .notification-icon { background: rgba(220, 53, 69, 0.1); color: var(--danger); } .notification-content { flex: 1; } .notification-content p { margin: 0; color: var(--text-dark); font-size: 0.95rem; line-height: 1.5; } .notification-close { background: none; border: none; color: var(--text-light); font-size: 1rem; cursor: pointer; padding: 0.25rem; transition: color 0.3s ease; } .notification-close:hover { color: var(--text-dark); } /* Animation for progress steps */ @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(80, 34, 45, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(80, 34, 45, 0); } } .progress-step.completed .step-indicator { animation: pulse 0.6s ease; background: var(--success); border-color: var(--success); } .progress-step.completed .step-check { opacity: 1; } .progress-step.completed .step-number { opacity: 0; } /* Focus styles for accessibility */ .modern-input:focus, .modern-textarea:focus, .modern-select:focus, .type-option:focus { outline: 2px solid var(--primary); outline-offset: 2px; } /* Loading animation for form submission */ @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .button-loader i { animation: spin 1s linear infinite; } </style>
+
+{{end}}

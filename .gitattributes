@@ -1,0 +1,29 @@
+# Normalize line endings to LF in the repository; check out as-is on Windows.
+* text=auto eol=lf
+
+# Go source
+*.go text eol=lf
+
+# Templates and web assets
+*.gohtml text eol=lf
+*.html   text eol=lf
+*.css    text eol=lf
+*.js     text eol=lf
+
+# Config / data
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+*.mod    text eol=lf
+*.sum    text eol=lf
+*.md     text eol=lf
+*.env    text eol=lf
+
+# Binaries — never convert
+*.exe    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.webp   binary

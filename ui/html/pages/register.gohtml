@@ -1,0 +1,819 @@
+{{define "title"}}Create Your Church Account | FaithConnect{{end}}
+
+{{define "description"}}Join FaithConnect to manage your church community. Register now to access powerful tools for administration, member management, and spiritual growth.{{end}}
+
+{{define "main"}}
+<div class="container">
+    <div class="columns is-centered is-vcentered min-vh-80">
+        <div class="column is-8-tablet is-6-desktop is-5-widescreen">
+            <!-- Registration Card -->
+            <div class="card has-gradient-border animate__animated animate__fadeInUp">
+                <div class="card-content p-6">
+                    <!-- Header Section -->
+                    <div class="has-text-centered mb-6">
+                        <div class="mb-4">
+                            <span class="icon is-large has-text-primary mb-3">
+
+                                <!-- Replace with your church logo -->
+                                <img src="/static/img/abc_filter.png" alt="Ascension Baptist Church Logo" class="church-logo">
+                                <!-- Fallback icon if logo not available -->
+{{/*                                <div class="logo-fallback">*/}}
+{{/*                                    <i class="fas fa-church"></i>*/}}
+{{/*                                </div>*/}}
+
+                            </span>
+                            <h1 class="title has-text-primary is-size-3">
+                                ASCENSION BAPTIST CHURCH - GHANA
+                            </h1>
+                            <p class="subtitle has-text-dark is-size-6 mt-2">
+                                Create your church administration account
+                            </p>
+                        </div>
+
+                        <!-- Progress Steps -->
+                        <div class="steps mb-5">
+                            <div class="steps-content">
+                                <div class="steps-item is-active is-primary">
+                                    <div class="steps-marker">
+                                        <span class="icon">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                    </div>
+                                    <div class="steps-details">
+                                        <p class="steps-title">Account</p>
+                                    </div>
+                                </div>
+                                <div class="steps-item">
+                                    <div class="steps-marker">
+                                        <span class="icon">
+                                            <i class="fas fa-church"></i>
+                                        </span>
+                                    </div>
+                                    <div class="steps-details">
+                                        <p class="steps-title">Church</p>
+                                    </div>
+                                </div>
+                                <div class="steps-item">
+                                    <div class="steps-marker">
+                                        <span class="icon">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    </div>
+                                    <div class="steps-details">
+                                        <p class="steps-title">Complete</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <form id="registerForm" action="/register" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                        <input type="hidden" name="registration_token" value="{{with .Form}}{{.RegistrationToken}}{{end}}">
+                        <!-- Account Type Selection -->
+                        <div class="field mb-5">
+                            <label class="label has-text-primary is-size-5 mb-4">
+                                I am registering as:
+                            </label>
+                            <div class="control">
+                                <div class="columns is-multiline">
+                                    <div class="column is-6">
+                                        <input type="radio" name="account_type" id="new_church" value="new_church" class="is-hidden" checked>
+                                        <label for="new_church" class="radio-card">
+                                            <div class="radio-card-content has-text-centered">
+                                                <span class="icon is-large mb-3">
+                                                    <i class="fas fa-plus-circle fa-2x has-text-primary"></i>
+                                                </span>
+                                                <h4 class="title is-size-5 has-text-primary mb-2">New Church</h4>
+                                                <p class="has-text-dark">Start a new church profile</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="column is-6">
+                                        <input type="radio" name="account_type" id="branch_church" value="branch_church" class="is-hidden">
+                                        <label for="branch_church" class="radio-card">
+                                            <div class="radio-card-content has-text-centered">
+                                                <span class="icon is-large mb-3">
+                                                    <i class="fas fa-code-branch fa-2x has-text-secondary"></i>
+                                                </span>
+                                                <h4 class="title is-size-5 has-text-secondary mb-2">Branch Church</h4>
+                                                <p class="has-text-dark">Join existing network</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="mb-5">
+                            <h3 class="title is-size-4 has-text-primary mb-4">
+                                <span class="icon-text">
+                                    <span class="icon">
+                                        <i class="fas fa-user-circle"></i>
+                                    </span>
+                                    <span>Personal Information</span>
+                                </span>
+                            </h3>
+
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">First Name *</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="text" name="first_name" placeholder="John" required>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-user has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Last Name *</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="text" name="last_name" placeholder="Doe" required>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-user has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="column is-12">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Email Address *</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="email" name="email"
+                                                   value="{{with .Form}}{{.Email}}{{end}}"
+                                                   placeholder="pastor@yourchurch.org"
+                                                   readonly style="background:#f8f9fa;cursor:not-allowed" required>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-envelope has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                        <p class="help has-text-support-blue">
+                                            <i class="fas fa-lock" style="font-size:0.75rem"></i>
+                                            This email was set by the invitation — it will be your login username
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Phone Number</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="tel" name="phone" placeholder="+1 (555) 123-4567">
+                                            <span class="icon is-left">
+                                                <i class="fas fa-phone has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Role *</label>
+                                        <div class="control has-icons-left">
+                                            <div class="select is-fullwidth">
+                                                <select name="role" required>
+                                                    <option value="" disabled selected>Select your role</option>
+                                                    <option value="pastor">Pastor</option>
+                                                    <option value="admin">Church Administrator</option>
+                                                    <option value="elder">Elder</option>
+                                                    <option value="deacon">Deacon</option>
+                                                    <option value="secretary">Church Secretary</option>
+                                                    <option value="other">Other Ministry Leader</option>
+                                                </select>
+                                            </div>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-user-tag has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Section -->
+                        <div class="mb-5">
+                            <h3 class="title is-size-4 has-text-primary mb-4">
+                                <span class="icon-text">
+                                    <span class="icon">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </span>
+                                    <span>Security</span>
+                                </span>
+                            </h3>
+
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Password *</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="password" name="password" id="password" placeholder="Create strong password" required>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-lock has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                        <div class="password-strength mt-2">
+                                            <progress class="progress is-small" value="0" max="100"></progress>
+                                            <p class="help has-text-dark">Password strength: <span id="strength-text">Weak</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="column is-6">
+                                    <div class="field">
+                                        <label class="label has-text-primary">Confirm Password *</label>
+                                        <div class="control has-icons-left">
+                                            <input class="input" type="password" name="confirm_password" id="confirm_password" placeholder="Repeat password" required>
+                                            <span class="icon is-left">
+                                                <i class="fas fa-lock has-text-primary"></i>
+                                            </span>
+                                        </div>
+                                        <p class="help has-text-dark" id="password-match"></p>
+                                    </div>
+                                </div>
+
+                                <div class="column is-12">
+                                    <div class="box has-background-light-bg">
+                                        <div class="content is-small">
+                                            <h6 class="has-text-primary mb-2">Password Requirements:</h6>
+                                            <ul class="requirements-list">
+                                                <li class="requirement" data-requirement="length">
+                                                    <span class="icon-text">
+                                                        <span class="icon">
+                                                            <i class="fas fa-check-circle has-text-success"></i>
+                                                        </span>
+                                                        <span>At least 8 characters</span>
+                                                    </span>
+                                                </li>
+                                                <li class="requirement" data-requirement="uppercase">
+                                                    <span class="icon-text">
+                                                        <span class="icon">
+                                                            <i class="fas fa-check-circle has-text-success"></i>
+                                                        </span>
+                                                        <span>One uppercase letter</span>
+                                                    </span>
+                                                </li>
+                                                <li class="requirement" data-requirement="lowercase">
+                                                    <span class="icon-text">
+                                                        <span class="icon">
+                                                            <i class="fas fa-check-circle has-text-success"></i>
+                                                        </span>
+                                                        <span>One lowercase letter</span>
+                                                    </span>
+                                                </li>
+                                                <li class="requirement" data-requirement="number">
+                                                    <span class="icon-text">
+                                                        <span class="icon">
+                                                            <i class="fas fa-check-circle has-text-success"></i>
+                                                        </span>
+                                                        <span>One number</span>
+                                                    </span>
+                                                </li>
+                                                <li class="requirement" data-requirement="special">
+                                                    <span class="icon-text">
+                                                        <span class="icon">
+                                                            <i class="fas fa-check-circle has-text-success"></i>
+                                                        </span>
+                                                        <span>One special character</span>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="field mb-6">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="terms" required>
+                                    <span class="has-text-dark">
+                                        I agree to the
+                                        <a href="/terms" class="has-text-primary has-text-weight-semibold">Terms of Service</a>
+                                        and
+                                        <a href="/privacy" class="has-text-primary has-text-weight-semibold">Privacy Policy</a>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-primary is-fullwidth is-large has-gradient" id="submitBtn">
+                                    <span class="icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </span>
+                                    <span>Create Account</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="has-text-centered my-5">
+                            <span class="has-text-dark">or</span>
+                        </div>
+
+                        <!-- Alternative Options -->
+                        <div class="has-text-centered">
+                            <p class="has-text-dark mb-3">
+                                Already have an account?
+                                <a href="/login" class="has-text-primary has-text-weight-semibold">Sign In</a>
+                            </p>
+                            <p class="has-text-support-blue is-size-7">
+                                Received an invitation?
+                                <a href="/invite/accept" class="has-text-support-purple has-text-weight-semibold">Click here</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="mt-6">
+                <h3 class="title is-size-4 has-text-centered has-text-primary mb-5">
+                    Why Join FaithConnect?
+                </h3>
+                <div class="columns is-multiline">
+                    <div class="column is-4">
+                        <div class="feature-card has-text-centered">
+                            <span class="icon is-large has-text-support-blue mb-3">
+                                <i class="fas fa-users fa-2x"></i>
+                            </span>
+                            <h4 class="title is-size-5 has-text-primary">Member Management</h4>
+                            <p class="has-text-dark">Organize your congregation efficiently</p>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="feature-card has-text-centered">
+                            <span class="icon is-large has-text-support-pink mb-3">
+                                <i class="fas fa-calendar-alt fa-2x"></i>
+                            </span>
+                            <h4 class="title is-size-5 has-text-primary">Event Planning</h4>
+                            <p class="has-text-dark">Schedule services and events</p>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="feature-card has-text-centered">
+                            <span class="icon is-large has-text-support-purple mb-3">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </span>
+                            <h4 class="title is-size-5 has-text-primary">Growth Analytics</h4>
+                            <p class="has-text-dark">Track your ministry's impact</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-80 {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        padding: 3rem 0;
+    }
+
+    .p-6 {
+        padding: 3rem !important;
+    }
+
+    /* Radio Card Styling */
+    .radio-card {
+        display: block;
+        border: 2px solid var(--light-gray);
+        border-radius: 10px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100%;
+        background: var(--white);
+    }
+
+    .radio-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 90, 255, 0.1);
+    }
+
+    input[type="radio"]:checked + .radio-card {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(160, 90, 255, 0.05) 0%, rgba(27, 207, 180, 0.05) 100%);
+        box-shadow: 0 5px 20px rgba(160, 90, 255, 0.15);
+    }
+
+    input[type="radio"]:checked + .radio-card .icon {
+        animation: pulse 0.6s ease;
+    }
+
+    /* Steps Styling */
+    .steps {
+        position: relative;
+    }
+
+    .steps-content {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .steps-item {
+        flex: 1;
+        position: relative;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .steps-marker {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--light-gray);
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        transition: all 0.3s ease;
+        border: 3px solid var(--white);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .steps-item.is-active .steps-marker {
+        background: var(--primary);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(160, 90, 255, 0.3);
+    }
+
+    .steps-item:not(.is-active) .steps-marker {
+        background: var(--medium-gray);
+    }
+
+    .steps-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+    }
+
+    .steps-item.is-active .steps-title {
+        color: var(--primary);
+    }
+
+    /* Progress bar between steps */
+    .steps-content::before {
+        content: '';
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        right: 25px;
+        height: 3px;
+        background: var(--light-gray);
+        z-index: 1;
+    }
+
+    /* Password Strength */
+    .password-strength .progress {
+        height: 6px;
+        margin-bottom: 5px;
+    }
+
+    .password-strength .progress::-webkit-progress-value {
+        transition: width 0.3s ease;
+    }
+
+    /* Requirements List */
+    .requirements-list {
+        list-style: none;
+        margin-left: 0;
+    }
+
+    .requirement {
+        margin-bottom: 5px;
+        padding: 2px 0;
+    }
+
+    .requirement .icon {
+        transition: all 0.3s ease;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        padding: 1.5rem;
+        border-radius: 10px;
+        background: var(--white);
+        border: 1px solid var(--light-gray);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(160, 90, 255, 0.1);
+        border-color: var(--primary);
+    }
+
+    /* Button Gradient */
+    .button.has-gradient {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--support-purple) 100%);
+        color: var(--white);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .button.has-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(160, 90, 255, 0.3);
+    }
+
+    /* Form Focus Effects */
+    .input:focus, .select select:focus {
+        box-shadow: 0 0 0 0.2em rgba(160, 90, 255, 0.2);
+        border-color: var(--primary);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .animate__animated {
+        animation-duration: 0.6s;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .p-6 {
+            padding: 2rem 1.5rem !important;
+        }
+
+        .steps-marker {
+            width: 40px;
+            height: 40px;
+        }
+
+        .steps-content::before {
+            top: 20px;
+        }
+
+        .radio-card {
+            padding: 1rem;
+        }
+
+        .feature-card {
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* Loading State */
+    .button.is-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+    .button.is-loading::after {
+        position: absolute;
+        left: calc(50% - 0.5em);
+        top: calc(50% - 0.5em);
+        animation: spinAround 0.5s infinite linear;
+        border: 2px solid var(--white);
+        border-radius: 290486px;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        content: "";
+        display: block;
+        height: 1em;
+        width: 1em;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const passwordMatch = document.getElementById('password-match');
+    const strengthText = document.getElementById('strength-text');
+    const progressBar = document.querySelector('.password-strength .progress');
+    const requirements = document.querySelectorAll('.requirement');
+    const submitBtn = document.getElementById('submitBtn');
+    const accountTypeRadios = document.querySelectorAll('input[name="account_type"]');
+
+    // Password strength checker
+    function checkPasswordStrength(pass) {
+        let strength = 0;
+        const requirementsMet = {
+            length: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            special: false
+        };
+
+        // Length requirement
+        if (pass.length >= 8) {
+            strength += 20;
+            requirementsMet.length = true;
+        }
+
+        // Uppercase letter
+        if (/[A-Z]/.test(pass)) {
+            strength += 20;
+            requirementsMet.uppercase = true;
+        }
+
+        // Lowercase letter
+        if (/[a-z]/.test(pass)) {
+            strength += 20;
+            requirementsMet.lowercase = true;
+        }
+
+        // Number
+        if (/[0-9]/.test(pass)) {
+            strength += 20;
+            requirementsMet.number = true;
+        }
+
+        // Special character
+        if (/[^A-Za-z0-9]/.test(pass)) {
+            strength += 20;
+            requirementsMet.special = true;
+        }
+
+        // Update progress bar
+        progressBar.value = strength;
+
+        // Update strength text
+        if (strength <= 40) {
+            strengthText.textContent = 'Weak';
+            strengthText.className = 'has-text-danger';
+            progressBar.className = 'progress is-small is-danger';
+        } else if (strength <= 80) {
+            strengthText.textContent = 'Medium';
+            strengthText.className = 'has-text-warning';
+            progressBar.className = 'progress is-small is-warning';
+        } else {
+            strengthText.textContent = 'Strong';
+            strengthText.className = 'has-text-success';
+            progressBar.className = 'progress is-small is-success';
+        }
+
+        // Update requirement indicators
+        Object.keys(requirementsMet).forEach(key => {
+            const requirementElement = document.querySelector(`.requirement[data-requirement="${key}"]`);
+            const icon = requirementElement.querySelector('.icon i');
+            if (requirementsMet[key]) {
+                icon.className = 'fas fa-check-circle has-text-success';
+            } else {
+                icon.className = 'fas fa-times-circle has-text-danger';
+            }
+        });
+
+        return strength;
+    }
+
+    // Check password match
+    function checkPasswordMatch() {
+        if (confirmPassword.value === '') {
+            passwordMatch.textContent = '';
+            passwordMatch.className = 'help has-text-dark';
+            return;
+        }
+
+        if (password.value === confirmPassword.value) {
+            passwordMatch.textContent = 'Passwords match!';
+            passwordMatch.className = 'help has-text-success';
+        } else {
+            passwordMatch.textContent = 'Passwords do not match';
+            passwordMatch.className = 'help has-text-danger';
+        }
+    }
+
+    // Real-time password validation
+    password.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+        checkPasswordMatch();
+    });
+
+    confirmPassword.addEventListener('input', checkPasswordMatch);
+
+    // Account type selection animation
+    accountTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const labels = document.querySelectorAll('.radio-card');
+            labels.forEach(label => {
+                label.style.transform = 'translateY(0)';
+            });
+
+            const selectedLabel = document.querySelector(`label[for="${this.id}"]`);
+            selectedLabel.style.transform = 'translateY(-5px)';
+
+            // Show appropriate message
+            if (this.value === 'branch_church') {
+                showPrimary('You will need an invitation code from your headquarters');
+            }
+        });
+    });
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Validate password match
+        if (password.value !== confirmPassword.value) {
+            showDanger('Passwords do not match');
+            confirmPassword.focus();
+            return;
+        }
+
+        // Validate password strength
+        if (checkPasswordStrength(password.value) < 60) {
+            showDanger('Please use a stronger password');
+            password.focus();
+            return;
+        }
+
+        // Validate terms
+        if (!form.terms.checked) {
+            showDanger('Please agree to the terms and conditions');
+            return;
+        }
+
+        // Show loading state
+        submitBtn.classList.add('is-loading');
+        submitBtn.disabled = true;
+
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // In real implementation, you would submit the form
+            // form.submit();
+
+            // For demo, show success
+            showSuccess('Account created successfully! Redirecting...');
+
+            // Redirect after success
+            setTimeout(() => {
+                window.location.href = '/register/church-info';
+            }, 2000);
+
+        } catch (error) {
+            showDanger('Registration failed. Please try again.');
+            submitBtn.classList.remove('is-loading');
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Toast notification functions
+    function showSuccess(message) {
+        bulmaToast.toast({
+            message: message,
+            type: 'is-success',
+            duration: 3000,
+            position: 'top-center',
+            animate: { in: 'fadeIn', out: 'fadeOut' }
+        });
+    }
+
+    function showPrimary(message) {
+        bulmaToast.toast({
+            message: message,
+            type: 'is-primary',
+            duration: 4000,
+            position: 'top-center',
+            animate: { in: 'fadeIn', out: 'fadeOut' }
+        });
+    }
+
+    function showDanger(message) {
+        bulmaToast.toast({
+            message: message,
+            type: 'is-danger',
+            duration: 5000,
+            position: 'top-center',
+            animate: { in: 'fadeIn', out: 'fadeOut' }
+        });
+    }
+
+    // Initialize with some animations
+    const steps = document.querySelectorAll('.steps-item');
+    steps.forEach((step, index) => {
+        step.style.animationDelay = `${index * 0.2}s`;
+    });
+});
+</script>
+{{end}}

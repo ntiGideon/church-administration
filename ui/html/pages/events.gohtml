@@ -1,0 +1,226 @@
+{{define "title"}}Events | FaithConnect{{end}}
+{{define "description"}}Manage your church events and services{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text"><i class="fas fa-calendar-alt mr-2 has-text-primary"></i>Events</h1>
+            <p class="page-subtitle-text">Schedule and manage all church events</p>
+        </div>
+        <div class="header-actions">
+            <a href="/events/new" class="button is-primary">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                <span>Create Event</span>
+            </a>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
+    <!-- Filter Bar -->
+    <div class="filter-bar mb-5">
+        <div class="search-box">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="eventSearch" placeholder="Search events..." class="search-input-field">
+        </div>
+        <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="service">Services</button>
+            <button class="filter-pill" data-filter="meeting">Meetings</button>
+            <button class="filter-pill" data-filter="conference">Conferences</button>
+            <button class="filter-pill" data-filter="outreach">Outreach</button>
+        </div>
+    </div>
+
+    {{$events := index .Data "events"}}
+    {{if $events}}
+    <div class="events-list" id="eventsContainer">
+        {{range $events}}
+        <a href="/events/{{.ID}}" class="event-card" data-type="{{.EventType}}">
+            <div class="event-date-col">
+                <div class="event-date-box">
+                    <span class="ev-day">{{.StartTime.Day}}</span>
+                    <span class="ev-month">{{.StartTime.Format "Jan"}}</span>
+                    <span class="ev-year">{{.StartTime.Year}}</span>
+                </div>
+            </div>
+            <div class="event-details">
+                <div class="event-top-row">
+                    <span class="ev-type-badge ev-{{.EventType}}">{{.EventType}}</span>
+                    {{if .IsPublished}}
+                    <span class="ev-published"><i class="fas fa-globe-africa"></i> Published</span>
+                    {{else}}
+                    <span class="ev-draft"><i class="fas fa-lock"></i> Draft</span>
+                    {{end}}
+                </div>
+                <h3 class="ev-title">{{.Title}}</h3>
+                <p class="ev-desc">{{.Description}}</p>
+                <div class="ev-meta-row">
+                    <span><i class="fas fa-map-marker-alt"></i> {{.Location}}</span>
+                    <span><i class="fas fa-clock"></i> {{.StartTime.Format "3:04 PM"}} – {{.EndTime.Format "3:04 PM"}}</span>
+                    <span><i class="fas fa-users"></i> {{.AttendanceCount}} attended</span>
+                </div>
+            </div>
+            <div class="event-action">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-page-state">
+        <div class="empty-icon"><i class="fas fa-calendar-plus"></i></div>
+        <h3>No events scheduled</h3>
+        <p>Create your first event to get started.</p>
+        <a href="/events/new" class="button is-primary mt-4">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Create First Event</span>
+        </a>
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle-text { color: var(--text-light); margin: 4px 0 0; font-size: 0.9rem; }
+
+.filter-bar { display: flex; align-items: center; gap: 1rem; background: white; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--light-gray); flex-wrap: wrap; }
+.search-box { position: relative; flex: 1; min-width: 200px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+.search-input-field { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.9rem; outline: none; }
+.search-input-field:focus { border-color: var(--primary); }
+.filter-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-pill { padding: 0.4rem 1rem; border-radius: 20px; border: 1.5px solid var(--light-gray); background: none; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.filter-pill.active, .filter-pill:hover { background: var(--primary); border-color: var(--primary); color: white; }
+
+/* Events list */
+.events-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.event-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--light-gray);
+    display: flex;
+    align-items: stretch;
+    text-decoration: none;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.event-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 20px rgba(80,34,45,0.1);
+    transform: translateX(4px);
+}
+
+.event-date-col {
+    width: 90px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 1rem;
+}
+
+.event-date-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.ev-day { font-size: 2rem; font-weight: 800; line-height: 1; }
+.ev-month { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+.ev-year { font-size: 0.65rem; opacity: 0.7; margin-top: 2px; }
+
+.event-details { flex: 1; padding: 1.2rem 1.5rem; min-width: 0; }
+
+.event-top-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+
+.ev-type-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+}
+
+.ev-service { background: rgba(80,34,45,0.1); color: var(--primary); }
+.ev-meeting { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.ev-conference { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.ev-outreach { background: rgba(212,165,165,0.2); color: #8B4A4A; }
+.ev-training { background: rgba(40,167,69,0.1); color: #28A745; }
+
+.ev-published { font-size: 0.75rem; color: #28A745; }
+.ev-draft { font-size: 0.75rem; color: var(--text-light); }
+
+.ev-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin: 0 0 0.4rem 0; }
+.ev-desc { font-size: 0.85rem; color: var(--text-light); margin: 0 0 0.8rem 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.ev-meta-row { display: flex; gap: 1.5rem; font-size: 0.8rem; color: var(--text-light); flex-wrap: wrap; }
+.ev-meta-row span { display: flex; align-items: center; gap: 5px; }
+
+.event-action {
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.empty-page-state { text-align: center; padding: 4rem 2rem; background: white; border-radius: 14px; border: 1px solid var(--light-gray); }
+.empty-icon { font-size: 3.5rem; color: var(--medium-gray); margin-bottom: 1rem; }
+.empty-page-state h3 { font-size: 1.3rem; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-page-state p { color: var(--text-light); font-size: 0.9rem; }
+
+@media (max-width: 600px) {
+    .event-date-col { width: 70px; }
+    .ev-day { font-size: 1.5rem; }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('eventSearch');
+    const cards = document.querySelectorAll('.event-card');
+    const pills = document.querySelectorAll('.filter-pill');
+    let currentFilter = 'all';
+
+    function filterEvents() {
+        const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        cards.forEach(function (card) {
+            const type = card.dataset.type || '';
+            const text = card.textContent.toLowerCase();
+            const matchFilter = currentFilter === 'all' || type === currentFilter;
+            const matchSearch = q === '' || text.includes(q);
+            card.style.display = (matchFilter && matchSearch) ? '' : 'none';
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterEvents);
+
+    pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+            pills.forEach(function (p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            filterEvents();
+        });
+    });
+
+    document.querySelectorAll('.notification .delete').forEach(function (btn) {
+        btn.addEventListener('click', function () { this.closest('.notification').remove(); });
+    });
+});
+</script>
+{{end}}

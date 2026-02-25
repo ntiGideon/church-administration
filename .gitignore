@@ -1,0 +1,42 @@
+# ── Compiled binaries ────────────────────────────────────────────────────────
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+web
+seed
+
+# ── Test output ───────────────────────────────────────────────────────────────
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE / editor ──────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+
+# ── Claude Code local config ──────────────────────────────────────────────────
+.claude/
+
+# ── OS generated ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Go workspace / module cache (if ever used locally) ───────────────────────
+/vendor/
+go.work
+go.work.sum
+
+# ── Temporary files ───────────────────────────────────────────────────────────
+tmp/
+*.tmp
+*.log

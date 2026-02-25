@@ -1,0 +1,161 @@
+{{define "title"}}Member Profile | FaithConnect{{end}}
+{{define "description"}}View member profile details{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    {{$member := index .Data "member"}}
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/members">Members</a> <i class="fas fa-chevron-right"></i>
+                <span>Profile</span>
+            </nav>
+            <h1 class="page-title-text">Member Profile</h1>
+        </div>
+        <a href="/members" class="button is-outlined">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Back to Members</span>
+        </a>
+    </div>
+
+    {{if $member}}
+    <div class="profile-layout">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="profile-hero">
+                <div class="profile-avatar-lg">
+                    {{if $member.Edges.Contact}}
+                        {{if $member.Edges.Contact.ProfilePictureURL}}
+                        <img src="{{$member.Edges.Contact.ProfilePictureURL}}" alt="Profile">
+                        {{else}}
+                        <div class="avatar-initials-lg">
+                            {{slice $member.Edges.Contact.FirstName 0 1}}{{slice $member.Edges.Contact.LastName 0 1}}
+                        </div>
+                        {{end}}
+                    {{else}}
+                    <div class="avatar-initials-lg">?</div>
+                    {{end}}
+                </div>
+                <div class="profile-hero-info">
+                    {{if $member.Edges.Contact}}
+                    <h2>{{$member.Edges.Contact.FirstName}} {{$member.Edges.Contact.LastName}}</h2>
+                    <p class="profile-email">{{$member.Email}}</p>
+                    {{else}}
+                    <h2>{{$member.Email}}</h2>
+                    {{end}}
+                    <div class="member-role-badge role-{{$member.Role}} mt-2">{{$member.Role}}</div>
+                </div>
+            </div>
+
+            <div class="profile-details-grid">
+                {{if $member.Edges.Contact}}
+                {{$c := $member.Edges.Contact}}
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
+                    <span class="detail-value">{{if $c.Phone}}{{$c.Phone}}{{else}}—{{end}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                    <span class="detail-value">{{if $c.Gender}}{{$c.Gender}}{{else}}—{{end}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-briefcase"></i> Occupation</span>
+                    <span class="detail-value">{{if $c.Occupation}}{{$c.Occupation}}{{else}}—{{end}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Location</span>
+                    <span class="detail-value">
+                        {{if $c.City}}{{$c.City}}{{if $c.Country}}, {{$c.Country}}{{end}}{{else}}—{{end}}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-ring"></i> Marital Status</span>
+                    <span class="detail-value">{{if $c.MaritalStatus}}{{$c.MaritalStatus}}{{else}}—{{end}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label"><i class="fas fa-calendar-alt"></i> Joined</span>
+                    <span class="detail-value">{{$member.CreatedAt.Format "Jan 2, 2006"}}</span>
+                </div>
+                {{end}}
+            </div>
+
+            <div class="profile-status">
+                <div class="status-row">
+                    {{if $member.IsActive}}
+                    <span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>
+                    {{else}}
+                    <span class="status-badge inactive"><i class="fas fa-times-circle"></i> Inactive</span>
+                    {{end}}
+
+                    {{if $.IsAuthenticated}}
+                    {{if $.LoggedInUser}}
+                        {{$role := $.LoggedInUser.Role.String}}
+                        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+                        {{if $member.IsActive}}
+                        <form action="/members/{{$member.ID}}/deactivate" method="POST" style="margin:0"
+                              onsubmit="return confirm('Deactivate this member? They will lose access to the system.')">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <button type="submit" class="button is-danger is-small is-outlined">
+                                <span class="icon"><i class="fas fa-user-slash"></i></span>
+                                <span>Deactivate Member</span>
+                            </button>
+                        </form>
+                        {{end}}
+                        {{end}}
+                    {{end}}
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+
+.profile-card { background: white; border-radius: 16px; border: 1px solid var(--light-gray); overflow: hidden; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+.profile-hero { display: flex; align-items: center; gap: 1.5rem; padding: 2rem; background: linear-gradient(135deg, rgba(80,34,45,0.04), rgba(196,195,208,0.06)); border-bottom: 1px solid var(--light-gray); }
+
+.profile-avatar-lg img, .avatar-initials-lg {
+    width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+}
+.avatar-initials-lg {
+    background: linear-gradient(135deg, var(--primary), #6B2F3D);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.8rem; text-transform: uppercase;
+}
+.profile-hero-info h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.profile-email { color: var(--text-light); font-size: 0.9rem; margin: 4px 0 0; }
+
+.profile-details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 2rem; }
+
+.detail-item { display: flex; flex-direction: column; gap: 4px; }
+.detail-label { font-size: 0.78rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.detail-label i { color: var(--primary); width: 14px; }
+.detail-value { font-size: 0.95rem; font-weight: 600; color: var(--text-dark); text-transform: capitalize; }
+
+.profile-status { padding: 1rem 2rem; border-top: 1px solid var(--light-gray); background: rgba(248,249,250,0.5); }
+.status-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.status-badge.active { background: rgba(40,167,69,0.1); color: #28A745; }
+.status-badge.inactive { background: rgba(220,53,69,0.1); color: #DC3545; }
+
+.member-role-badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; text-transform: capitalize; }
+.role-super_admin { background: rgba(80,34,45,0.1); color: var(--primary); }
+.role-branch_admin { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.role-pastor { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.role-secretary { background: rgba(212,165,165,0.15); color: #8B4A4A; }
+.role-member { background: rgba(108,117,125,0.1); color: #6C757D; }
+
+@media (max-width: 600px) {
+    .profile-details-grid { grid-template-columns: repeat(2, 1fr); }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+{{end}}

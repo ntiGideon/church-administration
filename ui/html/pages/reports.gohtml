@@ -1,0 +1,341 @@
+{{define "title"}}Reports & Analytics | FaithConnect{{end}}
+{{define "description"}}View church statistics, financial summaries, and member reports{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">Reports & Analytics</h1>
+            <p class="page-subtitle-text">Overview of church activity, finances, and membership</p>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
+    <!-- Top Stats Row -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon members">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{index .Data "memberCount"}}</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon events">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{index .Data "eventCount"}}</div>
+                <div class="stat-label">Total Events</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon income">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">GHS {{printf "%.2f" (index .Data "totalIncome")}}</div>
+                <div class="stat-label">Total Income</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon balance">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">GHS {{printf "%.2f" (index .Data "netBalance")}}</div>
+                <div class="stat-label">Net Balance</div>
+            </div>
+        </div>
+        {{if index .Data "churchCount"}}
+        <div class="stat-card">
+            <div class="stat-icon churches">
+                <i class="fas fa-church"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{index .Data "churchCount"}}</div>
+                <div class="stat-label">Churches in Network</div>
+            </div>
+        </div>
+        {{end}}
+        <div class="stat-card">
+            <div class="stat-icon attendance">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{index .Data "totalAttendance"}}</div>
+                <div class="stat-label">Total Event Attendance</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reports-body">
+        <!-- Left column -->
+        <div class="reports-left">
+
+            <!-- Finance Summary Card -->
+            <div class="report-card">
+                <div class="report-card-header">
+                    <h3><i class="fas fa-chart-pie mr-2"></i>Financial Summary</h3>
+                </div>
+                <div class="report-card-body">
+                    <div class="finance-row">
+                        <span class="f-label"><i class="fas fa-arrow-circle-up income-icon"></i> Total Income</span>
+                        <span class="f-value income">GHS {{printf "%.2f" (index .Data "totalIncome")}}</span>
+                    </div>
+                    <div class="finance-row">
+                        <span class="f-label"><i class="fas fa-arrow-circle-down expense-icon"></i> Total Expenses</span>
+                        <span class="f-value expense">GHS {{printf "%.2f" (index .Data "totalExpenses")}}</span>
+                    </div>
+                    <div class="finance-row total-row">
+                        <span class="f-label"><i class="fas fa-balance-scale balance-icon"></i> Net Balance</span>
+                        <span class="f-value balance">GHS {{printf "%.2f" (index .Data "netBalance")}}</span>
+                    </div>
+                    <div class="finance-divider"></div>
+                    <div class="finance-row">
+                        <span class="f-label"><i class="fas fa-calendar-check month-icon"></i> This Month Income</span>
+                        <span class="f-value income">GHS {{printf "%.2f" (index .Data "thisMonthIncome")}}</span>
+                    </div>
+                    <div class="finance-row">
+                        <span class="f-label"><i class="fas fa-calendar-times month-icon"></i> This Month Expenses</span>
+                        <span class="f-value expense">GHS {{printf "%.2f" (index .Data "thisMonthExpenses")}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Breakdown -->
+            <div class="report-card mt-3">
+                <div class="report-card-header">
+                    <h3><i class="fas fa-id-badge mr-2"></i>Member Role Breakdown</h3>
+                </div>
+                <div class="report-card-body">
+                    {{$roleCounts := index .Data "roleCounts"}}
+                    {{if $roleCounts}}
+                    {{range $role, $count := $roleCounts}}
+                    <div class="role-row">
+                        <span class="role-pill role-{{$role}}">{{$role}}</span>
+                        <div class="role-bar-wrap">
+                            <div class="role-bar" style="width: {{$count}}0%"></div>
+                        </div>
+                        <span class="role-count">{{$count}}</span>
+                    </div>
+                    {{end}}
+                    {{else}}
+                    <p class="empty-note">No member data available.</p>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: recent transactions -->
+        <div class="reports-right">
+            <div class="report-card">
+                <div class="report-card-header">
+                    <h3><i class="fas fa-receipt mr-2"></i>Recent Transactions</h3>
+                    <a href="/giving/donations" class="view-all-link">View all</a>
+                </div>
+                <div class="transactions-table-wrap">
+                    {{$txs := index .Data "recentTransactions"}}
+                    {{if $txs}}
+                    <table class="tx-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $txs}}
+                            <tr>
+                                <td class="tx-date">{{.TransactionDate.Format "Jan 2"}}</td>
+                                <td class="tx-desc">{{.Description}}</td>
+                                <td><span class="tx-type-badge tx-{{.TransactionType}}">{{.TransactionType}}</span></td>
+                                <td class="tx-amount text-right">GHS {{printf "%.2f" .Amount}}</td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                    {{else}}
+                    <div class="empty-state-sm">
+                        <i class="fas fa-receipt"></i>
+                        <p>No transactions recorded yet.</p>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { margin-bottom: 2rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle-text { color: var(--text-light); font-size: 0.9rem; margin-top: 4px; }
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.stat-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--light-gray);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.stat-icon.members  { background: rgba(80,34,45,0.1); color: var(--primary); }
+.stat-icon.events   { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.stat-icon.income   { background: rgba(40,167,69,0.1); color: #28A745; }
+.stat-icon.balance  { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.stat-icon.churches { background: rgba(255,193,7,0.15); color: #D6A000; }
+.stat-icon.attendance { background: rgba(23,162,184,0.12); color: #17A2B8; }
+.stat-value { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
+.stat-label { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+
+/* Reports Body */
+.reports-body { display: flex; gap: 1.5rem; align-items: flex-start; }
+.reports-left { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; }
+.reports-right { flex: 1; }
+.mt-3 { margin-top: 1rem; }
+
+/* Report Card */
+.report-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; }
+.report-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+.report-card-header h3 { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin: 0; }
+.view-all-link { font-size: 0.78rem; color: var(--primary); text-decoration: none; font-weight: 600; }
+.view-all-link:hover { text-decoration: underline; }
+.report-card-body { padding: 1.25rem; }
+
+/* Finance rows */
+.finance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+.finance-row:last-child { border-bottom: none; }
+.total-row { padding-top: 12px; }
+.finance-divider { height: 1px; background: var(--light-gray); margin: 6px 0; }
+.f-label { font-size: 0.83rem; color: var(--text-medium); display: flex; align-items: center; gap: 7px; }
+.f-label i { width: 14px; }
+.f-value { font-size: 0.88rem; font-weight: 700; }
+.f-value.income { color: #28A745; }
+.f-value.expense { color: #DC3545; }
+.f-value.balance { color: var(--primary); font-size: 1rem; }
+.income-icon { color: #28A745; }
+.expense-icon { color: #DC3545; }
+.balance-icon { color: var(--support-purple); }
+.month-icon { color: var(--text-light); }
+
+/* Role rows */
+.role-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+}
+.role-pill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 10px;
+    text-transform: capitalize;
+    white-space: nowrap;
+    min-width: 110px;
+    text-align: center;
+}
+.role-super_admin  { background: rgba(80,34,45,0.1); color: var(--primary); }
+.role-branch_admin { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.role-pastor       { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.role-secretary    { background: rgba(212,165,165,0.15); color: #8B4A4A; }
+.role-member       { background: rgba(108,117,125,0.1); color: #6C757D; }
+.role-finance_officer { background: rgba(40,167,69,0.1); color: #28A745; }
+.role-records_keeper  { background: rgba(23,162,184,0.12); color: #17A2B8; }
+
+.role-bar-wrap { flex: 1; height: 6px; background: var(--light-gray); border-radius: 3px; overflow: hidden; }
+.role-bar { height: 100%; background: linear-gradient(90deg, var(--primary), #8B4A5A); border-radius: 3px; min-width: 4px; }
+.role-count { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); min-width: 24px; text-align: right; }
+
+/* Transactions table */
+.transactions-table-wrap { overflow-x: auto; }
+.tx-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.tx-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--light-gray);
+    background: rgba(248,249,250,0.7);
+}
+.tx-table tbody tr { border-bottom: 1px solid var(--light-gray); transition: background 0.1s; }
+.tx-table tbody tr:last-child { border-bottom: none; }
+.tx-table tbody tr:hover { background: rgba(80,34,45,0.02); }
+.tx-table td { padding: 10px 14px; color: var(--text-medium); }
+.tx-date { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
+.tx-desc { font-weight: 500; color: var(--text-dark); }
+.tx-amount { font-weight: 700; color: var(--text-dark); white-space: nowrap; }
+.text-right { text-align: right; }
+.tx-type-badge { font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: capitalize; }
+.tx-donation  { background: rgba(40,167,69,0.1); color: #28A745; }
+.tx-tithe     { background: rgba(80,34,45,0.1); color: var(--primary); }
+.tx-offering  { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.tx-expense   { background: rgba(220,53,69,0.1); color: #DC3545; }
+.tx-salary    { background: rgba(255,193,7,0.15); color: #D6A000; }
+
+.empty-state-sm {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+}
+.empty-state-sm i { font-size: 2rem; opacity: 0.3; margin-bottom: 0.5rem; display: block; }
+.empty-state-sm p { font-size: 0.9rem; }
+.empty-note { color: var(--text-light); font-size: 0.85rem; text-align: center; padding: 1rem 0; }
+
+@media (max-width: 900px) {
+    .reports-body { flex-direction: column; }
+    .reports-left { width: 100%; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .page-wrapper { padding: 1rem; }
+}
+@media (max-width: 500px) {
+    .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+{{end}}

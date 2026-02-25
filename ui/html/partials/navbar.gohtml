@@ -1,0 +1,395 @@
+{{define "nav"}}
+<nav class="app-navbar">
+    <div class="navbar-inner">
+        <!-- Brand -->
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon">
+                <img src="/static/img/abc_filter.png" alt="Logo">
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">Ascension Baptist</span>
+                <span class="brand-sub">Church Management</span>
+            </div>
+        </a>
+
+        {{if .IsAuthenticated}}
+        <!-- Primary Nav Links -->
+        <div class="navbar-links" id="navLinks">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-th-large"></i><span>Dashboard</span>
+            </a>
+            <a href="/members" class="nav-link">
+                <i class="fas fa-users"></i><span>Members</span>
+            </a>
+            <a href="/events" class="nav-link">
+                <i class="fas fa-calendar-alt"></i><span>Events</span>
+            </a>
+            <a href="/giving/donations" class="nav-link">
+                <i class="fas fa-hand-holding-heart"></i><span>Giving</span>
+            </a>
+            <a href="/announcements" class="nav-link">
+                <i class="fas fa-bullhorn"></i><span>Notices</span>
+            </a>
+            <a href="/reports" class="nav-link">
+                <i class="fas fa-chart-bar"></i><span>Reports</span>
+            </a>
+            {{if .LoggedInUser}}
+                {{$role := .LoggedInUser.Role.String}}
+                {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+                <a href="/admin/churches" class="nav-link">
+                    <i class="fas fa-network-wired"></i><span>Network</span>
+                </a>
+                {{end}}
+            {{end}}
+        </div>
+
+        <!-- Right Side -->
+        <div class="navbar-right">
+            <!-- User Menu -->
+            <div class="user-menu" id="userMenu">
+                <button class="user-trigger" id="userTrigger">
+                    <div class="user-avatar">
+                        {{if .LoggedInUser}}
+                            {{if .LoggedInUser.Edges.Contact}}
+                                {{slice .LoggedInUser.Edges.Contact.FirstName 0 1}}{{slice .LoggedInUser.Edges.Contact.LastName 0 1}}
+                            {{else}}
+                                <i class="fas fa-user"></i>
+                            {{end}}
+                        {{else}}
+                            <i class="fas fa-user"></i>
+                        {{end}}
+                    </div>
+                    <div class="user-info">
+                        {{if .LoggedInUser}}
+                            {{if .LoggedInUser.Edges.Contact}}
+                            <span class="user-name">{{.LoggedInUser.Edges.Contact.FirstName}} {{.LoggedInUser.Edges.Contact.LastName}}</span>
+                            {{else}}
+                            <span class="user-name">{{.LoggedInUser.Email}}</span>
+                            {{end}}
+                            <span class="user-role">{{.LoggedInUser.Role}}</span>
+                        {{end}}
+                    </div>
+                    <i class="fas fa-chevron-down user-caret"></i>
+                </button>
+
+                <div class="user-dropdown" id="userDropdown">
+                    {{if .LoggedInUser}}
+                    <div class="dropdown-header">
+                        <div class="dh-avatar">
+                            {{if .LoggedInUser.Edges.Contact}}
+                                {{slice .LoggedInUser.Edges.Contact.FirstName 0 1}}{{slice .LoggedInUser.Edges.Contact.LastName 0 1}}
+                            {{else}}SA{{end}}
+                        </div>
+                        <div class="dh-info">
+                            {{if .LoggedInUser.Edges.Contact}}
+                            <strong>{{.LoggedInUser.Edges.Contact.FirstName}} {{.LoggedInUser.Edges.Contact.LastName}}</strong>
+                            {{end}}
+                            <small>{{.LoggedInUser.Email}}</small>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    {{end}}
+                    <a href="/dashboard" class="dd-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="/profile" class="dd-item"><i class="fas fa-user-edit"></i> My Profile</a>
+                    {{if .LoggedInUser}}
+                        {{$role := .LoggedInUser.Role.String}}
+                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                        <a href="/church/settings" class="dd-item"><i class="fas fa-church"></i> Church Settings</a>
+                        {{end}}
+                    {{end}}
+                    <div class="dropdown-divider"></div>
+                    <form action="/logout" method="POST" style="margin:0">
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                        <button type="submit" class="dd-item dd-logout">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        {{else}}
+        <!-- Guest Actions -->
+        <div class="navbar-guest">
+            <a href="/login" class="btn-login">Sign In</a>
+        </div>
+        {{end}}
+    </div>
+</nav>
+
+<style>
+.app-navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: #fff;
+    border-bottom: 1px solid #E9ECEF;
+    box-shadow: 0 1px 12px rgba(80,34,45,0.07);
+    z-index: 1000;
+}
+body { padding-top: 64px; }
+
+.navbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Brand */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--primary);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+}
+.brand-icon img { width: 100%; height: 100%; object-fit: contain; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-weight: 800; font-size: 1.05rem; color: var(--primary); letter-spacing: -0.2px; }
+.brand-sub { font-size: 0.68rem; color: var(--text-light); font-weight: 400; }
+
+/* Nav Links */
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+}
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    color: var(--text-medium);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.nav-link i { font-size: 0.85rem; color: var(--text-light); transition: color 0.15s; }
+.nav-link:hover { background: rgba(80,34,45,0.06); color: var(--primary); }
+.nav-link:hover i { color: var(--primary); }
+.nav-link.active { background: rgba(80,34,45,0.08); color: var(--primary); font-weight: 600; }
+.nav-link.active i { color: var(--primary); }
+
+/* Right Side */
+.navbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+/* User Menu */
+.user-menu { position: relative; }
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 6px 12px 6px 6px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.user-trigger:hover { border-color: var(--primary); background: rgba(80,34,45,0.03); }
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.user-info { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; }
+.user-name { font-size: 0.83rem; font-weight: 600; color: var(--text-dark); }
+.user-role { font-size: 0.68rem; color: var(--primary); font-weight: 500; text-transform: capitalize; }
+.user-caret { font-size: 0.7rem; color: var(--text-light); transition: transform 0.2s; }
+.user-menu.open .user-caret { transform: rotate(180deg); }
+
+/* Dropdown */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    min-width: 240px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+    z-index: 100;
+}
+.user-menu.open .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 12px;
+}
+.dh-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.dh-info { display: flex; flex-direction: column; }
+.dh-info strong { font-size: 0.88rem; color: var(--text-dark); }
+.dh-info small { font-size: 0.75rem; color: var(--text-light); }
+
+.dropdown-divider { height: 1px; background: var(--light-gray); margin: 4px 0; }
+
+.dd-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: background 0.12s;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+.dd-item i { width: 16px; text-align: center; color: var(--text-light); }
+.dd-item:hover { background: rgba(80,34,45,0.06); }
+.dd-logout { color: #DC3545 !important; }
+.dd-logout:hover { background: rgba(220,53,69,0.08) !important; }
+.dd-logout i { color: #DC3545 !important; }
+
+/* Guest */
+.navbar-guest { margin-left: auto; }
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 20px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.btn-login:hover { background: var(--primary-dark); color: white; }
+
+/* Mobile Toggle */
+.mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+.mobile-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-dark);
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+@media (max-width: 900px) {
+    .navbar-links {
+        display: none;
+        position: fixed;
+        top: 64px; left: 0; right: 0;
+        background: white;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+        border-bottom: 1px solid var(--light-gray);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        z-index: 999;
+    }
+    .navbar-links.open { display: flex; }
+    .nav-link { padding: 10px 14px; }
+    .mobile-toggle { display: flex; }
+    .user-info { display: none; }
+    .user-caret { display: none; }
+    .user-trigger { padding: 4px; border: none; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Highlight active nav link
+    const path = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (href && (path === href || (href !== '/' && path.startsWith(href)))) {
+            link.classList.add('active');
+        }
+    });
+
+    // User dropdown toggle
+    const userMenu = document.getElementById('userMenu');
+    const userTrigger = document.getElementById('userTrigger');
+    if (userTrigger) {
+        userTrigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('open');
+        });
+        document.addEventListener('click', function () {
+            userMenu.classList.remove('open');
+        });
+    }
+
+    // Mobile nav toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle && navLinks) {
+        mobileToggle.addEventListener('click', function () {
+            navLinks.classList.toggle('open');
+        });
+    }
+});
+</script>
+{{end}}

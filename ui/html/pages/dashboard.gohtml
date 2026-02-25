@@ -1,0 +1,580 @@
+{{define "title"}}Dashboard | FaithConnect{{end}}
+{{define "description"}}Church administration dashboard{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <!-- Page Header -->
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">
+                {{if .LoggedInUser}}
+                    Welcome back, {{with .LoggedInUser.Edges.Contact}}{{.FirstName}}{{end}} 👋
+                {{else}}
+                    Dashboard
+                {{end}}
+            </h1>
+            <p class="page-subtitle-text">
+                {{if .LoggedInUser}}
+                    Here's what's happening with your church today.
+                {{end}}
+            </p>
+        </div>
+        <div class="header-actions">
+            <a href="/events/new" class="button is-primary">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                <span>New Event</span>
+            </a>
+            <a href="/giving/new" class="button is-outlined is-primary ml-2">
+                <span class="icon"><i class="fas fa-donate"></i></span>
+                <span>Record Giving</span>
+            </a>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-5">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-widget churches">
+            <div class="stat-icon"><i class="fas fa-church"></i></div>
+            <div class="stat-content">
+                {{if .LoggedInUser}}
+                    {{if eq (printf "%s" .LoggedInUser.Role) "super_admin"}}
+                    <div class="stat-number">{{with index .Data "churchCount"}}{{.}}{{else}}0{{end}}</div>
+                    <div class="stat-label">Total Branches</div>
+                    {{else}}
+                    <div class="stat-number">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
+                    <div class="stat-label">Total Members</div>
+                    {{end}}
+                {{end}}
+            </div>
+            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Active</div>
+        </div>
+
+        <div class="stat-widget members">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+                <div class="stat-number">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
+                <div class="stat-label">Congregation</div>
+            </div>
+            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Growing</div>
+        </div>
+
+        <div class="stat-widget income">
+            <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+            <div class="stat-content">
+                <div class="stat-number">GH₵ {{printf "%.2f" (index .Data "thisMonthIncome")}}</div>
+                <div class="stat-label">This Month's Income</div>
+            </div>
+            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Income</div>
+        </div>
+
+        <div class="stat-widget expenses">
+            <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+            <div class="stat-content">
+                <div class="stat-number">GH₵ {{printf "%.2f" (index .Data "thisMonthExpenses")}}</div>
+                <div class="stat-label">This Month's Expenses</div>
+            </div>
+            <div class="stat-trend neutral"><i class="fas fa-minus"></i> Expenses</div>
+        </div>
+    </div>
+
+    <!-- Super Admin: Church Network Overview -->
+    {{if .LoggedInUser}}
+    {{if eq (printf "%s" .LoggedInUser.Role) "super_admin"}}
+    {{$churches := index .Data "churches"}}
+    {{if $churches}}
+    <div class="sa-section-header">
+        <h3><i class="fas fa-network-wired mr-2"></i>Church Network</h3>
+        <a href="/admin/churches" class="view-all-link">Manage All <i class="fas fa-arrow-right ml-1"></i></a>
+    </div>
+    <div class="churches-overview-grid">
+        {{range $churches}}
+        <div class="co-card">
+            <div class="co-type-stripe type-{{.Type}}"></div>
+            <div class="co-body">
+                <div class="co-top">
+                    <div class="co-name">{{.Name}}</div>
+                    <span class="co-badge co-{{.Type}}">{{.Type}}</span>
+                </div>
+                <div class="co-stats">
+                    <span><i class="fas fa-users"></i> {{len .Edges.Users}} members</span>
+                    {{if gt .CongregationSize 0}}
+                    <span><i class="fas fa-people-group"></i> {{.CongregationSize}} total</span>
+                    {{end}}
+                </div>
+                {{if .RegistrationToken}}
+                <span class="co-pending"><i class="fas fa-clock"></i> Pending setup</span>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+    </div>
+    <div class="sa-invite-cta">
+        <a href="/invite-church" class="button is-primary is-outlined is-small">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Invite New Branch</span>
+        </a>
+    </div>
+    {{end}}
+    {{end}}
+    {{end}}
+
+    <!-- Content Row -->
+    <div class="columns mt-5">
+        <!-- Upcoming Events -->
+        <div class="column is-7">
+            <div class="content-card">
+                <div class="card-header-bar">
+                    <h3><i class="fas fa-calendar-alt mr-2"></i>Upcoming Events</h3>
+                    <a href="/events/new" class="button is-small is-primary is-outlined">
+                        <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                        <span>Add Event</span>
+                    </a>
+                </div>
+                <div class="card-body-content">
+                    {{$events := index .Data "upcomingEvents"}}
+                    {{if $events}}
+                    <div class="event-list">
+                        {{range $events}}
+                        <a href="/events/{{.ID}}" class="event-row">
+                            <div class="event-date-badge">
+                                <span class="event-day">{{.StartTime.Day}}</span>
+                                <span class="event-month">{{.StartTime.Format "Jan"}}</span>
+                            </div>
+                            <div class="event-info">
+                                <div class="event-title">{{.Title}}</div>
+                                <div class="event-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i> {{.Location}}</span>
+                                    <span><i class="fas fa-clock"></i> {{.StartTime.Format "3:04 PM"}}</span>
+                                </div>
+                            </div>
+                            <div class="event-type-badge event-{{.EventType}}">{{.EventType}}</div>
+                        </a>
+                        {{end}}
+                    </div>
+                    {{else}}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No upcoming events</p>
+                        <a href="/events/new" class="button is-primary is-small mt-3">Schedule Event</a>
+                    </div>
+                    {{end}}
+                </div>
+                <div class="card-footer-bar">
+                    <a href="/events" class="view-all-link">View all events <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="column is-5">
+            <div class="content-card">
+                <div class="card-header-bar">
+                    <h3><i class="fas fa-chart-pie mr-2"></i>Financial Overview</h3>
+                    <a href="/giving/new" class="button is-small is-primary is-outlined">Record</a>
+                </div>
+                <div class="card-body-content">
+                    <div class="finance-metric">
+                        <div class="metric-label">Total Income</div>
+                        <div class="metric-value income">GH₵ {{printf "%.2f" (index .Data "totalIncome")}}</div>
+                    </div>
+                    <div class="finance-metric">
+                        <div class="metric-label">Total Expenses</div>
+                        <div class="metric-value expense">GH₵ {{printf "%.2f" (index .Data "totalExpenses")}}</div>
+                    </div>
+                    <div class="finance-divider"></div>
+                    <div class="finance-metric net">
+                        <div class="metric-label">Net Balance</div>
+                        <div class="metric-value">GH₵ {{printf "%.2f" (index .Data "netBalance")}}</div>
+                    </div>
+
+                    <!-- Simple bar chart -->
+                    <div class="mini-chart mt-4">
+                        <div class="mini-bar-label">Income vs Expenses</div>
+                        <div class="mini-bars">
+                            <div class="mini-bar income-bar" style="width: 100%">
+                                <span>Income</span>
+                            </div>
+                            {{$income := index .Data "totalIncome"}}
+                            {{$expenses := index .Data "totalExpenses"}}
+                            <div class="mini-bar expense-bar">
+                                <span>Expenses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer-bar">
+                    <a href="/giving/donations" class="view-all-link">View all transactions <i class="fas fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card mt-4">
+                <div class="card-header-bar">
+                    <h3><i class="fas fa-bolt mr-2"></i>Quick Actions</h3>
+                </div>
+                <div class="card-body-content">
+                    <div class="quick-action-grid">
+                        <a href="/members/new" class="quick-action-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Invite Member</span>
+                        </a>
+                        <a href="/events/new" class="quick-action-btn">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>New Event</span>
+                        </a>
+                        <a href="/giving/new" class="quick-action-btn">
+                            <i class="fas fa-donate"></i>
+                            <span>Record Giving</span>
+                        </a>
+                        <a href="/members" class="quick-action-btn">
+                            <i class="fas fa-users"></i>
+                            <span>View Members</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.page-subtitle-text {
+    color: var(--text-light);
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+}
+
+.header-actions { display: flex; align-items: center; }
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-widget {
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+    border: 1px solid var(--light-gray);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-widget:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    color: white;
+}
+
+.stat-widget.churches .stat-icon { background: linear-gradient(135deg, #50222D, #6B2F3D); }
+.stat-widget.members .stat-icon { background: linear-gradient(135deg, #7A8CA3, #5A6B7A); }
+.stat-widget.income .stat-icon { background: linear-gradient(135deg, #28A745, #20883A); }
+.stat-widget.expenses .stat-icon { background: linear-gradient(135deg, #DC3545, #C82333); }
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.stat-trend {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.stat-trend.up { background: rgba(40,167,69,0.1); color: #28A745; }
+.stat-trend.down { background: rgba(220,53,69,0.1); color: #DC3545; }
+.stat-trend.neutral { background: rgba(108,117,125,0.1); color: #6C757D; }
+
+/* Content Cards */
+.content-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+}
+
+.card-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.card-header-bar h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.card-body-content { padding: 1.2rem 1.5rem; }
+
+.card-footer-bar {
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid var(--light-gray);
+    background: rgba(248,249,250,0.5);
+}
+
+.view-all-link {
+    font-size: 0.85rem;
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.view-all-link:hover { color: var(--primary-dark); }
+
+/* Events */
+.event-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.event-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s;
+    border: 1px solid transparent;
+}
+
+.event-row:hover {
+    background: rgba(80,34,45,0.04);
+    border-color: var(--light-gray);
+}
+
+.event-date-badge {
+    width: 48px;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+}
+
+.event-day { font-size: 1.3rem; font-weight: 700; line-height: 1; }
+.event-month { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.event-info { flex: 1; min-width: 0; }
+
+.event-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.77rem;
+    color: var(--text-light);
+    margin-top: 3px;
+}
+
+.event-meta span { display: flex; align-items: center; gap: 4px; }
+
+.event-type-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.event-service { background: rgba(80,34,45,0.1); color: var(--primary); }
+.event-meeting { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.event-conference { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.event-outreach { background: rgba(212,165,165,0.2); color: #8B4A4A; }
+.event-training { background: rgba(40,167,69,0.1); color: #28A745; }
+
+/* Finance metrics */
+.finance-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0;
+}
+
+.metric-label { font-size: 0.85rem; color: var(--text-light); }
+.metric-value { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+.metric-value.income { color: #28A745; }
+.metric-value.expense { color: #DC3545; }
+.finance-metric.net .metric-value { font-size: 1.3rem; color: var(--primary); }
+.finance-divider { height: 1px; background: var(--light-gray); margin: 0.5rem 0; }
+
+.mini-chart { border-top: 1px solid var(--light-gray); padding-top: 1rem; }
+.mini-bar-label { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; }
+.mini-bars { display: flex; flex-direction: column; gap: 6px; }
+.mini-bar {
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 0.75rem;
+    color: white;
+    font-weight: 600;
+}
+.income-bar { background: linear-gradient(90deg, #28A745, #20C997); width: 100%; }
+.expense-bar { background: linear-gradient(90deg, #DC3545, #E05D6F); width: 60%; }
+
+/* Quick actions */
+.quick-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--light-gray);
+    text-decoration: none;
+    color: var(--text-dark);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.quick-action-btn i {
+    font-size: 1.3rem;
+    color: var(--primary);
+}
+
+.quick-action-btn:hover {
+    border-color: var(--primary);
+    background: rgba(80,34,45,0.04);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}
+.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: var(--medium-gray); }
+.empty-state p { font-size: 0.9rem; }
+
+/* Super admin church network section */
+.sa-section-header { display: flex; justify-content: space-between; align-items: center; margin: 2rem 0 1rem; }
+.sa-section-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-dark); margin: 0; }
+
+.churches-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+
+.co-card { background: white; border-radius: 12px; border: 1px solid var(--light-gray); overflow: hidden; transition: box-shadow 0.15s; }
+.co-card:hover { box-shadow: 0 4px 16px rgba(80,34,45,0.09); }
+.co-type-stripe { height: 3px; }
+.type-headquarters { background: linear-gradient(90deg, var(--primary), #6B2F3D); }
+.type-branch { background: linear-gradient(90deg, var(--support-blue), #7A8CA3); }
+.type-mission { background: linear-gradient(90deg, var(--support-purple), #9E8FB5); }
+.co-body { padding: 1rem 1.2rem; }
+.co-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+.co-name { font-weight: 600; font-size: 0.88rem; color: var(--text-dark); }
+.co-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; text-transform: capitalize; flex-shrink: 0; }
+.co-headquarters { background: rgba(80,34,45,0.1); color: var(--primary); }
+.co-branch { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.co-mission { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.co-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.co-stats span { font-size: 0.75rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+.co-stats i { color: var(--primary); font-size: 0.7rem; }
+.co-pending { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #856404; background: rgba(255,193,7,0.1); padding: 2px 7px; border-radius: 8px; margin-top: 4px; }
+.sa-invite-cta { margin-bottom: 1rem; }
+
+@media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.notification .delete').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            this.closest('.notification').remove();
+        });
+    });
+});
+</script>
+{{end}}
