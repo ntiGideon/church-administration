@@ -1,0 +1,419 @@
+{{define "title"}}Edit Member | FaithConnect{{end}}
+{{define "description"}}Edit member contact details{{end}}
+
+{{define "main"}}
+{{$member := index .Data "member"}}
+{{$allMembers := index .Data "allMembers"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/members">Members</a>
+                <i class="fas fa-chevron-right"></i>
+                {{if $member}}<a href="/members/{{$member.ID}}">Profile</a>{{end}}
+                <i class="fas fa-chevron-right"></i>
+                <span>Edit</span>
+            </nav>
+            <h1 class="page-title-text">Edit Member Details</h1>
+        </div>
+        {{if $member}}
+        <a href="/members/{{$member.ID}}" class="button is-outlined">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Back to Profile</span>
+        </a>
+        {{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="notification is-danger is-light mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-exclamation-circle mr-2"></i>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{with .Form}}
+    {{if .NonFieldErrors}}
+    <div class="notification is-danger is-light mb-4">
+        {{range .NonFieldErrors}}<p>{{.}}</p>{{end}}
+    </div>
+    {{end}}
+    {{end}}
+
+    {{if $member}}
+    <form action="/members/{{$member.ID}}/edit" method="POST" class="edit-form-wrap">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+        <!-- ── Personal Information ─────────────────────────────────────── -->
+        <div class="edit-card">
+            <div class="edit-card-header">
+                <i class="fas fa-user"></i> Personal Information
+            </div>
+            <div class="edit-card-body">
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">First Name *</label>
+                        <div class="control">
+                            <input class="input {{with .Form}}{{if index .FieldErrors "first_name"}}is-danger{{end}}{{end}}"
+                                   type="text" name="first_name"
+                                   value="{{with .Form}}{{.FirstName}}{{end}}" required>
+                        </div>
+                        {{with .Form}}{{with index .FieldErrors "first_name"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                    </div>
+                    <div class="field">
+                        <label class="label">Last Name *</label>
+                        <div class="control">
+                            <input class="input {{with .Form}}{{if index .FieldErrors "last_name"}}is-danger{{end}}{{end}}"
+                                   type="text" name="last_name"
+                                   value="{{with .Form}}{{.LastName}}{{end}}" required>
+                        </div>
+                        {{with .Form}}{{with index .FieldErrors "last_name"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                    </div>
+                    <div class="field">
+                        <label class="label">Middle Name</label>
+                        <div class="control">
+                            <input class="input" type="text" name="middle_name"
+                                   value="{{with .Form}}{{.MiddleName}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Phone</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="tel" name="phone" placeholder="+233 XX XXX XXXX"
+                                   value="{{with .Form}}{{.Phone}}{{end}}">
+                            <span class="icon is-left"><i class="fas fa-phone"></i></span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="email" name="email"
+                                   value="{{with .Form}}{{.Email}}{{end}}">
+                            <span class="icon is-left"><i class="fas fa-envelope"></i></span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">National ID Number</label>
+                        <div class="control">
+                            <input class="input" type="text" name="id_number" placeholder="GHA-XXXXXXXXX-X"
+                                   value="{{with .Form}}{{.IDNumber}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Gender</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="gender">
+                                    <option value="">Not specified</option>
+                                    <option value="male"   {{with .Form}}{{if eq .Gender "male"}}selected{{end}}{{end}}>Male</option>
+                                    <option value="female" {{with .Form}}{{if eq .Gender "female"}}selected{{end}}{{end}}>Female</option>
+                                    <option value="other"  {{with .Form}}{{if eq .Gender "other"}}selected{{end}}{{end}}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Date of Birth</label>
+                        <div class="control">
+                            <input class="input" type="date" name="date_of_birth"
+                                   value="{{with .Form}}{{.DateOfBirth}}{{end}}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Day Born</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="day_born">
+                                    <option value="">Not specified</option>
+                                    <option value="monday"    {{with .Form}}{{if eq .DayBorn "monday"}}selected{{end}}{{end}}>Monday</option>
+                                    <option value="tuesday"   {{with .Form}}{{if eq .DayBorn "tuesday"}}selected{{end}}{{end}}>Tuesday</option>
+                                    <option value="wednesday" {{with .Form}}{{if eq .DayBorn "wednesday"}}selected{{end}}{{end}}>Wednesday</option>
+                                    <option value="thursday"  {{with .Form}}{{if eq .DayBorn "thursday"}}selected{{end}}{{end}}>Thursday</option>
+                                    <option value="friday"    {{with .Form}}{{if eq .DayBorn "friday"}}selected{{end}}{{end}}>Friday</option>
+                                    <option value="saturday"  {{with .Form}}{{if eq .DayBorn "saturday"}}selected{{end}}{{end}}>Saturday</option>
+                                    <option value="sunday"    {{with .Form}}{{if eq .DayBorn "sunday"}}selected{{end}}{{end}}>Sunday</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Marital Status</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="marital_status">
+                                    <option value="">Not specified</option>
+                                    <option value="single"   {{with .Form}}{{if eq .MaritalStatus "single"}}selected{{end}}{{end}}>Single</option>
+                                    <option value="married"  {{with .Form}}{{if eq .MaritalStatus "married"}}selected{{end}}{{end}}>Married</option>
+                                    <option value="divorced" {{with .Form}}{{if eq .MaritalStatus "divorced"}}selected{{end}}{{end}}>Divorced</option>
+                                    <option value="widowed"  {{with .Form}}{{if eq .MaritalStatus "widowed"}}selected{{end}}{{end}}>Widowed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Occupation</label>
+                        <div class="control">
+                            <input class="input" type="text" name="occupation"
+                                   value="{{with .Form}}{{.Occupation}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Hometown</label>
+                        <div class="control">
+                            <input class="input" type="text" name="hometown"
+                                   value="{{with .Form}}{{.Hometown}}{{end}}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Region</label>
+                        <div class="control">
+                            <input class="input" type="text" name="region"
+                                   value="{{with .Form}}{{.Region}}{{end}}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">City / Town</label>
+                        <div class="control">
+                            <input class="input" type="text" name="city"
+                                   value="{{with .Form}}{{.City}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Address</label>
+                        <div class="control">
+                            <input class="input" type="text" name="address_line1"
+                                   value="{{with .Form}}{{.AddressLine1}}{{end}}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Country</label>
+                        <div class="control">
+                            <input class="input" type="text" name="country" placeholder="Ghana"
+                                   value="{{with .Form}}{{.Country}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Church & Membership ──────────────────────────────────────── -->
+        <div class="edit-card mt-4">
+            <div class="edit-card-header">
+                <i class="fas fa-church"></i> Church & Membership
+            </div>
+            <div class="edit-card-body">
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Sunday School Class</label>
+                        <div class="control">
+                            <input class="input" type="text" name="sunday_school_class"
+                                   placeholder="e.g. Young Adults"
+                                   value="{{with .Form}}{{.SundaySchoolClass}}{{end}}">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Membership Year</label>
+                        <div class="control">
+                            <input class="input" type="number" name="membership_year"
+                                   min="1900" max="2099" placeholder="e.g. 2018"
+                                   value="{{with .Form}}{{if .MembershipYear}}{{.MembershipYear}}{{end}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Spouse ───────────────────────────────────────────────────── -->
+        <div class="edit-card mt-4">
+            <div class="edit-card-header">
+                <i class="fas fa-heart"></i> Spouse
+            </div>
+            <div class="edit-card-body">
+                <div class="field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="has_spouse" value="true"
+                               id="hasSpouseCheck"
+                               {{with .Form}}{{if .HasSpouse}}checked{{end}}{{end}}>
+                        <span>This member has a spouse</span>
+                    </label>
+                </div>
+                <div class="field spouse-select-field" id="spouseSelectWrap"
+                     style="{{with .Form}}{{if not .HasSpouse}}display:none{{end}}{{end}}">
+                    <label class="label">Spouse (select from members)</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="spouse_id">
+                                <option value="0">— none —</option>
+                                {{if $allMembers}}
+                                {{range $allMembers}}
+                                {{if .Edges.Contact}}
+                                <option value="{{.Edges.Contact.ID}}"
+                                    {{with $.Form}}{{if eq .SpouseID $.Edges.Contact.ID}}selected{{end}}{{end}}>
+                                    {{.Edges.Contact.FirstName}} {{.Edges.Contact.LastName}}
+                                    {{if .Email}}({{.Email}}){{end}}
+                                </option>
+                                {{end}}
+                                {{end}}
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <p class="help">Selecting a spouse here will also update the other member's record.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Baptism ──────────────────────────────────────────────────── -->
+        <div class="edit-card mt-4">
+            <div class="edit-card-header">
+                <i class="fas fa-water"></i> Baptism
+            </div>
+            <div class="edit-card-body">
+                <div class="field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_baptized" value="true"
+                               id="isBaptizedCheck"
+                               {{with .Form}}{{if .IsBaptized}}checked{{end}}{{end}}>
+                        <span>This member has been baptized</span>
+                    </label>
+                </div>
+
+                <div id="baptismDetailsWrap"
+                     style="{{with .Form}}{{if not .IsBaptized}}display:none{{end}}{{end}}">
+                    <div class="field-row mt-3">
+                        <div class="field">
+                            <label class="label">Baptized By</label>
+                            <div class="control">
+                                <input class="input" type="text" name="baptized_by"
+                                       placeholder="Pastor's name"
+                                       value="{{with .Form}}{{.BaptizedBy}}{{end}}">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Baptism Church</label>
+                            <div class="control">
+                                <input class="input" type="text" name="baptism_church"
+                                       placeholder="Church name"
+                                       value="{{with .Form}}{{.BaptismChurch}}{{end}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="label">Certificate Number</label>
+                            <div class="control">
+                                <input class="input" type="text" name="baptism_cert_number"
+                                       value="{{with .Form}}{{.BaptismCertNumber}}{{end}}">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Baptism Date</label>
+                            <div class="control">
+                                <input class="input" type="date" name="baptism_date"
+                                       value="{{with .Form}}{{.BaptismDate}}{{end}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edit-actions mt-4">
+            <button type="submit" class="button is-primary">
+                <span class="icon"><i class="fas fa-save"></i></span>
+                <span>Save Changes</span>
+            </button>
+            <a href="/members/{{$member.ID}}" class="button is-light ml-2">Cancel</a>
+        </div>
+    </form>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1.25rem; }
+.ml-2 { margin-left: 0.5rem; }
+
+.edit-form-wrap { display: flex; flex-direction: column; gap: 0; }
+.edit-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; }
+.edit-card-header {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--light-gray);
+    background: rgba(80,34,45,0.03);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.edit-card-header i { color: var(--primary); }
+.edit-card-body { padding: 1.5rem; }
+
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.field { margin-bottom: 0.75rem; }
+
+.checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--text-dark); }
+.checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); }
+
+.edit-actions { display: flex; align-items: center; padding: 0.5rem 0; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .field-row { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.notification .delete').forEach(function (btn) {
+        btn.addEventListener('click', function () { this.closest('.notification').remove(); });
+    });
+
+    // Toggle spouse select
+    var hasSpouseCheck = document.getElementById('hasSpouseCheck');
+    var spouseWrap = document.getElementById('spouseSelectWrap');
+    if (hasSpouseCheck && spouseWrap) {
+        hasSpouseCheck.addEventListener('change', function () {
+            spouseWrap.style.display = this.checked ? '' : 'none';
+        });
+    }
+
+    // Toggle baptism details
+    var baptizedCheck = document.getElementById('isBaptizedCheck');
+    var baptismWrap = document.getElementById('baptismDetailsWrap');
+    if (baptizedCheck && baptismWrap) {
+        baptizedCheck.addEventListener('change', function () {
+            baptismWrap.style.display = this.checked ? '' : 'none';
+        });
+    }
+});
+</script>
+{{end}}

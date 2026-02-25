@@ -47,37 +47,124 @@
                 </div>
             </div>
 
-            <div class="profile-details-grid">
-                {{if $member.Edges.Contact}}
-                {{$c := $member.Edges.Contact}}
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
-                    <span class="detail-value">{{if $c.Phone}}{{$c.Phone}}{{else}}—{{end}}</span>
+            {{if $member.Edges.Contact}}
+            {{$c := $member.Edges.Contact}}
+
+            <!-- Personal -->
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-user"></i> Personal</div>
+                <div class="profile-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
+                        <span class="detail-value">{{if $c.Phone}}{{$c.Phone}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                        <span class="detail-value">{{if $c.Gender}}{{$c.Gender}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-sun"></i> Day Born</span>
+                        <span class="detail-value">{{if $c.DayBorn}}{{$c.DayBorn}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-id-card"></i> National ID</span>
+                        <span class="detail-value">{{if $c.IDNumber}}{{$c.IDNumber}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-briefcase"></i> Occupation</span>
+                        <span class="detail-value">{{if $c.Occupation}}{{$c.Occupation}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-ring"></i> Marital Status</span>
+                        <span class="detail-value">{{if $c.MaritalStatus}}{{$c.MaritalStatus}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-home"></i> Hometown</span>
+                        <span class="detail-value">{{if $c.Hometown}}{{$c.Hometown}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-map"></i> Region</span>
+                        <span class="detail-value">{{if $c.Region}}{{$c.Region}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-map-marker-alt"></i> City / Country</span>
+                        <span class="detail-value">
+                            {{if $c.City}}{{$c.City}}{{if $c.Country}}, {{$c.Country}}{{end}}{{else}}—{{end}}
+                        </span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-venus-mars"></i> Gender</span>
-                    <span class="detail-value">{{if $c.Gender}}{{$c.Gender}}{{else}}—{{end}}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-briefcase"></i> Occupation</span>
-                    <span class="detail-value">{{if $c.Occupation}}{{$c.Occupation}}{{else}}—{{end}}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Location</span>
-                    <span class="detail-value">
-                        {{if $c.City}}{{$c.City}}{{if $c.Country}}, {{$c.Country}}{{end}}{{else}}—{{end}}
-                    </span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-ring"></i> Marital Status</span>
-                    <span class="detail-value">{{if $c.MaritalStatus}}{{$c.MaritalStatus}}{{else}}—{{end}}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label"><i class="fas fa-calendar-alt"></i> Joined</span>
-                    <span class="detail-value">{{$member.CreatedAt.Format "Jan 2, 2006"}}</span>
-                </div>
-                {{end}}
             </div>
+
+            <!-- Church & Membership -->
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-church"></i> Church & Membership</div>
+                <div class="profile-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-book-open"></i> Sunday School Class</span>
+                        <span class="detail-value">{{if $c.SundaySchoolClass}}{{$c.SundaySchoolClass}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar-plus"></i> Membership Year</span>
+                        <span class="detail-value">{{if $c.MembershipYear}}{{$c.MembershipYear}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar-alt"></i> Joined Platform</span>
+                        <span class="detail-value">{{$member.CreatedAt.Format "Jan 2, 2006"}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spouse -->
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-heart"></i> Spouse</div>
+                <div class="profile-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-heart"></i> Has Spouse</span>
+                        <span class="detail-value">{{if $c.HasSpouse}}Yes{{else}}No{{end}}</span>
+                    </div>
+                    {{if $c.HasSpouse}}
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-user-friends"></i> Spouse</span>
+                        <span class="detail-value">
+                            {{if $c.Edges.SpouseContact}}
+                                {{$sp := $c.Edges.SpouseContact}}
+                                {{$sp.FirstName}} {{$sp.LastName}}
+                            {{else}}—{{end}}
+                        </span>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Baptism -->
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-water"></i> Baptism</div>
+                <div class="profile-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-water"></i> Baptized</span>
+                        <span class="detail-value">{{if $c.IsBaptized}}Yes{{else}}No{{end}}</span>
+                    </div>
+                    {{if $c.IsBaptized}}
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-user-tie"></i> Baptized By</span>
+                        <span class="detail-value">{{if $c.BaptizedBy}}{{$c.BaptizedBy}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-church"></i> Baptism Church</span>
+                        <span class="detail-value">{{if $c.BaptismChurch}}{{$c.BaptismChurch}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-certificate"></i> Certificate No.</span>
+                        <span class="detail-value">{{if $c.BaptismCertNumber}}{{$c.BaptismCertNumber}}{{else}}—{{end}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar-check"></i> Baptism Date</span>
+                        <span class="detail-value">{{if not $c.BaptismDate.IsZero}}{{$c.BaptismDate.Format "Jan 2, 2006"}}{{else}}—{{end}}</span>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
 
             <div class="profile-status">
                 <div class="status-row">
@@ -91,13 +178,17 @@
                     {{if $.LoggedInUser}}
                         {{$role := $.LoggedInUser.Role.String}}
                         {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+                        <a href="/members/{{$member.ID}}/edit" class="button is-info is-small is-outlined">
+                            <span class="icon"><i class="fas fa-edit"></i></span>
+                            <span>Edit Details</span>
+                        </a>
                         {{if $member.IsActive}}
                         <form action="/members/{{$member.ID}}/deactivate" method="POST" style="margin:0"
                               onsubmit="return confirm('Deactivate this member? They will lose access to the system.')">
                             <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                             <button type="submit" class="button is-danger is-small is-outlined">
                                 <span class="icon"><i class="fas fa-user-slash"></i></span>
-                                <span>Deactivate Member</span>
+                                <span>Deactivate</span>
                             </button>
                         </form>
                         {{end}}

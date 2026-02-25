@@ -55,12 +55,42 @@ const (
 	FieldEmergencyContactRelationship = "emergency_contact_relationship"
 	// FieldProfilePictureURL holds the string denoting the profile_picture_url field in the database.
 	FieldProfilePictureURL = "profile_picture_url"
+	// FieldIDNumber holds the string denoting the id_number field in the database.
+	FieldIDNumber = "id_number"
+	// FieldHometown holds the string denoting the hometown field in the database.
+	FieldHometown = "hometown"
+	// FieldRegion holds the string denoting the region field in the database.
+	FieldRegion = "region"
+	// FieldSundaySchoolClass holds the string denoting the sunday_school_class field in the database.
+	FieldSundaySchoolClass = "sunday_school_class"
+	// FieldDayBorn holds the string denoting the day_born field in the database.
+	FieldDayBorn = "day_born"
+	// FieldMembershipYear holds the string denoting the membership_year field in the database.
+	FieldMembershipYear = "membership_year"
+	// FieldHasSpouse holds the string denoting the has_spouse field in the database.
+	FieldHasSpouse = "has_spouse"
+	// FieldSpouseID holds the string denoting the spouse_id field in the database.
+	FieldSpouseID = "spouse_id"
+	// FieldIsBaptized holds the string denoting the is_baptized field in the database.
+	FieldIsBaptized = "is_baptized"
+	// FieldBaptizedBy holds the string denoting the baptized_by field in the database.
+	FieldBaptizedBy = "baptized_by"
+	// FieldBaptismChurch holds the string denoting the baptism_church field in the database.
+	FieldBaptismChurch = "baptism_church"
+	// FieldBaptismCertNumber holds the string denoting the baptism_cert_number field in the database.
+	FieldBaptismCertNumber = "baptism_cert_number"
+	// FieldBaptismDate holds the string denoting the baptism_date field in the database.
+	FieldBaptismDate = "baptism_date"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeSpouseContact holds the string denoting the spouse_contact edge name in mutations.
+	EdgeSpouseContact = "spouse_contact"
+	// EdgeSpouseOfContact holds the string denoting the spouse_of_contact edge name in mutations.
+	EdgeSpouseOfContact = "spouse_of_contact"
 	// Table holds the table name of the contact in the database.
 	Table = "contacts"
 	// UserTable is the table that holds the user relation/edge.
@@ -70,6 +100,14 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "contact_user"
+	// SpouseContactTable is the table that holds the spouse_contact relation/edge.
+	SpouseContactTable = "contacts"
+	// SpouseContactColumn is the table column denoting the spouse_contact relation/edge.
+	SpouseContactColumn = "spouse_id"
+	// SpouseOfContactTable is the table that holds the spouse_of_contact relation/edge.
+	SpouseOfContactTable = "contacts"
+	// SpouseOfContactColumn is the table column denoting the spouse_of_contact relation/edge.
+	SpouseOfContactColumn = "spouse_id"
 )
 
 // Columns holds all SQL columns for contact fields.
@@ -95,6 +133,19 @@ var Columns = []string{
 	FieldEmergencyContactPhone,
 	FieldEmergencyContactRelationship,
 	FieldProfilePictureURL,
+	FieldIDNumber,
+	FieldHometown,
+	FieldRegion,
+	FieldSundaySchoolClass,
+	FieldDayBorn,
+	FieldMembershipYear,
+	FieldHasSpouse,
+	FieldSpouseID,
+	FieldIsBaptized,
+	FieldBaptizedBy,
+	FieldBaptismChurch,
+	FieldBaptismCertNumber,
+	FieldBaptismDate,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -110,6 +161,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultHasSpouse holds the default value on creation for the "has_spouse" field.
+	DefaultHasSpouse bool
+	// DefaultIsBaptized holds the default value on creation for the "is_baptized" field.
+	DefaultIsBaptized bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -164,6 +219,34 @@ func MaritalStatusValidator(ms MaritalStatus) error {
 		return nil
 	default:
 		return fmt.Errorf("contact: invalid enum value for marital_status field: %q", ms)
+	}
+}
+
+// DayBorn defines the type for the "day_born" enum field.
+type DayBorn string
+
+// DayBorn values.
+const (
+	DayBornMonday    DayBorn = "monday"
+	DayBornTuesday   DayBorn = "tuesday"
+	DayBornWednesday DayBorn = "wednesday"
+	DayBornThursday  DayBorn = "thursday"
+	DayBornFriday    DayBorn = "friday"
+	DayBornSaturday  DayBorn = "saturday"
+	DayBornSunday    DayBorn = "sunday"
+)
+
+func (db DayBorn) String() string {
+	return string(db)
+}
+
+// DayBornValidator is a validator for the "day_born" field enum values. It is called by the builders before save.
+func DayBornValidator(db DayBorn) error {
+	switch db {
+	case DayBornMonday, DayBornTuesday, DayBornWednesday, DayBornThursday, DayBornFriday, DayBornSaturday, DayBornSunday:
+		return nil
+	default:
+		return fmt.Errorf("contact: invalid enum value for day_born field: %q", db)
 	}
 }
 
@@ -275,6 +358,71 @@ func ByProfilePictureURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProfilePictureURL, opts...).ToFunc()
 }
 
+// ByIDNumber orders the results by the id_number field.
+func ByIDNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIDNumber, opts...).ToFunc()
+}
+
+// ByHometown orders the results by the hometown field.
+func ByHometown(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHometown, opts...).ToFunc()
+}
+
+// ByRegion orders the results by the region field.
+func ByRegion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRegion, opts...).ToFunc()
+}
+
+// BySundaySchoolClass orders the results by the sunday_school_class field.
+func BySundaySchoolClass(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSundaySchoolClass, opts...).ToFunc()
+}
+
+// ByDayBorn orders the results by the day_born field.
+func ByDayBorn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDayBorn, opts...).ToFunc()
+}
+
+// ByMembershipYear orders the results by the membership_year field.
+func ByMembershipYear(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMembershipYear, opts...).ToFunc()
+}
+
+// ByHasSpouse orders the results by the has_spouse field.
+func ByHasSpouse(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasSpouse, opts...).ToFunc()
+}
+
+// BySpouseID orders the results by the spouse_id field.
+func BySpouseID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpouseID, opts...).ToFunc()
+}
+
+// ByIsBaptized orders the results by the is_baptized field.
+func ByIsBaptized(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsBaptized, opts...).ToFunc()
+}
+
+// ByBaptizedBy orders the results by the baptized_by field.
+func ByBaptizedBy(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBaptizedBy, opts...).ToFunc()
+}
+
+// ByBaptismChurch orders the results by the baptism_church field.
+func ByBaptismChurch(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBaptismChurch, opts...).ToFunc()
+}
+
+// ByBaptismCertNumber orders the results by the baptism_cert_number field.
+func ByBaptismCertNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBaptismCertNumber, opts...).ToFunc()
+}
+
+// ByBaptismDate orders the results by the baptism_date field.
+func ByBaptismDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBaptismDate, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -291,10 +439,38 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySpouseContactField orders the results by spouse_contact field.
+func BySpouseContactField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSpouseContactStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySpouseOfContactField orders the results by spouse_of_contact field.
+func BySpouseOfContactField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSpouseOfContactStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, UserTable, UserColumn),
+	)
+}
+func newSpouseContactStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, SpouseContactTable, SpouseContactColumn),
+	)
+}
+func newSpouseOfContactStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, SpouseOfContactTable, SpouseOfContactColumn),
 	)
 }

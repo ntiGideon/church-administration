@@ -3226,11 +3226,28 @@ type ContactMutation struct {
 	emergency_contact_phone        *string
 	emergency_contact_relationship *string
 	profile_picture_url            *string
+	id_number                      *string
+	hometown                       *string
+	region                         *string
+	sunday_school_class            *string
+	day_born                       *contact.DayBorn
+	membership_year                *int
+	addmembership_year             *int
+	has_spouse                     *bool
+	is_baptized                    *bool
+	baptized_by                    *string
+	baptism_church                 *string
+	baptism_cert_number            *string
+	baptism_date                   *time.Time
 	created_at                     *time.Time
 	updated_at                     *time.Time
 	clearedFields                  map[string]struct{}
 	user                           *int
 	cleareduser                    bool
+	spouse_contact                 *int
+	clearedspouse_contact          bool
+	spouse_of_contact              *int
+	clearedspouse_of_contact       bool
 	done                           bool
 	oldValue                       func(context.Context) (*Contact, error)
 	predicates                     []predicate.Contact
@@ -4288,6 +4305,638 @@ func (m *ContactMutation) ResetProfilePictureURL() {
 	delete(m.clearedFields, contact.FieldProfilePictureURL)
 }
 
+// SetIDNumber sets the "id_number" field.
+func (m *ContactMutation) SetIDNumber(s string) {
+	m.id_number = &s
+}
+
+// IDNumber returns the value of the "id_number" field in the mutation.
+func (m *ContactMutation) IDNumber() (r string, exists bool) {
+	v := m.id_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIDNumber returns the old "id_number" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldIDNumber(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIDNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIDNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIDNumber: %w", err)
+	}
+	return oldValue.IDNumber, nil
+}
+
+// ClearIDNumber clears the value of the "id_number" field.
+func (m *ContactMutation) ClearIDNumber() {
+	m.id_number = nil
+	m.clearedFields[contact.FieldIDNumber] = struct{}{}
+}
+
+// IDNumberCleared returns if the "id_number" field was cleared in this mutation.
+func (m *ContactMutation) IDNumberCleared() bool {
+	_, ok := m.clearedFields[contact.FieldIDNumber]
+	return ok
+}
+
+// ResetIDNumber resets all changes to the "id_number" field.
+func (m *ContactMutation) ResetIDNumber() {
+	m.id_number = nil
+	delete(m.clearedFields, contact.FieldIDNumber)
+}
+
+// SetHometown sets the "hometown" field.
+func (m *ContactMutation) SetHometown(s string) {
+	m.hometown = &s
+}
+
+// Hometown returns the value of the "hometown" field in the mutation.
+func (m *ContactMutation) Hometown() (r string, exists bool) {
+	v := m.hometown
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHometown returns the old "hometown" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldHometown(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHometown is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHometown requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHometown: %w", err)
+	}
+	return oldValue.Hometown, nil
+}
+
+// ClearHometown clears the value of the "hometown" field.
+func (m *ContactMutation) ClearHometown() {
+	m.hometown = nil
+	m.clearedFields[contact.FieldHometown] = struct{}{}
+}
+
+// HometownCleared returns if the "hometown" field was cleared in this mutation.
+func (m *ContactMutation) HometownCleared() bool {
+	_, ok := m.clearedFields[contact.FieldHometown]
+	return ok
+}
+
+// ResetHometown resets all changes to the "hometown" field.
+func (m *ContactMutation) ResetHometown() {
+	m.hometown = nil
+	delete(m.clearedFields, contact.FieldHometown)
+}
+
+// SetRegion sets the "region" field.
+func (m *ContactMutation) SetRegion(s string) {
+	m.region = &s
+}
+
+// Region returns the value of the "region" field in the mutation.
+func (m *ContactMutation) Region() (r string, exists bool) {
+	v := m.region
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegion returns the old "region" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldRegion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegion: %w", err)
+	}
+	return oldValue.Region, nil
+}
+
+// ClearRegion clears the value of the "region" field.
+func (m *ContactMutation) ClearRegion() {
+	m.region = nil
+	m.clearedFields[contact.FieldRegion] = struct{}{}
+}
+
+// RegionCleared returns if the "region" field was cleared in this mutation.
+func (m *ContactMutation) RegionCleared() bool {
+	_, ok := m.clearedFields[contact.FieldRegion]
+	return ok
+}
+
+// ResetRegion resets all changes to the "region" field.
+func (m *ContactMutation) ResetRegion() {
+	m.region = nil
+	delete(m.clearedFields, contact.FieldRegion)
+}
+
+// SetSundaySchoolClass sets the "sunday_school_class" field.
+func (m *ContactMutation) SetSundaySchoolClass(s string) {
+	m.sunday_school_class = &s
+}
+
+// SundaySchoolClass returns the value of the "sunday_school_class" field in the mutation.
+func (m *ContactMutation) SundaySchoolClass() (r string, exists bool) {
+	v := m.sunday_school_class
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSundaySchoolClass returns the old "sunday_school_class" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldSundaySchoolClass(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSundaySchoolClass is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSundaySchoolClass requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSundaySchoolClass: %w", err)
+	}
+	return oldValue.SundaySchoolClass, nil
+}
+
+// ClearSundaySchoolClass clears the value of the "sunday_school_class" field.
+func (m *ContactMutation) ClearSundaySchoolClass() {
+	m.sunday_school_class = nil
+	m.clearedFields[contact.FieldSundaySchoolClass] = struct{}{}
+}
+
+// SundaySchoolClassCleared returns if the "sunday_school_class" field was cleared in this mutation.
+func (m *ContactMutation) SundaySchoolClassCleared() bool {
+	_, ok := m.clearedFields[contact.FieldSundaySchoolClass]
+	return ok
+}
+
+// ResetSundaySchoolClass resets all changes to the "sunday_school_class" field.
+func (m *ContactMutation) ResetSundaySchoolClass() {
+	m.sunday_school_class = nil
+	delete(m.clearedFields, contact.FieldSundaySchoolClass)
+}
+
+// SetDayBorn sets the "day_born" field.
+func (m *ContactMutation) SetDayBorn(cb contact.DayBorn) {
+	m.day_born = &cb
+}
+
+// DayBorn returns the value of the "day_born" field in the mutation.
+func (m *ContactMutation) DayBorn() (r contact.DayBorn, exists bool) {
+	v := m.day_born
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDayBorn returns the old "day_born" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldDayBorn(ctx context.Context) (v contact.DayBorn, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDayBorn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDayBorn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDayBorn: %w", err)
+	}
+	return oldValue.DayBorn, nil
+}
+
+// ClearDayBorn clears the value of the "day_born" field.
+func (m *ContactMutation) ClearDayBorn() {
+	m.day_born = nil
+	m.clearedFields[contact.FieldDayBorn] = struct{}{}
+}
+
+// DayBornCleared returns if the "day_born" field was cleared in this mutation.
+func (m *ContactMutation) DayBornCleared() bool {
+	_, ok := m.clearedFields[contact.FieldDayBorn]
+	return ok
+}
+
+// ResetDayBorn resets all changes to the "day_born" field.
+func (m *ContactMutation) ResetDayBorn() {
+	m.day_born = nil
+	delete(m.clearedFields, contact.FieldDayBorn)
+}
+
+// SetMembershipYear sets the "membership_year" field.
+func (m *ContactMutation) SetMembershipYear(i int) {
+	m.membership_year = &i
+	m.addmembership_year = nil
+}
+
+// MembershipYear returns the value of the "membership_year" field in the mutation.
+func (m *ContactMutation) MembershipYear() (r int, exists bool) {
+	v := m.membership_year
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMembershipYear returns the old "membership_year" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldMembershipYear(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMembershipYear is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMembershipYear requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMembershipYear: %w", err)
+	}
+	return oldValue.MembershipYear, nil
+}
+
+// AddMembershipYear adds i to the "membership_year" field.
+func (m *ContactMutation) AddMembershipYear(i int) {
+	if m.addmembership_year != nil {
+		*m.addmembership_year += i
+	} else {
+		m.addmembership_year = &i
+	}
+}
+
+// AddedMembershipYear returns the value that was added to the "membership_year" field in this mutation.
+func (m *ContactMutation) AddedMembershipYear() (r int, exists bool) {
+	v := m.addmembership_year
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMembershipYear clears the value of the "membership_year" field.
+func (m *ContactMutation) ClearMembershipYear() {
+	m.membership_year = nil
+	m.addmembership_year = nil
+	m.clearedFields[contact.FieldMembershipYear] = struct{}{}
+}
+
+// MembershipYearCleared returns if the "membership_year" field was cleared in this mutation.
+func (m *ContactMutation) MembershipYearCleared() bool {
+	_, ok := m.clearedFields[contact.FieldMembershipYear]
+	return ok
+}
+
+// ResetMembershipYear resets all changes to the "membership_year" field.
+func (m *ContactMutation) ResetMembershipYear() {
+	m.membership_year = nil
+	m.addmembership_year = nil
+	delete(m.clearedFields, contact.FieldMembershipYear)
+}
+
+// SetHasSpouse sets the "has_spouse" field.
+func (m *ContactMutation) SetHasSpouse(b bool) {
+	m.has_spouse = &b
+}
+
+// HasSpouse returns the value of the "has_spouse" field in the mutation.
+func (m *ContactMutation) HasSpouse() (r bool, exists bool) {
+	v := m.has_spouse
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasSpouse returns the old "has_spouse" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldHasSpouse(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasSpouse is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasSpouse requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasSpouse: %w", err)
+	}
+	return oldValue.HasSpouse, nil
+}
+
+// ResetHasSpouse resets all changes to the "has_spouse" field.
+func (m *ContactMutation) ResetHasSpouse() {
+	m.has_spouse = nil
+}
+
+// SetSpouseID sets the "spouse_id" field.
+func (m *ContactMutation) SetSpouseID(i int) {
+	m.spouse_contact = &i
+}
+
+// SpouseID returns the value of the "spouse_id" field in the mutation.
+func (m *ContactMutation) SpouseID() (r int, exists bool) {
+	v := m.spouse_contact
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpouseID returns the old "spouse_id" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldSpouseID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpouseID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpouseID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpouseID: %w", err)
+	}
+	return oldValue.SpouseID, nil
+}
+
+// ClearSpouseID clears the value of the "spouse_id" field.
+func (m *ContactMutation) ClearSpouseID() {
+	m.spouse_contact = nil
+	m.clearedFields[contact.FieldSpouseID] = struct{}{}
+}
+
+// SpouseIDCleared returns if the "spouse_id" field was cleared in this mutation.
+func (m *ContactMutation) SpouseIDCleared() bool {
+	_, ok := m.clearedFields[contact.FieldSpouseID]
+	return ok
+}
+
+// ResetSpouseID resets all changes to the "spouse_id" field.
+func (m *ContactMutation) ResetSpouseID() {
+	m.spouse_contact = nil
+	delete(m.clearedFields, contact.FieldSpouseID)
+}
+
+// SetIsBaptized sets the "is_baptized" field.
+func (m *ContactMutation) SetIsBaptized(b bool) {
+	m.is_baptized = &b
+}
+
+// IsBaptized returns the value of the "is_baptized" field in the mutation.
+func (m *ContactMutation) IsBaptized() (r bool, exists bool) {
+	v := m.is_baptized
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsBaptized returns the old "is_baptized" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldIsBaptized(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsBaptized is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsBaptized requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsBaptized: %w", err)
+	}
+	return oldValue.IsBaptized, nil
+}
+
+// ResetIsBaptized resets all changes to the "is_baptized" field.
+func (m *ContactMutation) ResetIsBaptized() {
+	m.is_baptized = nil
+}
+
+// SetBaptizedBy sets the "baptized_by" field.
+func (m *ContactMutation) SetBaptizedBy(s string) {
+	m.baptized_by = &s
+}
+
+// BaptizedBy returns the value of the "baptized_by" field in the mutation.
+func (m *ContactMutation) BaptizedBy() (r string, exists bool) {
+	v := m.baptized_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBaptizedBy returns the old "baptized_by" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldBaptizedBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBaptizedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBaptizedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBaptizedBy: %w", err)
+	}
+	return oldValue.BaptizedBy, nil
+}
+
+// ClearBaptizedBy clears the value of the "baptized_by" field.
+func (m *ContactMutation) ClearBaptizedBy() {
+	m.baptized_by = nil
+	m.clearedFields[contact.FieldBaptizedBy] = struct{}{}
+}
+
+// BaptizedByCleared returns if the "baptized_by" field was cleared in this mutation.
+func (m *ContactMutation) BaptizedByCleared() bool {
+	_, ok := m.clearedFields[contact.FieldBaptizedBy]
+	return ok
+}
+
+// ResetBaptizedBy resets all changes to the "baptized_by" field.
+func (m *ContactMutation) ResetBaptizedBy() {
+	m.baptized_by = nil
+	delete(m.clearedFields, contact.FieldBaptizedBy)
+}
+
+// SetBaptismChurch sets the "baptism_church" field.
+func (m *ContactMutation) SetBaptismChurch(s string) {
+	m.baptism_church = &s
+}
+
+// BaptismChurch returns the value of the "baptism_church" field in the mutation.
+func (m *ContactMutation) BaptismChurch() (r string, exists bool) {
+	v := m.baptism_church
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBaptismChurch returns the old "baptism_church" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldBaptismChurch(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBaptismChurch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBaptismChurch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBaptismChurch: %w", err)
+	}
+	return oldValue.BaptismChurch, nil
+}
+
+// ClearBaptismChurch clears the value of the "baptism_church" field.
+func (m *ContactMutation) ClearBaptismChurch() {
+	m.baptism_church = nil
+	m.clearedFields[contact.FieldBaptismChurch] = struct{}{}
+}
+
+// BaptismChurchCleared returns if the "baptism_church" field was cleared in this mutation.
+func (m *ContactMutation) BaptismChurchCleared() bool {
+	_, ok := m.clearedFields[contact.FieldBaptismChurch]
+	return ok
+}
+
+// ResetBaptismChurch resets all changes to the "baptism_church" field.
+func (m *ContactMutation) ResetBaptismChurch() {
+	m.baptism_church = nil
+	delete(m.clearedFields, contact.FieldBaptismChurch)
+}
+
+// SetBaptismCertNumber sets the "baptism_cert_number" field.
+func (m *ContactMutation) SetBaptismCertNumber(s string) {
+	m.baptism_cert_number = &s
+}
+
+// BaptismCertNumber returns the value of the "baptism_cert_number" field in the mutation.
+func (m *ContactMutation) BaptismCertNumber() (r string, exists bool) {
+	v := m.baptism_cert_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBaptismCertNumber returns the old "baptism_cert_number" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldBaptismCertNumber(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBaptismCertNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBaptismCertNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBaptismCertNumber: %w", err)
+	}
+	return oldValue.BaptismCertNumber, nil
+}
+
+// ClearBaptismCertNumber clears the value of the "baptism_cert_number" field.
+func (m *ContactMutation) ClearBaptismCertNumber() {
+	m.baptism_cert_number = nil
+	m.clearedFields[contact.FieldBaptismCertNumber] = struct{}{}
+}
+
+// BaptismCertNumberCleared returns if the "baptism_cert_number" field was cleared in this mutation.
+func (m *ContactMutation) BaptismCertNumberCleared() bool {
+	_, ok := m.clearedFields[contact.FieldBaptismCertNumber]
+	return ok
+}
+
+// ResetBaptismCertNumber resets all changes to the "baptism_cert_number" field.
+func (m *ContactMutation) ResetBaptismCertNumber() {
+	m.baptism_cert_number = nil
+	delete(m.clearedFields, contact.FieldBaptismCertNumber)
+}
+
+// SetBaptismDate sets the "baptism_date" field.
+func (m *ContactMutation) SetBaptismDate(t time.Time) {
+	m.baptism_date = &t
+}
+
+// BaptismDate returns the value of the "baptism_date" field in the mutation.
+func (m *ContactMutation) BaptismDate() (r time.Time, exists bool) {
+	v := m.baptism_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBaptismDate returns the old "baptism_date" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldBaptismDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBaptismDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBaptismDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBaptismDate: %w", err)
+	}
+	return oldValue.BaptismDate, nil
+}
+
+// ClearBaptismDate clears the value of the "baptism_date" field.
+func (m *ContactMutation) ClearBaptismDate() {
+	m.baptism_date = nil
+	m.clearedFields[contact.FieldBaptismDate] = struct{}{}
+}
+
+// BaptismDateCleared returns if the "baptism_date" field was cleared in this mutation.
+func (m *ContactMutation) BaptismDateCleared() bool {
+	_, ok := m.clearedFields[contact.FieldBaptismDate]
+	return ok
+}
+
+// ResetBaptismDate resets all changes to the "baptism_date" field.
+func (m *ContactMutation) ResetBaptismDate() {
+	m.baptism_date = nil
+	delete(m.clearedFields, contact.FieldBaptismDate)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ContactMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -4399,6 +5048,86 @@ func (m *ContactMutation) ResetUser() {
 	m.cleareduser = false
 }
 
+// SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by id.
+func (m *ContactMutation) SetSpouseContactID(id int) {
+	m.spouse_contact = &id
+}
+
+// ClearSpouseContact clears the "spouse_contact" edge to the Contact entity.
+func (m *ContactMutation) ClearSpouseContact() {
+	m.clearedspouse_contact = true
+	m.clearedFields[contact.FieldSpouseID] = struct{}{}
+}
+
+// SpouseContactCleared reports if the "spouse_contact" edge to the Contact entity was cleared.
+func (m *ContactMutation) SpouseContactCleared() bool {
+	return m.SpouseIDCleared() || m.clearedspouse_contact
+}
+
+// SpouseContactID returns the "spouse_contact" edge ID in the mutation.
+func (m *ContactMutation) SpouseContactID() (id int, exists bool) {
+	if m.spouse_contact != nil {
+		return *m.spouse_contact, true
+	}
+	return
+}
+
+// SpouseContactIDs returns the "spouse_contact" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SpouseContactID instead. It exists only for internal usage by the builders.
+func (m *ContactMutation) SpouseContactIDs() (ids []int) {
+	if id := m.spouse_contact; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSpouseContact resets all changes to the "spouse_contact" edge.
+func (m *ContactMutation) ResetSpouseContact() {
+	m.spouse_contact = nil
+	m.clearedspouse_contact = false
+}
+
+// SetSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by id.
+func (m *ContactMutation) SetSpouseOfContactID(id int) {
+	m.spouse_of_contact = &id
+}
+
+// ClearSpouseOfContact clears the "spouse_of_contact" edge to the Contact entity.
+func (m *ContactMutation) ClearSpouseOfContact() {
+	m.clearedspouse_of_contact = true
+	m.clearedFields[contact.FieldSpouseID] = struct{}{}
+}
+
+// SpouseOfContactCleared reports if the "spouse_of_contact" edge to the Contact entity was cleared.
+func (m *ContactMutation) SpouseOfContactCleared() bool {
+	return m.SpouseIDCleared() || m.clearedspouse_of_contact
+}
+
+// SpouseOfContactID returns the "spouse_of_contact" edge ID in the mutation.
+func (m *ContactMutation) SpouseOfContactID() (id int, exists bool) {
+	if m.spouse_of_contact != nil {
+		return *m.spouse_of_contact, true
+	}
+	return
+}
+
+// SpouseOfContactIDs returns the "spouse_of_contact" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SpouseOfContactID instead. It exists only for internal usage by the builders.
+func (m *ContactMutation) SpouseOfContactIDs() (ids []int) {
+	if id := m.spouse_of_contact; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSpouseOfContact resets all changes to the "spouse_of_contact" edge.
+func (m *ContactMutation) ResetSpouseOfContact() {
+	m.spouse_of_contact = nil
+	m.clearedspouse_of_contact = false
+}
+
 // Where appends a list predicates to the ContactMutation builder.
 func (m *ContactMutation) Where(ps ...predicate.Contact) {
 	m.predicates = append(m.predicates, ps...)
@@ -4433,7 +5162,7 @@ func (m *ContactMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ContactMutation) Fields() []string {
-	fields := make([]string, 0, 22)
+	fields := make([]string, 0, 35)
 	if m.first_name != nil {
 		fields = append(fields, contact.FieldFirstName)
 	}
@@ -4494,6 +5223,45 @@ func (m *ContactMutation) Fields() []string {
 	if m.profile_picture_url != nil {
 		fields = append(fields, contact.FieldProfilePictureURL)
 	}
+	if m.id_number != nil {
+		fields = append(fields, contact.FieldIDNumber)
+	}
+	if m.hometown != nil {
+		fields = append(fields, contact.FieldHometown)
+	}
+	if m.region != nil {
+		fields = append(fields, contact.FieldRegion)
+	}
+	if m.sunday_school_class != nil {
+		fields = append(fields, contact.FieldSundaySchoolClass)
+	}
+	if m.day_born != nil {
+		fields = append(fields, contact.FieldDayBorn)
+	}
+	if m.membership_year != nil {
+		fields = append(fields, contact.FieldMembershipYear)
+	}
+	if m.has_spouse != nil {
+		fields = append(fields, contact.FieldHasSpouse)
+	}
+	if m.spouse_contact != nil {
+		fields = append(fields, contact.FieldSpouseID)
+	}
+	if m.is_baptized != nil {
+		fields = append(fields, contact.FieldIsBaptized)
+	}
+	if m.baptized_by != nil {
+		fields = append(fields, contact.FieldBaptizedBy)
+	}
+	if m.baptism_church != nil {
+		fields = append(fields, contact.FieldBaptismChurch)
+	}
+	if m.baptism_cert_number != nil {
+		fields = append(fields, contact.FieldBaptismCertNumber)
+	}
+	if m.baptism_date != nil {
+		fields = append(fields, contact.FieldBaptismDate)
+	}
 	if m.created_at != nil {
 		fields = append(fields, contact.FieldCreatedAt)
 	}
@@ -4548,6 +5316,32 @@ func (m *ContactMutation) Field(name string) (ent.Value, bool) {
 		return m.EmergencyContactRelationship()
 	case contact.FieldProfilePictureURL:
 		return m.ProfilePictureURL()
+	case contact.FieldIDNumber:
+		return m.IDNumber()
+	case contact.FieldHometown:
+		return m.Hometown()
+	case contact.FieldRegion:
+		return m.Region()
+	case contact.FieldSundaySchoolClass:
+		return m.SundaySchoolClass()
+	case contact.FieldDayBorn:
+		return m.DayBorn()
+	case contact.FieldMembershipYear:
+		return m.MembershipYear()
+	case contact.FieldHasSpouse:
+		return m.HasSpouse()
+	case contact.FieldSpouseID:
+		return m.SpouseID()
+	case contact.FieldIsBaptized:
+		return m.IsBaptized()
+	case contact.FieldBaptizedBy:
+		return m.BaptizedBy()
+	case contact.FieldBaptismChurch:
+		return m.BaptismChurch()
+	case contact.FieldBaptismCertNumber:
+		return m.BaptismCertNumber()
+	case contact.FieldBaptismDate:
+		return m.BaptismDate()
 	case contact.FieldCreatedAt:
 		return m.CreatedAt()
 	case contact.FieldUpdatedAt:
@@ -4601,6 +5395,32 @@ func (m *ContactMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldEmergencyContactRelationship(ctx)
 	case contact.FieldProfilePictureURL:
 		return m.OldProfilePictureURL(ctx)
+	case contact.FieldIDNumber:
+		return m.OldIDNumber(ctx)
+	case contact.FieldHometown:
+		return m.OldHometown(ctx)
+	case contact.FieldRegion:
+		return m.OldRegion(ctx)
+	case contact.FieldSundaySchoolClass:
+		return m.OldSundaySchoolClass(ctx)
+	case contact.FieldDayBorn:
+		return m.OldDayBorn(ctx)
+	case contact.FieldMembershipYear:
+		return m.OldMembershipYear(ctx)
+	case contact.FieldHasSpouse:
+		return m.OldHasSpouse(ctx)
+	case contact.FieldSpouseID:
+		return m.OldSpouseID(ctx)
+	case contact.FieldIsBaptized:
+		return m.OldIsBaptized(ctx)
+	case contact.FieldBaptizedBy:
+		return m.OldBaptizedBy(ctx)
+	case contact.FieldBaptismChurch:
+		return m.OldBaptismChurch(ctx)
+	case contact.FieldBaptismCertNumber:
+		return m.OldBaptismCertNumber(ctx)
+	case contact.FieldBaptismDate:
+		return m.OldBaptismDate(ctx)
 	case contact.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case contact.FieldUpdatedAt:
@@ -4754,6 +5574,97 @@ func (m *ContactMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetProfilePictureURL(v)
 		return nil
+	case contact.FieldIDNumber:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIDNumber(v)
+		return nil
+	case contact.FieldHometown:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHometown(v)
+		return nil
+	case contact.FieldRegion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegion(v)
+		return nil
+	case contact.FieldSundaySchoolClass:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSundaySchoolClass(v)
+		return nil
+	case contact.FieldDayBorn:
+		v, ok := value.(contact.DayBorn)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDayBorn(v)
+		return nil
+	case contact.FieldMembershipYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMembershipYear(v)
+		return nil
+	case contact.FieldHasSpouse:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasSpouse(v)
+		return nil
+	case contact.FieldSpouseID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpouseID(v)
+		return nil
+	case contact.FieldIsBaptized:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsBaptized(v)
+		return nil
+	case contact.FieldBaptizedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBaptizedBy(v)
+		return nil
+	case contact.FieldBaptismChurch:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBaptismChurch(v)
+		return nil
+	case contact.FieldBaptismCertNumber:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBaptismCertNumber(v)
+		return nil
+	case contact.FieldBaptismDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBaptismDate(v)
+		return nil
 	case contact.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -4775,13 +5686,21 @@ func (m *ContactMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ContactMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addmembership_year != nil {
+		fields = append(fields, contact.FieldMembershipYear)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ContactMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case contact.FieldMembershipYear:
+		return m.AddedMembershipYear()
+	}
 	return nil, false
 }
 
@@ -4790,6 +5709,13 @@ func (m *ContactMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ContactMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case contact.FieldMembershipYear:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMembershipYear(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Contact numeric field %s", name)
 }
@@ -4851,6 +5777,39 @@ func (m *ContactMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(contact.FieldProfilePictureURL) {
 		fields = append(fields, contact.FieldProfilePictureURL)
+	}
+	if m.FieldCleared(contact.FieldIDNumber) {
+		fields = append(fields, contact.FieldIDNumber)
+	}
+	if m.FieldCleared(contact.FieldHometown) {
+		fields = append(fields, contact.FieldHometown)
+	}
+	if m.FieldCleared(contact.FieldRegion) {
+		fields = append(fields, contact.FieldRegion)
+	}
+	if m.FieldCleared(contact.FieldSundaySchoolClass) {
+		fields = append(fields, contact.FieldSundaySchoolClass)
+	}
+	if m.FieldCleared(contact.FieldDayBorn) {
+		fields = append(fields, contact.FieldDayBorn)
+	}
+	if m.FieldCleared(contact.FieldMembershipYear) {
+		fields = append(fields, contact.FieldMembershipYear)
+	}
+	if m.FieldCleared(contact.FieldSpouseID) {
+		fields = append(fields, contact.FieldSpouseID)
+	}
+	if m.FieldCleared(contact.FieldBaptizedBy) {
+		fields = append(fields, contact.FieldBaptizedBy)
+	}
+	if m.FieldCleared(contact.FieldBaptismChurch) {
+		fields = append(fields, contact.FieldBaptismChurch)
+	}
+	if m.FieldCleared(contact.FieldBaptismCertNumber) {
+		fields = append(fields, contact.FieldBaptismCertNumber)
+	}
+	if m.FieldCleared(contact.FieldBaptismDate) {
+		fields = append(fields, contact.FieldBaptismDate)
 	}
 	return fields
 }
@@ -4920,6 +5879,39 @@ func (m *ContactMutation) ClearField(name string) error {
 	case contact.FieldProfilePictureURL:
 		m.ClearProfilePictureURL()
 		return nil
+	case contact.FieldIDNumber:
+		m.ClearIDNumber()
+		return nil
+	case contact.FieldHometown:
+		m.ClearHometown()
+		return nil
+	case contact.FieldRegion:
+		m.ClearRegion()
+		return nil
+	case contact.FieldSundaySchoolClass:
+		m.ClearSundaySchoolClass()
+		return nil
+	case contact.FieldDayBorn:
+		m.ClearDayBorn()
+		return nil
+	case contact.FieldMembershipYear:
+		m.ClearMembershipYear()
+		return nil
+	case contact.FieldSpouseID:
+		m.ClearSpouseID()
+		return nil
+	case contact.FieldBaptizedBy:
+		m.ClearBaptizedBy()
+		return nil
+	case contact.FieldBaptismChurch:
+		m.ClearBaptismChurch()
+		return nil
+	case contact.FieldBaptismCertNumber:
+		m.ClearBaptismCertNumber()
+		return nil
+	case contact.FieldBaptismDate:
+		m.ClearBaptismDate()
+		return nil
 	}
 	return fmt.Errorf("unknown Contact nullable field %s", name)
 }
@@ -4988,6 +5980,45 @@ func (m *ContactMutation) ResetField(name string) error {
 	case contact.FieldProfilePictureURL:
 		m.ResetProfilePictureURL()
 		return nil
+	case contact.FieldIDNumber:
+		m.ResetIDNumber()
+		return nil
+	case contact.FieldHometown:
+		m.ResetHometown()
+		return nil
+	case contact.FieldRegion:
+		m.ResetRegion()
+		return nil
+	case contact.FieldSundaySchoolClass:
+		m.ResetSundaySchoolClass()
+		return nil
+	case contact.FieldDayBorn:
+		m.ResetDayBorn()
+		return nil
+	case contact.FieldMembershipYear:
+		m.ResetMembershipYear()
+		return nil
+	case contact.FieldHasSpouse:
+		m.ResetHasSpouse()
+		return nil
+	case contact.FieldSpouseID:
+		m.ResetSpouseID()
+		return nil
+	case contact.FieldIsBaptized:
+		m.ResetIsBaptized()
+		return nil
+	case contact.FieldBaptizedBy:
+		m.ResetBaptizedBy()
+		return nil
+	case contact.FieldBaptismChurch:
+		m.ResetBaptismChurch()
+		return nil
+	case contact.FieldBaptismCertNumber:
+		m.ResetBaptismCertNumber()
+		return nil
+	case contact.FieldBaptismDate:
+		m.ResetBaptismDate()
+		return nil
 	case contact.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
@@ -5000,9 +6031,15 @@ func (m *ContactMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ContactMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.user != nil {
 		edges = append(edges, contact.EdgeUser)
+	}
+	if m.spouse_contact != nil {
+		edges = append(edges, contact.EdgeSpouseContact)
+	}
+	if m.spouse_of_contact != nil {
+		edges = append(edges, contact.EdgeSpouseOfContact)
 	}
 	return edges
 }
@@ -5015,13 +6052,21 @@ func (m *ContactMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
+	case contact.EdgeSpouseContact:
+		if id := m.spouse_contact; id != nil {
+			return []ent.Value{*id}
+		}
+	case contact.EdgeSpouseOfContact:
+		if id := m.spouse_of_contact; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ContactMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -5033,9 +6078,15 @@ func (m *ContactMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ContactMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.cleareduser {
 		edges = append(edges, contact.EdgeUser)
+	}
+	if m.clearedspouse_contact {
+		edges = append(edges, contact.EdgeSpouseContact)
+	}
+	if m.clearedspouse_of_contact {
+		edges = append(edges, contact.EdgeSpouseOfContact)
 	}
 	return edges
 }
@@ -5046,6 +6097,10 @@ func (m *ContactMutation) EdgeCleared(name string) bool {
 	switch name {
 	case contact.EdgeUser:
 		return m.cleareduser
+	case contact.EdgeSpouseContact:
+		return m.clearedspouse_contact
+	case contact.EdgeSpouseOfContact:
+		return m.clearedspouse_of_contact
 	}
 	return false
 }
@@ -5057,6 +6112,12 @@ func (m *ContactMutation) ClearEdge(name string) error {
 	case contact.EdgeUser:
 		m.ClearUser()
 		return nil
+	case contact.EdgeSpouseContact:
+		m.ClearSpouseContact()
+		return nil
+	case contact.EdgeSpouseOfContact:
+		m.ClearSpouseOfContact()
+		return nil
 	}
 	return fmt.Errorf("unknown Contact unique edge %s", name)
 }
@@ -5067,6 +6128,12 @@ func (m *ContactMutation) ResetEdge(name string) error {
 	switch name {
 	case contact.EdgeUser:
 		m.ResetUser()
+		return nil
+	case contact.EdgeSpouseContact:
+		m.ResetSpouseContact()
+		return nil
+	case contact.EdgeSpouseOfContact:
+		m.ResetSpouseOfContact()
 		return nil
 	}
 	return fmt.Errorf("unknown Contact edge %s", name)

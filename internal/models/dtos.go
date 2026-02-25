@@ -98,13 +98,19 @@ type AnnouncementDto struct {
 
 // ProfileDto is used to update the logged-in user's contact info
 type ProfileDto struct {
-	FirstName    string `form:"first_name"`
-	LastName     string `form:"last_name"`
-	Phone        string `form:"phone"`
-	Gender       string `form:"gender"`
-	Occupation   string `form:"occupation"`
-	City         string `form:"city"`
-	Country      string `form:"country"`
+	FirstName         string `form:"first_name"`
+	LastName          string `form:"last_name"`
+	Phone             string `form:"phone"`
+	Gender            string `form:"gender"`
+	Occupation        string `form:"occupation"`
+	City              string `form:"city"`
+	Country           string `form:"country"`
+	IDNumber          string `form:"id_number"`
+	Hometown          string `form:"hometown"`
+	Region            string `form:"region"`
+	SundaySchoolClass string `form:"sunday_school_class"`
+	DayBorn           string `form:"day_born"`
+	HasSpouse         bool   `form:"has_spouse"`
 
 	validator.Validator `form:"-"`
 }
@@ -136,6 +142,25 @@ type MemberDto struct {
 	AddressLine1 string `form:"address_line1"`
 	City         string `form:"city"`
 	Country      string `form:"country"`
+
+	// Church & identity records
+	IDNumber          string `form:"id_number"`
+	Hometown          string `form:"hometown"`
+	Region            string `form:"region"`
+	SundaySchoolClass string `form:"sunday_school_class"`
+	DayBorn           string `form:"day_born"`
+	MembershipYear    int    `form:"membership_year"`
+
+	// Spouse
+	HasSpouse bool `form:"has_spouse"`
+	SpouseID  int  `form:"spouse_id"`
+
+	// Baptism
+	IsBaptized        bool   `form:"is_baptized"`
+	BaptizedBy        string `form:"baptized_by"`
+	BaptismChurch     string `form:"baptism_church"`
+	BaptismCertNumber string `form:"baptism_cert_number"`
+	BaptismDate       string `form:"baptism_date"`
 
 	validator.Validator `form:"-"`
 }

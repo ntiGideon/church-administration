@@ -417,6 +417,261 @@ func (_u *ContactUpdate) ClearProfilePictureURL() *ContactUpdate {
 	return _u
 }
 
+// SetIDNumber sets the "id_number" field.
+func (_u *ContactUpdate) SetIDNumber(v string) *ContactUpdate {
+	_u.mutation.SetIDNumber(v)
+	return _u
+}
+
+// SetNillableIDNumber sets the "id_number" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableIDNumber(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetIDNumber(*v)
+	}
+	return _u
+}
+
+// ClearIDNumber clears the value of the "id_number" field.
+func (_u *ContactUpdate) ClearIDNumber() *ContactUpdate {
+	_u.mutation.ClearIDNumber()
+	return _u
+}
+
+// SetHometown sets the "hometown" field.
+func (_u *ContactUpdate) SetHometown(v string) *ContactUpdate {
+	_u.mutation.SetHometown(v)
+	return _u
+}
+
+// SetNillableHometown sets the "hometown" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableHometown(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetHometown(*v)
+	}
+	return _u
+}
+
+// ClearHometown clears the value of the "hometown" field.
+func (_u *ContactUpdate) ClearHometown() *ContactUpdate {
+	_u.mutation.ClearHometown()
+	return _u
+}
+
+// SetRegion sets the "region" field.
+func (_u *ContactUpdate) SetRegion(v string) *ContactUpdate {
+	_u.mutation.SetRegion(v)
+	return _u
+}
+
+// SetNillableRegion sets the "region" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableRegion(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetRegion(*v)
+	}
+	return _u
+}
+
+// ClearRegion clears the value of the "region" field.
+func (_u *ContactUpdate) ClearRegion() *ContactUpdate {
+	_u.mutation.ClearRegion()
+	return _u
+}
+
+// SetSundaySchoolClass sets the "sunday_school_class" field.
+func (_u *ContactUpdate) SetSundaySchoolClass(v string) *ContactUpdate {
+	_u.mutation.SetSundaySchoolClass(v)
+	return _u
+}
+
+// SetNillableSundaySchoolClass sets the "sunday_school_class" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableSundaySchoolClass(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetSundaySchoolClass(*v)
+	}
+	return _u
+}
+
+// ClearSundaySchoolClass clears the value of the "sunday_school_class" field.
+func (_u *ContactUpdate) ClearSundaySchoolClass() *ContactUpdate {
+	_u.mutation.ClearSundaySchoolClass()
+	return _u
+}
+
+// SetDayBorn sets the "day_born" field.
+func (_u *ContactUpdate) SetDayBorn(v contact.DayBorn) *ContactUpdate {
+	_u.mutation.SetDayBorn(v)
+	return _u
+}
+
+// SetNillableDayBorn sets the "day_born" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableDayBorn(v *contact.DayBorn) *ContactUpdate {
+	if v != nil {
+		_u.SetDayBorn(*v)
+	}
+	return _u
+}
+
+// ClearDayBorn clears the value of the "day_born" field.
+func (_u *ContactUpdate) ClearDayBorn() *ContactUpdate {
+	_u.mutation.ClearDayBorn()
+	return _u
+}
+
+// SetMembershipYear sets the "membership_year" field.
+func (_u *ContactUpdate) SetMembershipYear(v int) *ContactUpdate {
+	_u.mutation.ResetMembershipYear()
+	_u.mutation.SetMembershipYear(v)
+	return _u
+}
+
+// SetNillableMembershipYear sets the "membership_year" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableMembershipYear(v *int) *ContactUpdate {
+	if v != nil {
+		_u.SetMembershipYear(*v)
+	}
+	return _u
+}
+
+// AddMembershipYear adds value to the "membership_year" field.
+func (_u *ContactUpdate) AddMembershipYear(v int) *ContactUpdate {
+	_u.mutation.AddMembershipYear(v)
+	return _u
+}
+
+// ClearMembershipYear clears the value of the "membership_year" field.
+func (_u *ContactUpdate) ClearMembershipYear() *ContactUpdate {
+	_u.mutation.ClearMembershipYear()
+	return _u
+}
+
+// SetHasSpouse sets the "has_spouse" field.
+func (_u *ContactUpdate) SetHasSpouse(v bool) *ContactUpdate {
+	_u.mutation.SetHasSpouse(v)
+	return _u
+}
+
+// SetNillableHasSpouse sets the "has_spouse" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableHasSpouse(v *bool) *ContactUpdate {
+	if v != nil {
+		_u.SetHasSpouse(*v)
+	}
+	return _u
+}
+
+// SetSpouseID sets the "spouse_id" field.
+func (_u *ContactUpdate) SetSpouseID(v int) *ContactUpdate {
+	_u.mutation.SetSpouseID(v)
+	return _u
+}
+
+// SetNillableSpouseID sets the "spouse_id" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableSpouseID(v *int) *ContactUpdate {
+	if v != nil {
+		_u.SetSpouseID(*v)
+	}
+	return _u
+}
+
+// ClearSpouseID clears the value of the "spouse_id" field.
+func (_u *ContactUpdate) ClearSpouseID() *ContactUpdate {
+	_u.mutation.ClearSpouseID()
+	return _u
+}
+
+// SetIsBaptized sets the "is_baptized" field.
+func (_u *ContactUpdate) SetIsBaptized(v bool) *ContactUpdate {
+	_u.mutation.SetIsBaptized(v)
+	return _u
+}
+
+// SetNillableIsBaptized sets the "is_baptized" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableIsBaptized(v *bool) *ContactUpdate {
+	if v != nil {
+		_u.SetIsBaptized(*v)
+	}
+	return _u
+}
+
+// SetBaptizedBy sets the "baptized_by" field.
+func (_u *ContactUpdate) SetBaptizedBy(v string) *ContactUpdate {
+	_u.mutation.SetBaptizedBy(v)
+	return _u
+}
+
+// SetNillableBaptizedBy sets the "baptized_by" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableBaptizedBy(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetBaptizedBy(*v)
+	}
+	return _u
+}
+
+// ClearBaptizedBy clears the value of the "baptized_by" field.
+func (_u *ContactUpdate) ClearBaptizedBy() *ContactUpdate {
+	_u.mutation.ClearBaptizedBy()
+	return _u
+}
+
+// SetBaptismChurch sets the "baptism_church" field.
+func (_u *ContactUpdate) SetBaptismChurch(v string) *ContactUpdate {
+	_u.mutation.SetBaptismChurch(v)
+	return _u
+}
+
+// SetNillableBaptismChurch sets the "baptism_church" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableBaptismChurch(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetBaptismChurch(*v)
+	}
+	return _u
+}
+
+// ClearBaptismChurch clears the value of the "baptism_church" field.
+func (_u *ContactUpdate) ClearBaptismChurch() *ContactUpdate {
+	_u.mutation.ClearBaptismChurch()
+	return _u
+}
+
+// SetBaptismCertNumber sets the "baptism_cert_number" field.
+func (_u *ContactUpdate) SetBaptismCertNumber(v string) *ContactUpdate {
+	_u.mutation.SetBaptismCertNumber(v)
+	return _u
+}
+
+// SetNillableBaptismCertNumber sets the "baptism_cert_number" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableBaptismCertNumber(v *string) *ContactUpdate {
+	if v != nil {
+		_u.SetBaptismCertNumber(*v)
+	}
+	return _u
+}
+
+// ClearBaptismCertNumber clears the value of the "baptism_cert_number" field.
+func (_u *ContactUpdate) ClearBaptismCertNumber() *ContactUpdate {
+	_u.mutation.ClearBaptismCertNumber()
+	return _u
+}
+
+// SetBaptismDate sets the "baptism_date" field.
+func (_u *ContactUpdate) SetBaptismDate(v time.Time) *ContactUpdate {
+	_u.mutation.SetBaptismDate(v)
+	return _u
+}
+
+// SetNillableBaptismDate sets the "baptism_date" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableBaptismDate(v *time.Time) *ContactUpdate {
+	if v != nil {
+		_u.SetBaptismDate(*v)
+	}
+	return _u
+}
+
+// ClearBaptismDate clears the value of the "baptism_date" field.
+func (_u *ContactUpdate) ClearBaptismDate() *ContactUpdate {
+	_u.mutation.ClearBaptismDate()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ContactUpdate) SetCreatedAt(v time.Time) *ContactUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -456,6 +711,44 @@ func (_u *ContactUpdate) SetUser(v *User) *ContactUpdate {
 	return _u.SetUserID(v.ID)
 }
 
+// SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
+func (_u *ContactUpdate) SetSpouseContactID(id int) *ContactUpdate {
+	_u.mutation.SetSpouseContactID(id)
+	return _u
+}
+
+// SetNillableSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_u *ContactUpdate) SetNillableSpouseContactID(id *int) *ContactUpdate {
+	if id != nil {
+		_u = _u.SetSpouseContactID(*id)
+	}
+	return _u
+}
+
+// SetSpouseContact sets the "spouse_contact" edge to the Contact entity.
+func (_u *ContactUpdate) SetSpouseContact(v *Contact) *ContactUpdate {
+	return _u.SetSpouseContactID(v.ID)
+}
+
+// SetSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID.
+func (_u *ContactUpdate) SetSpouseOfContactID(id int) *ContactUpdate {
+	_u.mutation.SetSpouseOfContactID(id)
+	return _u
+}
+
+// SetNillableSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_u *ContactUpdate) SetNillableSpouseOfContactID(id *int) *ContactUpdate {
+	if id != nil {
+		_u = _u.SetSpouseOfContactID(*id)
+	}
+	return _u
+}
+
+// SetSpouseOfContact sets the "spouse_of_contact" edge to the Contact entity.
+func (_u *ContactUpdate) SetSpouseOfContact(v *Contact) *ContactUpdate {
+	return _u.SetSpouseOfContactID(v.ID)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdate) Mutation() *ContactMutation {
 	return _u.mutation
@@ -464,6 +757,18 @@ func (_u *ContactUpdate) Mutation() *ContactMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (_u *ContactUpdate) ClearUser() *ContactUpdate {
 	_u.mutation.ClearUser()
+	return _u
+}
+
+// ClearSpouseContact clears the "spouse_contact" edge to the Contact entity.
+func (_u *ContactUpdate) ClearSpouseContact() *ContactUpdate {
+	_u.mutation.ClearSpouseContact()
+	return _u
+}
+
+// ClearSpouseOfContact clears the "spouse_of_contact" edge to the Contact entity.
+func (_u *ContactUpdate) ClearSpouseOfContact() *ContactUpdate {
+	_u.mutation.ClearSpouseOfContact()
 	return _u
 }
 
@@ -513,6 +818,11 @@ func (_u *ContactUpdate) check() error {
 	if v, ok := _u.mutation.MaritalStatus(); ok {
 		if err := contact.MaritalStatusValidator(v); err != nil {
 			return &ValidationError{Name: "marital_status", err: fmt.Errorf(`ent: validator failed for field "Contact.marital_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.DayBorn(); ok {
+		if err := contact.DayBornValidator(v); err != nil {
+			return &ValidationError{Name: "day_born", err: fmt.Errorf(`ent: validator failed for field "Contact.day_born": %w`, err)}
 		}
 	}
 	return nil
@@ -644,6 +954,75 @@ func (_u *ContactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.ProfilePictureURLCleared() {
 		_spec.ClearField(contact.FieldProfilePictureURL, field.TypeString)
 	}
+	if value, ok := _u.mutation.IDNumber(); ok {
+		_spec.SetField(contact.FieldIDNumber, field.TypeString, value)
+	}
+	if _u.mutation.IDNumberCleared() {
+		_spec.ClearField(contact.FieldIDNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.Hometown(); ok {
+		_spec.SetField(contact.FieldHometown, field.TypeString, value)
+	}
+	if _u.mutation.HometownCleared() {
+		_spec.ClearField(contact.FieldHometown, field.TypeString)
+	}
+	if value, ok := _u.mutation.Region(); ok {
+		_spec.SetField(contact.FieldRegion, field.TypeString, value)
+	}
+	if _u.mutation.RegionCleared() {
+		_spec.ClearField(contact.FieldRegion, field.TypeString)
+	}
+	if value, ok := _u.mutation.SundaySchoolClass(); ok {
+		_spec.SetField(contact.FieldSundaySchoolClass, field.TypeString, value)
+	}
+	if _u.mutation.SundaySchoolClassCleared() {
+		_spec.ClearField(contact.FieldSundaySchoolClass, field.TypeString)
+	}
+	if value, ok := _u.mutation.DayBorn(); ok {
+		_spec.SetField(contact.FieldDayBorn, field.TypeEnum, value)
+	}
+	if _u.mutation.DayBornCleared() {
+		_spec.ClearField(contact.FieldDayBorn, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.MembershipYear(); ok {
+		_spec.SetField(contact.FieldMembershipYear, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedMembershipYear(); ok {
+		_spec.AddField(contact.FieldMembershipYear, field.TypeInt, value)
+	}
+	if _u.mutation.MembershipYearCleared() {
+		_spec.ClearField(contact.FieldMembershipYear, field.TypeInt)
+	}
+	if value, ok := _u.mutation.HasSpouse(); ok {
+		_spec.SetField(contact.FieldHasSpouse, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.IsBaptized(); ok {
+		_spec.SetField(contact.FieldIsBaptized, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.BaptizedBy(); ok {
+		_spec.SetField(contact.FieldBaptizedBy, field.TypeString, value)
+	}
+	if _u.mutation.BaptizedByCleared() {
+		_spec.ClearField(contact.FieldBaptizedBy, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismChurch(); ok {
+		_spec.SetField(contact.FieldBaptismChurch, field.TypeString, value)
+	}
+	if _u.mutation.BaptismChurchCleared() {
+		_spec.ClearField(contact.FieldBaptismChurch, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismCertNumber(); ok {
+		_spec.SetField(contact.FieldBaptismCertNumber, field.TypeString, value)
+	}
+	if _u.mutation.BaptismCertNumberCleared() {
+		_spec.ClearField(contact.FieldBaptismCertNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismDate(); ok {
+		_spec.SetField(contact.FieldBaptismDate, field.TypeTime, value)
+	}
+	if _u.mutation.BaptismDateCleared() {
+		_spec.ClearField(contact.FieldBaptismDate, field.TypeTime)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(contact.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -672,6 +1051,64 @@ func (_u *ContactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SpouseContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   contact.SpouseContactTable,
+			Columns: []string{contact.SpouseContactColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SpouseContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   contact.SpouseContactTable,
+			Columns: []string{contact.SpouseContactColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SpouseOfContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   contact.SpouseOfContactTable,
+			Columns: []string{contact.SpouseOfContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SpouseOfContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   contact.SpouseOfContactTable,
+			Columns: []string{contact.SpouseOfContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1087,6 +1524,261 @@ func (_u *ContactUpdateOne) ClearProfilePictureURL() *ContactUpdateOne {
 	return _u
 }
 
+// SetIDNumber sets the "id_number" field.
+func (_u *ContactUpdateOne) SetIDNumber(v string) *ContactUpdateOne {
+	_u.mutation.SetIDNumber(v)
+	return _u
+}
+
+// SetNillableIDNumber sets the "id_number" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableIDNumber(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetIDNumber(*v)
+	}
+	return _u
+}
+
+// ClearIDNumber clears the value of the "id_number" field.
+func (_u *ContactUpdateOne) ClearIDNumber() *ContactUpdateOne {
+	_u.mutation.ClearIDNumber()
+	return _u
+}
+
+// SetHometown sets the "hometown" field.
+func (_u *ContactUpdateOne) SetHometown(v string) *ContactUpdateOne {
+	_u.mutation.SetHometown(v)
+	return _u
+}
+
+// SetNillableHometown sets the "hometown" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableHometown(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetHometown(*v)
+	}
+	return _u
+}
+
+// ClearHometown clears the value of the "hometown" field.
+func (_u *ContactUpdateOne) ClearHometown() *ContactUpdateOne {
+	_u.mutation.ClearHometown()
+	return _u
+}
+
+// SetRegion sets the "region" field.
+func (_u *ContactUpdateOne) SetRegion(v string) *ContactUpdateOne {
+	_u.mutation.SetRegion(v)
+	return _u
+}
+
+// SetNillableRegion sets the "region" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableRegion(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetRegion(*v)
+	}
+	return _u
+}
+
+// ClearRegion clears the value of the "region" field.
+func (_u *ContactUpdateOne) ClearRegion() *ContactUpdateOne {
+	_u.mutation.ClearRegion()
+	return _u
+}
+
+// SetSundaySchoolClass sets the "sunday_school_class" field.
+func (_u *ContactUpdateOne) SetSundaySchoolClass(v string) *ContactUpdateOne {
+	_u.mutation.SetSundaySchoolClass(v)
+	return _u
+}
+
+// SetNillableSundaySchoolClass sets the "sunday_school_class" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableSundaySchoolClass(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetSundaySchoolClass(*v)
+	}
+	return _u
+}
+
+// ClearSundaySchoolClass clears the value of the "sunday_school_class" field.
+func (_u *ContactUpdateOne) ClearSundaySchoolClass() *ContactUpdateOne {
+	_u.mutation.ClearSundaySchoolClass()
+	return _u
+}
+
+// SetDayBorn sets the "day_born" field.
+func (_u *ContactUpdateOne) SetDayBorn(v contact.DayBorn) *ContactUpdateOne {
+	_u.mutation.SetDayBorn(v)
+	return _u
+}
+
+// SetNillableDayBorn sets the "day_born" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableDayBorn(v *contact.DayBorn) *ContactUpdateOne {
+	if v != nil {
+		_u.SetDayBorn(*v)
+	}
+	return _u
+}
+
+// ClearDayBorn clears the value of the "day_born" field.
+func (_u *ContactUpdateOne) ClearDayBorn() *ContactUpdateOne {
+	_u.mutation.ClearDayBorn()
+	return _u
+}
+
+// SetMembershipYear sets the "membership_year" field.
+func (_u *ContactUpdateOne) SetMembershipYear(v int) *ContactUpdateOne {
+	_u.mutation.ResetMembershipYear()
+	_u.mutation.SetMembershipYear(v)
+	return _u
+}
+
+// SetNillableMembershipYear sets the "membership_year" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableMembershipYear(v *int) *ContactUpdateOne {
+	if v != nil {
+		_u.SetMembershipYear(*v)
+	}
+	return _u
+}
+
+// AddMembershipYear adds value to the "membership_year" field.
+func (_u *ContactUpdateOne) AddMembershipYear(v int) *ContactUpdateOne {
+	_u.mutation.AddMembershipYear(v)
+	return _u
+}
+
+// ClearMembershipYear clears the value of the "membership_year" field.
+func (_u *ContactUpdateOne) ClearMembershipYear() *ContactUpdateOne {
+	_u.mutation.ClearMembershipYear()
+	return _u
+}
+
+// SetHasSpouse sets the "has_spouse" field.
+func (_u *ContactUpdateOne) SetHasSpouse(v bool) *ContactUpdateOne {
+	_u.mutation.SetHasSpouse(v)
+	return _u
+}
+
+// SetNillableHasSpouse sets the "has_spouse" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableHasSpouse(v *bool) *ContactUpdateOne {
+	if v != nil {
+		_u.SetHasSpouse(*v)
+	}
+	return _u
+}
+
+// SetSpouseID sets the "spouse_id" field.
+func (_u *ContactUpdateOne) SetSpouseID(v int) *ContactUpdateOne {
+	_u.mutation.SetSpouseID(v)
+	return _u
+}
+
+// SetNillableSpouseID sets the "spouse_id" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableSpouseID(v *int) *ContactUpdateOne {
+	if v != nil {
+		_u.SetSpouseID(*v)
+	}
+	return _u
+}
+
+// ClearSpouseID clears the value of the "spouse_id" field.
+func (_u *ContactUpdateOne) ClearSpouseID() *ContactUpdateOne {
+	_u.mutation.ClearSpouseID()
+	return _u
+}
+
+// SetIsBaptized sets the "is_baptized" field.
+func (_u *ContactUpdateOne) SetIsBaptized(v bool) *ContactUpdateOne {
+	_u.mutation.SetIsBaptized(v)
+	return _u
+}
+
+// SetNillableIsBaptized sets the "is_baptized" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableIsBaptized(v *bool) *ContactUpdateOne {
+	if v != nil {
+		_u.SetIsBaptized(*v)
+	}
+	return _u
+}
+
+// SetBaptizedBy sets the "baptized_by" field.
+func (_u *ContactUpdateOne) SetBaptizedBy(v string) *ContactUpdateOne {
+	_u.mutation.SetBaptizedBy(v)
+	return _u
+}
+
+// SetNillableBaptizedBy sets the "baptized_by" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableBaptizedBy(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetBaptizedBy(*v)
+	}
+	return _u
+}
+
+// ClearBaptizedBy clears the value of the "baptized_by" field.
+func (_u *ContactUpdateOne) ClearBaptizedBy() *ContactUpdateOne {
+	_u.mutation.ClearBaptizedBy()
+	return _u
+}
+
+// SetBaptismChurch sets the "baptism_church" field.
+func (_u *ContactUpdateOne) SetBaptismChurch(v string) *ContactUpdateOne {
+	_u.mutation.SetBaptismChurch(v)
+	return _u
+}
+
+// SetNillableBaptismChurch sets the "baptism_church" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableBaptismChurch(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetBaptismChurch(*v)
+	}
+	return _u
+}
+
+// ClearBaptismChurch clears the value of the "baptism_church" field.
+func (_u *ContactUpdateOne) ClearBaptismChurch() *ContactUpdateOne {
+	_u.mutation.ClearBaptismChurch()
+	return _u
+}
+
+// SetBaptismCertNumber sets the "baptism_cert_number" field.
+func (_u *ContactUpdateOne) SetBaptismCertNumber(v string) *ContactUpdateOne {
+	_u.mutation.SetBaptismCertNumber(v)
+	return _u
+}
+
+// SetNillableBaptismCertNumber sets the "baptism_cert_number" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableBaptismCertNumber(v *string) *ContactUpdateOne {
+	if v != nil {
+		_u.SetBaptismCertNumber(*v)
+	}
+	return _u
+}
+
+// ClearBaptismCertNumber clears the value of the "baptism_cert_number" field.
+func (_u *ContactUpdateOne) ClearBaptismCertNumber() *ContactUpdateOne {
+	_u.mutation.ClearBaptismCertNumber()
+	return _u
+}
+
+// SetBaptismDate sets the "baptism_date" field.
+func (_u *ContactUpdateOne) SetBaptismDate(v time.Time) *ContactUpdateOne {
+	_u.mutation.SetBaptismDate(v)
+	return _u
+}
+
+// SetNillableBaptismDate sets the "baptism_date" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableBaptismDate(v *time.Time) *ContactUpdateOne {
+	if v != nil {
+		_u.SetBaptismDate(*v)
+	}
+	return _u
+}
+
+// ClearBaptismDate clears the value of the "baptism_date" field.
+func (_u *ContactUpdateOne) ClearBaptismDate() *ContactUpdateOne {
+	_u.mutation.ClearBaptismDate()
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ContactUpdateOne) SetCreatedAt(v time.Time) *ContactUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -1126,6 +1818,44 @@ func (_u *ContactUpdateOne) SetUser(v *User) *ContactUpdateOne {
 	return _u.SetUserID(v.ID)
 }
 
+// SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
+func (_u *ContactUpdateOne) SetSpouseContactID(id int) *ContactUpdateOne {
+	_u.mutation.SetSpouseContactID(id)
+	return _u
+}
+
+// SetNillableSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableSpouseContactID(id *int) *ContactUpdateOne {
+	if id != nil {
+		_u = _u.SetSpouseContactID(*id)
+	}
+	return _u
+}
+
+// SetSpouseContact sets the "spouse_contact" edge to the Contact entity.
+func (_u *ContactUpdateOne) SetSpouseContact(v *Contact) *ContactUpdateOne {
+	return _u.SetSpouseContactID(v.ID)
+}
+
+// SetSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID.
+func (_u *ContactUpdateOne) SetSpouseOfContactID(id int) *ContactUpdateOne {
+	_u.mutation.SetSpouseOfContactID(id)
+	return _u
+}
+
+// SetNillableSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableSpouseOfContactID(id *int) *ContactUpdateOne {
+	if id != nil {
+		_u = _u.SetSpouseOfContactID(*id)
+	}
+	return _u
+}
+
+// SetSpouseOfContact sets the "spouse_of_contact" edge to the Contact entity.
+func (_u *ContactUpdateOne) SetSpouseOfContact(v *Contact) *ContactUpdateOne {
+	return _u.SetSpouseOfContactID(v.ID)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdateOne) Mutation() *ContactMutation {
 	return _u.mutation
@@ -1134,6 +1864,18 @@ func (_u *ContactUpdateOne) Mutation() *ContactMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (_u *ContactUpdateOne) ClearUser() *ContactUpdateOne {
 	_u.mutation.ClearUser()
+	return _u
+}
+
+// ClearSpouseContact clears the "spouse_contact" edge to the Contact entity.
+func (_u *ContactUpdateOne) ClearSpouseContact() *ContactUpdateOne {
+	_u.mutation.ClearSpouseContact()
+	return _u
+}
+
+// ClearSpouseOfContact clears the "spouse_of_contact" edge to the Contact entity.
+func (_u *ContactUpdateOne) ClearSpouseOfContact() *ContactUpdateOne {
+	_u.mutation.ClearSpouseOfContact()
 	return _u
 }
 
@@ -1196,6 +1938,11 @@ func (_u *ContactUpdateOne) check() error {
 	if v, ok := _u.mutation.MaritalStatus(); ok {
 		if err := contact.MaritalStatusValidator(v); err != nil {
 			return &ValidationError{Name: "marital_status", err: fmt.Errorf(`ent: validator failed for field "Contact.marital_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.DayBorn(); ok {
+		if err := contact.DayBornValidator(v); err != nil {
+			return &ValidationError{Name: "day_born", err: fmt.Errorf(`ent: validator failed for field "Contact.day_born": %w`, err)}
 		}
 	}
 	return nil
@@ -1344,6 +2091,75 @@ func (_u *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err er
 	if _u.mutation.ProfilePictureURLCleared() {
 		_spec.ClearField(contact.FieldProfilePictureURL, field.TypeString)
 	}
+	if value, ok := _u.mutation.IDNumber(); ok {
+		_spec.SetField(contact.FieldIDNumber, field.TypeString, value)
+	}
+	if _u.mutation.IDNumberCleared() {
+		_spec.ClearField(contact.FieldIDNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.Hometown(); ok {
+		_spec.SetField(contact.FieldHometown, field.TypeString, value)
+	}
+	if _u.mutation.HometownCleared() {
+		_spec.ClearField(contact.FieldHometown, field.TypeString)
+	}
+	if value, ok := _u.mutation.Region(); ok {
+		_spec.SetField(contact.FieldRegion, field.TypeString, value)
+	}
+	if _u.mutation.RegionCleared() {
+		_spec.ClearField(contact.FieldRegion, field.TypeString)
+	}
+	if value, ok := _u.mutation.SundaySchoolClass(); ok {
+		_spec.SetField(contact.FieldSundaySchoolClass, field.TypeString, value)
+	}
+	if _u.mutation.SundaySchoolClassCleared() {
+		_spec.ClearField(contact.FieldSundaySchoolClass, field.TypeString)
+	}
+	if value, ok := _u.mutation.DayBorn(); ok {
+		_spec.SetField(contact.FieldDayBorn, field.TypeEnum, value)
+	}
+	if _u.mutation.DayBornCleared() {
+		_spec.ClearField(contact.FieldDayBorn, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.MembershipYear(); ok {
+		_spec.SetField(contact.FieldMembershipYear, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedMembershipYear(); ok {
+		_spec.AddField(contact.FieldMembershipYear, field.TypeInt, value)
+	}
+	if _u.mutation.MembershipYearCleared() {
+		_spec.ClearField(contact.FieldMembershipYear, field.TypeInt)
+	}
+	if value, ok := _u.mutation.HasSpouse(); ok {
+		_spec.SetField(contact.FieldHasSpouse, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.IsBaptized(); ok {
+		_spec.SetField(contact.FieldIsBaptized, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.BaptizedBy(); ok {
+		_spec.SetField(contact.FieldBaptizedBy, field.TypeString, value)
+	}
+	if _u.mutation.BaptizedByCleared() {
+		_spec.ClearField(contact.FieldBaptizedBy, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismChurch(); ok {
+		_spec.SetField(contact.FieldBaptismChurch, field.TypeString, value)
+	}
+	if _u.mutation.BaptismChurchCleared() {
+		_spec.ClearField(contact.FieldBaptismChurch, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismCertNumber(); ok {
+		_spec.SetField(contact.FieldBaptismCertNumber, field.TypeString, value)
+	}
+	if _u.mutation.BaptismCertNumberCleared() {
+		_spec.ClearField(contact.FieldBaptismCertNumber, field.TypeString)
+	}
+	if value, ok := _u.mutation.BaptismDate(); ok {
+		_spec.SetField(contact.FieldBaptismDate, field.TypeTime, value)
+	}
+	if _u.mutation.BaptismDateCleared() {
+		_spec.ClearField(contact.FieldBaptismDate, field.TypeTime)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(contact.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -1372,6 +2188,64 @@ func (_u *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SpouseContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   contact.SpouseContactTable,
+			Columns: []string{contact.SpouseContactColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SpouseContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   contact.SpouseContactTable,
+			Columns: []string{contact.SpouseContactColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SpouseOfContactCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   contact.SpouseOfContactTable,
+			Columns: []string{contact.SpouseOfContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SpouseOfContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   contact.SpouseOfContactTable,
+			Columns: []string{contact.SpouseOfContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -285,6 +285,188 @@ func (_c *ContactCreate) SetNillableProfilePictureURL(v *string) *ContactCreate 
 	return _c
 }
 
+// SetIDNumber sets the "id_number" field.
+func (_c *ContactCreate) SetIDNumber(v string) *ContactCreate {
+	_c.mutation.SetIDNumber(v)
+	return _c
+}
+
+// SetNillableIDNumber sets the "id_number" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableIDNumber(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetIDNumber(*v)
+	}
+	return _c
+}
+
+// SetHometown sets the "hometown" field.
+func (_c *ContactCreate) SetHometown(v string) *ContactCreate {
+	_c.mutation.SetHometown(v)
+	return _c
+}
+
+// SetNillableHometown sets the "hometown" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableHometown(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetHometown(*v)
+	}
+	return _c
+}
+
+// SetRegion sets the "region" field.
+func (_c *ContactCreate) SetRegion(v string) *ContactCreate {
+	_c.mutation.SetRegion(v)
+	return _c
+}
+
+// SetNillableRegion sets the "region" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableRegion(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetRegion(*v)
+	}
+	return _c
+}
+
+// SetSundaySchoolClass sets the "sunday_school_class" field.
+func (_c *ContactCreate) SetSundaySchoolClass(v string) *ContactCreate {
+	_c.mutation.SetSundaySchoolClass(v)
+	return _c
+}
+
+// SetNillableSundaySchoolClass sets the "sunday_school_class" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableSundaySchoolClass(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetSundaySchoolClass(*v)
+	}
+	return _c
+}
+
+// SetDayBorn sets the "day_born" field.
+func (_c *ContactCreate) SetDayBorn(v contact.DayBorn) *ContactCreate {
+	_c.mutation.SetDayBorn(v)
+	return _c
+}
+
+// SetNillableDayBorn sets the "day_born" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableDayBorn(v *contact.DayBorn) *ContactCreate {
+	if v != nil {
+		_c.SetDayBorn(*v)
+	}
+	return _c
+}
+
+// SetMembershipYear sets the "membership_year" field.
+func (_c *ContactCreate) SetMembershipYear(v int) *ContactCreate {
+	_c.mutation.SetMembershipYear(v)
+	return _c
+}
+
+// SetNillableMembershipYear sets the "membership_year" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableMembershipYear(v *int) *ContactCreate {
+	if v != nil {
+		_c.SetMembershipYear(*v)
+	}
+	return _c
+}
+
+// SetHasSpouse sets the "has_spouse" field.
+func (_c *ContactCreate) SetHasSpouse(v bool) *ContactCreate {
+	_c.mutation.SetHasSpouse(v)
+	return _c
+}
+
+// SetNillableHasSpouse sets the "has_spouse" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableHasSpouse(v *bool) *ContactCreate {
+	if v != nil {
+		_c.SetHasSpouse(*v)
+	}
+	return _c
+}
+
+// SetSpouseID sets the "spouse_id" field.
+func (_c *ContactCreate) SetSpouseID(v int) *ContactCreate {
+	_c.mutation.SetSpouseID(v)
+	return _c
+}
+
+// SetNillableSpouseID sets the "spouse_id" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableSpouseID(v *int) *ContactCreate {
+	if v != nil {
+		_c.SetSpouseID(*v)
+	}
+	return _c
+}
+
+// SetIsBaptized sets the "is_baptized" field.
+func (_c *ContactCreate) SetIsBaptized(v bool) *ContactCreate {
+	_c.mutation.SetIsBaptized(v)
+	return _c
+}
+
+// SetNillableIsBaptized sets the "is_baptized" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableIsBaptized(v *bool) *ContactCreate {
+	if v != nil {
+		_c.SetIsBaptized(*v)
+	}
+	return _c
+}
+
+// SetBaptizedBy sets the "baptized_by" field.
+func (_c *ContactCreate) SetBaptizedBy(v string) *ContactCreate {
+	_c.mutation.SetBaptizedBy(v)
+	return _c
+}
+
+// SetNillableBaptizedBy sets the "baptized_by" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableBaptizedBy(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetBaptizedBy(*v)
+	}
+	return _c
+}
+
+// SetBaptismChurch sets the "baptism_church" field.
+func (_c *ContactCreate) SetBaptismChurch(v string) *ContactCreate {
+	_c.mutation.SetBaptismChurch(v)
+	return _c
+}
+
+// SetNillableBaptismChurch sets the "baptism_church" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableBaptismChurch(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetBaptismChurch(*v)
+	}
+	return _c
+}
+
+// SetBaptismCertNumber sets the "baptism_cert_number" field.
+func (_c *ContactCreate) SetBaptismCertNumber(v string) *ContactCreate {
+	_c.mutation.SetBaptismCertNumber(v)
+	return _c
+}
+
+// SetNillableBaptismCertNumber sets the "baptism_cert_number" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableBaptismCertNumber(v *string) *ContactCreate {
+	if v != nil {
+		_c.SetBaptismCertNumber(*v)
+	}
+	return _c
+}
+
+// SetBaptismDate sets the "baptism_date" field.
+func (_c *ContactCreate) SetBaptismDate(v time.Time) *ContactCreate {
+	_c.mutation.SetBaptismDate(v)
+	return _c
+}
+
+// SetNillableBaptismDate sets the "baptism_date" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableBaptismDate(v *time.Time) *ContactCreate {
+	if v != nil {
+		_c.SetBaptismDate(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ContactCreate) SetCreatedAt(v time.Time) *ContactCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -332,6 +514,44 @@ func (_c *ContactCreate) SetUser(v *User) *ContactCreate {
 	return _c.SetUserID(v.ID)
 }
 
+// SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
+func (_c *ContactCreate) SetSpouseContactID(id int) *ContactCreate {
+	_c.mutation.SetSpouseContactID(id)
+	return _c
+}
+
+// SetNillableSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_c *ContactCreate) SetNillableSpouseContactID(id *int) *ContactCreate {
+	if id != nil {
+		_c = _c.SetSpouseContactID(*id)
+	}
+	return _c
+}
+
+// SetSpouseContact sets the "spouse_contact" edge to the Contact entity.
+func (_c *ContactCreate) SetSpouseContact(v *Contact) *ContactCreate {
+	return _c.SetSpouseContactID(v.ID)
+}
+
+// SetSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID.
+func (_c *ContactCreate) SetSpouseOfContactID(id int) *ContactCreate {
+	_c.mutation.SetSpouseOfContactID(id)
+	return _c
+}
+
+// SetNillableSpouseOfContactID sets the "spouse_of_contact" edge to the Contact entity by ID if the given value is not nil.
+func (_c *ContactCreate) SetNillableSpouseOfContactID(id *int) *ContactCreate {
+	if id != nil {
+		_c = _c.SetSpouseOfContactID(*id)
+	}
+	return _c
+}
+
+// SetSpouseOfContact sets the "spouse_of_contact" edge to the Contact entity.
+func (_c *ContactCreate) SetSpouseOfContact(v *Contact) *ContactCreate {
+	return _c.SetSpouseOfContactID(v.ID)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_c *ContactCreate) Mutation() *ContactMutation {
 	return _c.mutation
@@ -367,6 +587,14 @@ func (_c *ContactCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ContactCreate) defaults() {
+	if _, ok := _c.mutation.HasSpouse(); !ok {
+		v := contact.DefaultHasSpouse
+		_c.mutation.SetHasSpouse(v)
+	}
+	if _, ok := _c.mutation.IsBaptized(); !ok {
+		v := contact.DefaultIsBaptized
+		_c.mutation.SetIsBaptized(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := contact.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -394,6 +622,17 @@ func (_c *ContactCreate) check() error {
 		if err := contact.MaritalStatusValidator(v); err != nil {
 			return &ValidationError{Name: "marital_status", err: fmt.Errorf(`ent: validator failed for field "Contact.marital_status": %w`, err)}
 		}
+	}
+	if v, ok := _c.mutation.DayBorn(); ok {
+		if err := contact.DayBornValidator(v); err != nil {
+			return &ValidationError{Name: "day_born", err: fmt.Errorf(`ent: validator failed for field "Contact.day_born": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.HasSpouse(); !ok {
+		return &ValidationError{Name: "has_spouse", err: errors.New(`ent: missing required field "Contact.has_spouse"`)}
+	}
+	if _, ok := _c.mutation.IsBaptized(); !ok {
+		return &ValidationError{Name: "is_baptized", err: errors.New(`ent: missing required field "Contact.is_baptized"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Contact.created_at"`)}
@@ -507,6 +746,54 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 		_spec.SetField(contact.FieldProfilePictureURL, field.TypeString, value)
 		_node.ProfilePictureURL = value
 	}
+	if value, ok := _c.mutation.IDNumber(); ok {
+		_spec.SetField(contact.FieldIDNumber, field.TypeString, value)
+		_node.IDNumber = value
+	}
+	if value, ok := _c.mutation.Hometown(); ok {
+		_spec.SetField(contact.FieldHometown, field.TypeString, value)
+		_node.Hometown = value
+	}
+	if value, ok := _c.mutation.Region(); ok {
+		_spec.SetField(contact.FieldRegion, field.TypeString, value)
+		_node.Region = value
+	}
+	if value, ok := _c.mutation.SundaySchoolClass(); ok {
+		_spec.SetField(contact.FieldSundaySchoolClass, field.TypeString, value)
+		_node.SundaySchoolClass = value
+	}
+	if value, ok := _c.mutation.DayBorn(); ok {
+		_spec.SetField(contact.FieldDayBorn, field.TypeEnum, value)
+		_node.DayBorn = value
+	}
+	if value, ok := _c.mutation.MembershipYear(); ok {
+		_spec.SetField(contact.FieldMembershipYear, field.TypeInt, value)
+		_node.MembershipYear = value
+	}
+	if value, ok := _c.mutation.HasSpouse(); ok {
+		_spec.SetField(contact.FieldHasSpouse, field.TypeBool, value)
+		_node.HasSpouse = value
+	}
+	if value, ok := _c.mutation.IsBaptized(); ok {
+		_spec.SetField(contact.FieldIsBaptized, field.TypeBool, value)
+		_node.IsBaptized = value
+	}
+	if value, ok := _c.mutation.BaptizedBy(); ok {
+		_spec.SetField(contact.FieldBaptizedBy, field.TypeString, value)
+		_node.BaptizedBy = value
+	}
+	if value, ok := _c.mutation.BaptismChurch(); ok {
+		_spec.SetField(contact.FieldBaptismChurch, field.TypeString, value)
+		_node.BaptismChurch = value
+	}
+	if value, ok := _c.mutation.BaptismCertNumber(); ok {
+		_spec.SetField(contact.FieldBaptismCertNumber, field.TypeString, value)
+		_node.BaptismCertNumber = value
+	}
+	if value, ok := _c.mutation.BaptismDate(); ok {
+		_spec.SetField(contact.FieldBaptismDate, field.TypeTime, value)
+		_node.BaptismDate = value
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(contact.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -529,6 +816,40 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SpouseContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   contact.SpouseContactTable,
+			Columns: []string{contact.SpouseContactColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SpouseID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SpouseOfContactIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   contact.SpouseOfContactTable,
+			Columns: []string{contact.SpouseOfContactColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SpouseID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -67,12 +67,20 @@ func init() {
 	church.UpdateDefaultUpdatedAt = churchDescUpdatedAt.UpdateDefault.(func() time.Time)
 	contactFields := schema.Contact{}.Fields()
 	_ = contactFields
+	// contactDescHasSpouse is the schema descriptor for has_spouse field.
+	contactDescHasSpouse := contactFields[26].Descriptor()
+	// contact.DefaultHasSpouse holds the default value on creation for the has_spouse field.
+	contact.DefaultHasSpouse = contactDescHasSpouse.Default.(bool)
+	// contactDescIsBaptized is the schema descriptor for is_baptized field.
+	contactDescIsBaptized := contactFields[28].Descriptor()
+	// contact.DefaultIsBaptized holds the default value on creation for the is_baptized field.
+	contact.DefaultIsBaptized = contactDescIsBaptized.Default.(bool)
 	// contactDescCreatedAt is the schema descriptor for created_at field.
-	contactDescCreatedAt := contactFields[20].Descriptor()
+	contactDescCreatedAt := contactFields[33].Descriptor()
 	// contact.DefaultCreatedAt holds the default value on creation for the created_at field.
 	contact.DefaultCreatedAt = contactDescCreatedAt.Default.(func() time.Time)
 	// contactDescUpdatedAt is the schema descriptor for updated_at field.
-	contactDescUpdatedAt := contactFields[21].Descriptor()
+	contactDescUpdatedAt := contactFields[34].Descriptor()
 	// contact.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	contact.DefaultUpdatedAt = contactDescUpdatedAt.Default.(func() time.Time)
 	// contact.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -58,6 +58,32 @@ type Contact struct {
 	EmergencyContactRelationship string `json:"emergency_contact_relationship,omitempty"`
 	// ProfilePictureURL holds the value of the "profile_picture_url" field.
 	ProfilePictureURL string `json:"profile_picture_url,omitempty"`
+	// IDNumber holds the value of the "id_number" field.
+	IDNumber string `json:"id_number,omitempty"`
+	// Hometown holds the value of the "hometown" field.
+	Hometown string `json:"hometown,omitempty"`
+	// Region holds the value of the "region" field.
+	Region string `json:"region,omitempty"`
+	// SundaySchoolClass holds the value of the "sunday_school_class" field.
+	SundaySchoolClass string `json:"sunday_school_class,omitempty"`
+	// DayBorn holds the value of the "day_born" field.
+	DayBorn contact.DayBorn `json:"day_born,omitempty"`
+	// MembershipYear holds the value of the "membership_year" field.
+	MembershipYear int `json:"membership_year,omitempty"`
+	// HasSpouse holds the value of the "has_spouse" field.
+	HasSpouse bool `json:"has_spouse,omitempty"`
+	// SpouseID holds the value of the "spouse_id" field.
+	SpouseID int `json:"spouse_id,omitempty"`
+	// IsBaptized holds the value of the "is_baptized" field.
+	IsBaptized bool `json:"is_baptized,omitempty"`
+	// BaptizedBy holds the value of the "baptized_by" field.
+	BaptizedBy string `json:"baptized_by,omitempty"`
+	// BaptismChurch holds the value of the "baptism_church" field.
+	BaptismChurch string `json:"baptism_church,omitempty"`
+	// BaptismCertNumber holds the value of the "baptism_cert_number" field.
+	BaptismCertNumber string `json:"baptism_cert_number,omitempty"`
+	// BaptismDate holds the value of the "baptism_date" field.
+	BaptismDate time.Time `json:"baptism_date,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -72,9 +98,13 @@ type Contact struct {
 type ContactEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// SpouseContact holds the value of the spouse_contact edge.
+	SpouseContact *Contact `json:"spouse_contact,omitempty"`
+	// SpouseOfContact holds the value of the spouse_of_contact edge.
+	SpouseOfContact *Contact `json:"spouse_of_contact,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -88,16 +118,40 @@ func (e ContactEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
+// SpouseContactOrErr returns the SpouseContact value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ContactEdges) SpouseContactOrErr() (*Contact, error) {
+	if e.SpouseContact != nil {
+		return e.SpouseContact, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: contact.Label}
+	}
+	return nil, &NotLoadedError{edge: "spouse_contact"}
+}
+
+// SpouseOfContactOrErr returns the SpouseOfContact value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ContactEdges) SpouseOfContactOrErr() (*Contact, error) {
+	if e.SpouseOfContact != nil {
+		return e.SpouseOfContact, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: contact.Label}
+	}
+	return nil, &NotLoadedError{edge: "spouse_of_contact"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Contact) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case contact.FieldID:
+		case contact.FieldHasSpouse, contact.FieldIsBaptized:
+			values[i] = new(sql.NullBool)
+		case contact.FieldID, contact.FieldMembershipYear, contact.FieldSpouseID:
 			values[i] = new(sql.NullInt64)
-		case contact.FieldFirstName, contact.FieldLastName, contact.FieldMiddleName, contact.FieldPhone, contact.FieldSecondaryPhone, contact.FieldEmail, contact.FieldGender, contact.FieldMaritalStatus, contact.FieldOccupation, contact.FieldAddressLine1, contact.FieldAddressLine2, contact.FieldCity, contact.FieldState, contact.FieldCountry, contact.FieldPostalCode, contact.FieldEmergencyContactName, contact.FieldEmergencyContactPhone, contact.FieldEmergencyContactRelationship, contact.FieldProfilePictureURL:
+		case contact.FieldFirstName, contact.FieldLastName, contact.FieldMiddleName, contact.FieldPhone, contact.FieldSecondaryPhone, contact.FieldEmail, contact.FieldGender, contact.FieldMaritalStatus, contact.FieldOccupation, contact.FieldAddressLine1, contact.FieldAddressLine2, contact.FieldCity, contact.FieldState, contact.FieldCountry, contact.FieldPostalCode, contact.FieldEmergencyContactName, contact.FieldEmergencyContactPhone, contact.FieldEmergencyContactRelationship, contact.FieldProfilePictureURL, contact.FieldIDNumber, contact.FieldHometown, contact.FieldRegion, contact.FieldSundaySchoolClass, contact.FieldDayBorn, contact.FieldBaptizedBy, contact.FieldBaptismChurch, contact.FieldBaptismCertNumber:
 			values[i] = new(sql.NullString)
-		case contact.FieldDateOfBirth, contact.FieldCreatedAt, contact.FieldUpdatedAt:
+		case contact.FieldDateOfBirth, contact.FieldBaptismDate, contact.FieldCreatedAt, contact.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -240,6 +294,84 @@ func (_m *Contact) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.ProfilePictureURL = value.String
 			}
+		case contact.FieldIDNumber:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field id_number", values[i])
+			} else if value.Valid {
+				_m.IDNumber = value.String
+			}
+		case contact.FieldHometown:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field hometown", values[i])
+			} else if value.Valid {
+				_m.Hometown = value.String
+			}
+		case contact.FieldRegion:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field region", values[i])
+			} else if value.Valid {
+				_m.Region = value.String
+			}
+		case contact.FieldSundaySchoolClass:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sunday_school_class", values[i])
+			} else if value.Valid {
+				_m.SundaySchoolClass = value.String
+			}
+		case contact.FieldDayBorn:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field day_born", values[i])
+			} else if value.Valid {
+				_m.DayBorn = contact.DayBorn(value.String)
+			}
+		case contact.FieldMembershipYear:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field membership_year", values[i])
+			} else if value.Valid {
+				_m.MembershipYear = int(value.Int64)
+			}
+		case contact.FieldHasSpouse:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_spouse", values[i])
+			} else if value.Valid {
+				_m.HasSpouse = value.Bool
+			}
+		case contact.FieldSpouseID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spouse_id", values[i])
+			} else if value.Valid {
+				_m.SpouseID = int(value.Int64)
+			}
+		case contact.FieldIsBaptized:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_baptized", values[i])
+			} else if value.Valid {
+				_m.IsBaptized = value.Bool
+			}
+		case contact.FieldBaptizedBy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field baptized_by", values[i])
+			} else if value.Valid {
+				_m.BaptizedBy = value.String
+			}
+		case contact.FieldBaptismChurch:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field baptism_church", values[i])
+			} else if value.Valid {
+				_m.BaptismChurch = value.String
+			}
+		case contact.FieldBaptismCertNumber:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field baptism_cert_number", values[i])
+			} else if value.Valid {
+				_m.BaptismCertNumber = value.String
+			}
+		case contact.FieldBaptismDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field baptism_date", values[i])
+			} else if value.Valid {
+				_m.BaptismDate = value.Time
+			}
 		case contact.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -268,6 +400,16 @@ func (_m *Contact) Value(name string) (ent.Value, error) {
 // QueryUser queries the "user" edge of the Contact entity.
 func (_m *Contact) QueryUser() *UserQuery {
 	return NewContactClient(_m.config).QueryUser(_m)
+}
+
+// QuerySpouseContact queries the "spouse_contact" edge of the Contact entity.
+func (_m *Contact) QuerySpouseContact() *ContactQuery {
+	return NewContactClient(_m.config).QuerySpouseContact(_m)
+}
+
+// QuerySpouseOfContact queries the "spouse_of_contact" edge of the Contact entity.
+func (_m *Contact) QuerySpouseOfContact() *ContactQuery {
+	return NewContactClient(_m.config).QuerySpouseOfContact(_m)
 }
 
 // Update returns a builder for updating this Contact.
@@ -352,6 +494,45 @@ func (_m *Contact) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("profile_picture_url=")
 	builder.WriteString(_m.ProfilePictureURL)
+	builder.WriteString(", ")
+	builder.WriteString("id_number=")
+	builder.WriteString(_m.IDNumber)
+	builder.WriteString(", ")
+	builder.WriteString("hometown=")
+	builder.WriteString(_m.Hometown)
+	builder.WriteString(", ")
+	builder.WriteString("region=")
+	builder.WriteString(_m.Region)
+	builder.WriteString(", ")
+	builder.WriteString("sunday_school_class=")
+	builder.WriteString(_m.SundaySchoolClass)
+	builder.WriteString(", ")
+	builder.WriteString("day_born=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DayBorn))
+	builder.WriteString(", ")
+	builder.WriteString("membership_year=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MembershipYear))
+	builder.WriteString(", ")
+	builder.WriteString("has_spouse=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HasSpouse))
+	builder.WriteString(", ")
+	builder.WriteString("spouse_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SpouseID))
+	builder.WriteString(", ")
+	builder.WriteString("is_baptized=")
+	builder.WriteString(fmt.Sprintf("%v", _m.IsBaptized))
+	builder.WriteString(", ")
+	builder.WriteString("baptized_by=")
+	builder.WriteString(_m.BaptizedBy)
+	builder.WriteString(", ")
+	builder.WriteString("baptism_church=")
+	builder.WriteString(_m.BaptismChurch)
+	builder.WriteString(", ")
+	builder.WriteString("baptism_cert_number=")
+	builder.WriteString(_m.BaptismCertNumber)
+	builder.WriteString(", ")
+	builder.WriteString("baptism_date=")
+	builder.WriteString(_m.BaptismDate.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

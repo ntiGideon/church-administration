@@ -164,6 +164,68 @@
                         </div>
                     </div>
 
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="label">Hometown</label>
+                            <div class="control">
+                                <input class="input" type="text" name="hometown" placeholder="e.g. Kumasi"
+                                       value="{{with .Form}}{{.Hometown}}{{end}}">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Region</label>
+                            <div class="control">
+                                <input class="input" type="text" name="region" placeholder="e.g. Ashanti"
+                                       value="{{with .Form}}{{.Region}}{{end}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label class="label">National ID Number</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="text" name="id_number" placeholder="GHA-XXXXXXXXX-X"
+                                       value="{{with .Form}}{{.IDNumber}}{{end}}">
+                                <span class="icon is-left"><i class="fas fa-id-card"></i></span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Day Born</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select name="day_born">
+                                        <option value="">Not specified</option>
+                                        <option value="monday"    {{with .Form}}{{if eq .DayBorn "monday"}}selected{{end}}{{end}}>Monday</option>
+                                        <option value="tuesday"   {{with .Form}}{{if eq .DayBorn "tuesday"}}selected{{end}}{{end}}>Tuesday</option>
+                                        <option value="wednesday" {{with .Form}}{{if eq .DayBorn "wednesday"}}selected{{end}}{{end}}>Wednesday</option>
+                                        <option value="thursday"  {{with .Form}}{{if eq .DayBorn "thursday"}}selected{{end}}{{end}}>Thursday</option>
+                                        <option value="friday"    {{with .Form}}{{if eq .DayBorn "friday"}}selected{{end}}{{end}}>Friday</option>
+                                        <option value="saturday"  {{with .Form}}{{if eq .DayBorn "saturday"}}selected{{end}}{{end}}>Saturday</option>
+                                        <option value="sunday"    {{with .Form}}{{if eq .DayBorn "sunday"}}selected{{end}}{{end}}>Sunday</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Sunday School Class</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="sunday_school_class" placeholder="e.g. Bereans"
+                                   value="{{with .Form}}{{.SundaySchoolClass}}{{end}}">
+                            <span class="icon is-left"><i class="fas fa-book-open"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="checkbox">
+                            <input type="checkbox" name="has_spouse" value="true"
+                                   {{with .Form}}{{if .HasSpouse}}checked{{end}}{{end}}>
+                            &nbsp;I have a spouse
+                        </label>
+                    </div>
+
                     <div class="field mt-4">
                         <button type="submit" class="button is-primary">
                             <span class="icon"><i class="fas fa-save"></i></span>

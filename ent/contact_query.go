@@ -20,11 +20,13 @@ import (
 // ContactQuery is the builder for querying Contact entities.
 type ContactQuery struct {
 	config
-	ctx        *QueryContext
-	order      []contact.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Contact
-	withUser   *UserQuery
+	ctx                 *QueryContext
+	order               []contact.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Contact
+	withUser            *UserQuery
+	withSpouseContact   *ContactQuery
+	withSpouseOfContact *ContactQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,50 @@ func (_q *ContactQuery) QueryUser() *UserQuery {
 			sqlgraph.From(contact.Table, contact.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, contact.UserTable, contact.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySpouseContact chains the current query on the "spouse_contact" edge.
+func (_q *ContactQuery) QuerySpouseContact() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, contact.SpouseContactTable, contact.SpouseContactColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySpouseOfContact chains the current query on the "spouse_of_contact" edge.
+func (_q *ContactQuery) QuerySpouseOfContact() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, contact.SpouseOfContactTable, contact.SpouseOfContactColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +316,14 @@ func (_q *ContactQuery) Clone() *ContactQuery {
 		return nil
 	}
 	return &ContactQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]contact.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.Contact{}, _q.predicates...),
-		withUser:   _q.withUser.Clone(),
+		config:              _q.config,
+		ctx:                 _q.ctx.Clone(),
+		order:               append([]contact.OrderOption{}, _q.order...),
+		inters:              append([]Interceptor{}, _q.inters...),
+		predicates:          append([]predicate.Contact{}, _q.predicates...),
+		withUser:            _q.withUser.Clone(),
+		withSpouseContact:   _q.withSpouseContact.Clone(),
+		withSpouseOfContact: _q.withSpouseOfContact.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -290,6 +338,28 @@ func (_q *ContactQuery) WithUser(opts ...func(*UserQuery)) *ContactQuery {
 		opt(query)
 	}
 	_q.withUser = query
+	return _q
+}
+
+// WithSpouseContact tells the query-builder to eager-load the nodes that are connected to
+// the "spouse_contact" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithSpouseContact(opts ...func(*ContactQuery)) *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSpouseContact = query
+	return _q
+}
+
+// WithSpouseOfContact tells the query-builder to eager-load the nodes that are connected to
+// the "spouse_of_contact" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithSpouseOfContact(opts ...func(*ContactQuery)) *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSpouseOfContact = query
 	return _q
 }
 
@@ -371,8 +441,10 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	var (
 		nodes       = []*Contact{}
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [3]bool{
 			_q.withUser != nil,
+			_q.withSpouseContact != nil,
+			_q.withSpouseOfContact != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -396,6 +468,18 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	if query := _q.withUser; query != nil {
 		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *Contact, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSpouseContact; query != nil {
+		if err := _q.loadSpouseContact(ctx, query, nodes, nil,
+			func(n *Contact, e *Contact) { n.Edges.SpouseContact = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSpouseOfContact; query != nil {
+		if err := _q.loadSpouseOfContact(ctx, query, nodes, nil,
+			func(n *Contact, e *Contact) { n.Edges.SpouseOfContact = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -430,6 +514,64 @@ func (_q *ContactQuery) loadUser(ctx context.Context, query *UserQuery, nodes []
 	}
 	return nil
 }
+func (_q *ContactQuery) loadSpouseContact(ctx context.Context, query *ContactQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Contact)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Contact)
+	for i := range nodes {
+		fk := nodes[i].SpouseID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(contact.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "spouse_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *ContactQuery) loadSpouseOfContact(ctx context.Context, query *ContactQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Contact)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Contact)
+	for i := range nodes {
+		fk := nodes[i].SpouseID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(contact.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "spouse_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *ContactQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -455,6 +597,12 @@ func (_q *ContactQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != contact.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withSpouseContact != nil {
+			_spec.Node.AddColumnOnce(contact.FieldSpouseID)
+		}
+		if _q.withSpouseOfContact != nil {
+			_spec.Node.AddColumnOnce(contact.FieldSpouseID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

@@ -120,14 +120,35 @@ var (
 		{Name: "emergency_contact_phone", Type: field.TypeString, Nullable: true},
 		{Name: "emergency_contact_relationship", Type: field.TypeString, Nullable: true},
 		{Name: "profile_picture_url", Type: field.TypeString, Nullable: true},
+		{Name: "id_number", Type: field.TypeString, Nullable: true},
+		{Name: "hometown", Type: field.TypeString, Nullable: true},
+		{Name: "region", Type: field.TypeString, Nullable: true},
+		{Name: "sunday_school_class", Type: field.TypeString, Nullable: true},
+		{Name: "day_born", Type: field.TypeEnum, Nullable: true, Enums: []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}},
+		{Name: "membership_year", Type: field.TypeInt, Nullable: true},
+		{Name: "has_spouse", Type: field.TypeBool, Default: false},
+		{Name: "is_baptized", Type: field.TypeBool, Default: false},
+		{Name: "baptized_by", Type: field.TypeString, Nullable: true},
+		{Name: "baptism_church", Type: field.TypeString, Nullable: true},
+		{Name: "baptism_cert_number", Type: field.TypeString, Nullable: true},
+		{Name: "baptism_date", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "spouse_id", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ContactsTable holds the schema information for the "contacts" table.
 	ContactsTable = &schema.Table{
 		Name:       "contacts",
 		Columns:    ContactsColumns,
 		PrimaryKey: []*schema.Column{ContactsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "contacts_contacts_spouse_contact",
+				Columns:    []*schema.Column{ContactsColumns[35]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
@@ -339,6 +360,7 @@ func init() {
 	AnnouncementsTable.ForeignKeys[0].RefTable = ChurchesTable
 	AnnouncementsTable.ForeignKeys[1].RefTable = UsersTable
 	ChurchesTable.ForeignKeys[0].RefTable = ChurchesTable
+	ContactsTable.ForeignKeys[0].RefTable = ContactsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = ChurchesTable
 	EventsTable.ForeignKeys[0].RefTable = ChurchesTable
 	FinancesTable.ForeignKeys[0].RefTable = ChurchesTable
