@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/user"
 )
@@ -74,6 +75,8 @@ type Contact struct {
 	HasSpouse bool `json:"has_spouse,omitempty"`
 	// SpouseID holds the value of the "spouse_id" field.
 	SpouseID int `json:"spouse_id,omitempty"`
+	// ChurchID holds the value of the "church_id" field.
+	ChurchID int `json:"church_id,omitempty"`
 	// IsBaptized holds the value of the "is_baptized" field.
 	IsBaptized bool `json:"is_baptized,omitempty"`
 	// BaptizedBy holds the value of the "baptized_by" field.
@@ -98,13 +101,15 @@ type Contact struct {
 type ContactEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// Church holds the value of the church edge.
+	Church *Church `json:"church,omitempty"`
 	// SpouseContact holds the value of the spouse_contact edge.
 	SpouseContact *Contact `json:"spouse_contact,omitempty"`
 	// SpouseOfContact holds the value of the spouse_of_contact edge.
 	SpouseOfContact *Contact `json:"spouse_of_contact,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -118,12 +123,23 @@ func (e ContactEdges) UserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
+// ChurchOrErr returns the Church value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ContactEdges) ChurchOrErr() (*Church, error) {
+	if e.Church != nil {
+		return e.Church, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: church.Label}
+	}
+	return nil, &NotLoadedError{edge: "church"}
+}
+
 // SpouseContactOrErr returns the SpouseContact value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ContactEdges) SpouseContactOrErr() (*Contact, error) {
 	if e.SpouseContact != nil {
 		return e.SpouseContact, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: contact.Label}
 	}
 	return nil, &NotLoadedError{edge: "spouse_contact"}
@@ -134,7 +150,7 @@ func (e ContactEdges) SpouseContactOrErr() (*Contact, error) {
 func (e ContactEdges) SpouseOfContactOrErr() (*Contact, error) {
 	if e.SpouseOfContact != nil {
 		return e.SpouseOfContact, nil
-	} else if e.loadedTypes[2] {
+	} else if e.loadedTypes[3] {
 		return nil, &NotFoundError{label: contact.Label}
 	}
 	return nil, &NotLoadedError{edge: "spouse_of_contact"}
@@ -147,7 +163,7 @@ func (*Contact) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case contact.FieldHasSpouse, contact.FieldIsBaptized:
 			values[i] = new(sql.NullBool)
-		case contact.FieldID, contact.FieldMembershipYear, contact.FieldSpouseID:
+		case contact.FieldID, contact.FieldMembershipYear, contact.FieldSpouseID, contact.FieldChurchID:
 			values[i] = new(sql.NullInt64)
 		case contact.FieldFirstName, contact.FieldLastName, contact.FieldMiddleName, contact.FieldPhone, contact.FieldSecondaryPhone, contact.FieldEmail, contact.FieldGender, contact.FieldMaritalStatus, contact.FieldOccupation, contact.FieldAddressLine1, contact.FieldAddressLine2, contact.FieldCity, contact.FieldState, contact.FieldCountry, contact.FieldPostalCode, contact.FieldEmergencyContactName, contact.FieldEmergencyContactPhone, contact.FieldEmergencyContactRelationship, contact.FieldProfilePictureURL, contact.FieldIDNumber, contact.FieldHometown, contact.FieldRegion, contact.FieldSundaySchoolClass, contact.FieldDayBorn, contact.FieldBaptizedBy, contact.FieldBaptismChurch, contact.FieldBaptismCertNumber:
 			values[i] = new(sql.NullString)
@@ -342,6 +358,12 @@ func (_m *Contact) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.SpouseID = int(value.Int64)
 			}
+		case contact.FieldChurchID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field church_id", values[i])
+			} else if value.Valid {
+				_m.ChurchID = int(value.Int64)
+			}
 		case contact.FieldIsBaptized:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_baptized", values[i])
@@ -400,6 +422,11 @@ func (_m *Contact) Value(name string) (ent.Value, error) {
 // QueryUser queries the "user" edge of the Contact entity.
 func (_m *Contact) QueryUser() *UserQuery {
 	return NewContactClient(_m.config).QueryUser(_m)
+}
+
+// QueryChurch queries the "church" edge of the Contact entity.
+func (_m *Contact) QueryChurch() *ChurchQuery {
+	return NewContactClient(_m.config).QueryChurch(_m)
 }
 
 // QuerySpouseContact queries the "spouse_contact" edge of the Contact entity.
@@ -518,6 +545,9 @@ func (_m *Contact) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("spouse_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SpouseID))
+	builder.WriteString(", ")
+	builder.WriteString("church_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ChurchID))
 	builder.WriteString(", ")
 	builder.WriteString("is_baptized=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsBaptized))

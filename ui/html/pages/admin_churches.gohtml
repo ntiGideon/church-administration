@@ -1,4 +1,4 @@
-{{define "title"}}Church Network | FaithConnect{{end}}
+{{define "title"}}Church Network | Ascension Baptist{{end}}
 {{define "description"}}Manage all churches in the network{{end}}
 
 {{define "main"}}
@@ -62,7 +62,7 @@
     {{if $churches}}
     <div class="churches-grid">
         {{range $churches}}
-        <div class="church-item">
+        <a href="/admin/churches/{{.ID}}" class="church-item">
             <div class="church-type-bar type-{{.Type}}"></div>
             <div class="church-body">
                 <div class="church-top">
@@ -116,7 +116,7 @@
                 {{end}}
                 <div class="church-since">Member since {{.CreatedAt.Format "January 2006"}}</div>
             </div>
-        </div>
+        </a>
         {{end}}
     </div>
     {{else}}
@@ -157,6 +157,9 @@
 .churches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.2rem; }
 
 .church-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
     background: white;
     border-radius: 12px;
     border: 1px solid var(--light-gray);

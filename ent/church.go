@@ -83,9 +83,13 @@ type ChurchEdges struct {
 	Invitations []*Invitation `json:"invitations,omitempty"`
 	// Announcements holds the value of the announcements edge.
 	Announcements []*Announcement `json:"announcements,omitempty"`
+	// Contacts holds the value of the contacts edge.
+	Contacts []*Contact `json:"contacts,omitempty"`
+	// Programs holds the value of the programs edge.
+	Programs []*ProgramEntry `json:"programs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [10]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -160,6 +164,24 @@ func (e ChurchEdges) AnnouncementsOrErr() ([]*Announcement, error) {
 		return e.Announcements, nil
 	}
 	return nil, &NotLoadedError{edge: "announcements"}
+}
+
+// ContactsOrErr returns the Contacts value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) ContactsOrErr() ([]*Contact, error) {
+	if e.loadedTypes[8] {
+		return e.Contacts, nil
+	}
+	return nil, &NotLoadedError{edge: "contacts"}
+}
+
+// ProgramsOrErr returns the Programs value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) ProgramsOrErr() ([]*ProgramEntry, error) {
+	if e.loadedTypes[9] {
+		return e.Programs, nil
+	}
+	return nil, &NotLoadedError{edge: "programs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -376,6 +398,16 @@ func (_m *Church) QueryInvitations() *InvitationQuery {
 // QueryAnnouncements queries the "announcements" edge of the Church entity.
 func (_m *Church) QueryAnnouncements() *AnnouncementQuery {
 	return NewChurchClient(_m.config).QueryAnnouncements(_m)
+}
+
+// QueryContacts queries the "contacts" edge of the Church entity.
+func (_m *Church) QueryContacts() *ContactQuery {
+	return NewChurchClient(_m.config).QueryContacts(_m)
+}
+
+// QueryPrograms queries the "programs" edge of the Church entity.
+func (_m *Church) QueryPrograms() *ProgramEntryQuery {
+	return NewChurchClient(_m.config).QueryPrograms(_m)
 }
 
 // Update returns a builder for updating this Church.

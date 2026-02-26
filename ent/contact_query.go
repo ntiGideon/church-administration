@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -25,6 +26,7 @@ type ContactQuery struct {
 	inters              []Interceptor
 	predicates          []predicate.Contact
 	withUser            *UserQuery
+	withChurch          *ChurchQuery
 	withSpouseContact   *ContactQuery
 	withSpouseOfContact *ContactQuery
 	// intermediate query (i.e. traversal path).
@@ -78,6 +80,28 @@ func (_q *ContactQuery) QueryUser() *UserQuery {
 			sqlgraph.From(contact.Table, contact.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, contact.UserTable, contact.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChurch chains the current query on the "church" edge.
+func (_q *ContactQuery) QueryChurch() *ChurchQuery {
+	query := (&ChurchClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, contact.ChurchTable, contact.ChurchColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -322,6 +346,7 @@ func (_q *ContactQuery) Clone() *ContactQuery {
 		inters:              append([]Interceptor{}, _q.inters...),
 		predicates:          append([]predicate.Contact{}, _q.predicates...),
 		withUser:            _q.withUser.Clone(),
+		withChurch:          _q.withChurch.Clone(),
 		withSpouseContact:   _q.withSpouseContact.Clone(),
 		withSpouseOfContact: _q.withSpouseOfContact.Clone(),
 		// clone intermediate query.
@@ -338,6 +363,17 @@ func (_q *ContactQuery) WithUser(opts ...func(*UserQuery)) *ContactQuery {
 		opt(query)
 	}
 	_q.withUser = query
+	return _q
+}
+
+// WithChurch tells the query-builder to eager-load the nodes that are connected to
+// the "church" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithChurch(opts ...func(*ChurchQuery)) *ContactQuery {
+	query := (&ChurchClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withChurch = query
 	return _q
 }
 
@@ -441,8 +477,9 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	var (
 		nodes       = []*Contact{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withUser != nil,
+			_q.withChurch != nil,
 			_q.withSpouseContact != nil,
 			_q.withSpouseOfContact != nil,
 		}
@@ -468,6 +505,12 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	if query := _q.withUser; query != nil {
 		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *Contact, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withChurch; query != nil {
+		if err := _q.loadChurch(ctx, query, nodes, nil,
+			func(n *Contact, e *Church) { n.Edges.Church = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -511,6 +554,35 @@ func (_q *ContactQuery) loadUser(ctx context.Context, query *UserQuery, nodes []
 			return fmt.Errorf(`unexpected referenced foreign-key "contact_user" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadChurch(ctx context.Context, query *ChurchQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Church)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Contact)
+	for i := range nodes {
+		fk := nodes[i].ChurchID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(church.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "church_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -597,6 +669,9 @@ func (_q *ContactQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != contact.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withChurch != nil {
+			_spec.Node.AddColumnOnce(contact.FieldChurchID)
 		}
 		if _q.withSpouseContact != nil {
 			_spec.Node.AddColumnOnce(contact.FieldSpouseID)

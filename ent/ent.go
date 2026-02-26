@@ -19,6 +19,7 @@ import (
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
 )
@@ -88,6 +89,7 @@ func checkColumn(t, c string) error {
 			event.Table:        event.ValidColumn,
 			finance.Table:      finance.ValidColumn,
 			invitation.Table:   invitation.ValidColumn,
+			programentry.Table: programentry.ValidColumn,
 			session.Table:      session.ValidColumn,
 			user.Table:         user.ValidColumn,
 		})

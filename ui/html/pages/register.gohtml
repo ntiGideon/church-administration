@@ -71,41 +71,6 @@
                     <form id="registerForm" action="/register" method="POST">
                         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                         <input type="hidden" name="registration_token" value="{{with .Form}}{{.RegistrationToken}}{{end}}">
-                        <!-- Account Type Selection -->
-                        <div class="field mb-5">
-                            <label class="label has-text-primary is-size-5 mb-4">
-                                I am registering as:
-                            </label>
-                            <div class="control">
-                                <div class="columns is-multiline">
-                                    <div class="column is-6">
-                                        <input type="radio" name="account_type" id="new_church" value="new_church" class="is-hidden" checked>
-                                        <label for="new_church" class="radio-card">
-                                            <div class="radio-card-content has-text-centered">
-                                                <span class="icon is-large mb-3">
-                                                    <i class="fas fa-plus-circle fa-2x has-text-primary"></i>
-                                                </span>
-                                                <h4 class="title is-size-5 has-text-primary mb-2">New Church</h4>
-                                                <p class="has-text-dark">Start a new church profile</p>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="column is-6">
-                                        <input type="radio" name="account_type" id="branch_church" value="branch_church" class="is-hidden">
-                                        <label for="branch_church" class="radio-card">
-                                            <div class="radio-card-content has-text-centered">
-                                                <span class="icon is-large mb-3">
-                                                    <i class="fas fa-code-branch fa-2x has-text-secondary"></i>
-                                                </span>
-                                                <h4 class="title is-size-5 has-text-secondary mb-2">Branch Church</h4>
-                                                <p class="has-text-dark">Join existing network</p>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Personal Information -->
                         <div class="mb-5">
                             <h3 class="title is-size-4 has-text-primary mb-4">
@@ -168,28 +133,6 @@
                                             <input class="input" type="tel" name="phone" placeholder="+1 (555) 123-4567">
                                             <span class="icon is-left">
                                                 <i class="fas fa-phone has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Role *</label>
-                                        <div class="control has-icons-left">
-                                            <div class="select is-fullwidth">
-                                                <select name="role" required>
-                                                    <option value="" disabled selected>Select your role</option>
-                                                    <option value="pastor">Pastor</option>
-                                                    <option value="admin">Church Administrator</option>
-                                                    <option value="elder">Elder</option>
-                                                    <option value="deacon">Deacon</option>
-                                                    <option value="secretary">Church Secretary</option>
-                                                    <option value="other">Other Ministry Leader</option>
-                                                </select>
-                                            </div>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-user-tag has-text-primary"></i>
                                             </span>
                                         </div>
                                     </div>
@@ -610,7 +553,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.querySelector('.password-strength .progress');
     const requirements = document.querySelectorAll('.requirement');
     const submitBtn = document.getElementById('submitBtn');
-    const accountTypeRadios = document.querySelectorAll('input[name="account_type"]');
 
     // Password strength checker
     function checkPasswordStrength(pass) {
@@ -710,30 +652,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     confirmPassword.addEventListener('input', checkPasswordMatch);
 
-    // Account type selection animation
-    accountTypeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            const labels = document.querySelectorAll('.radio-card');
-            labels.forEach(label => {
-                label.style.transform = 'translateY(0)';
-            });
-
-            const selectedLabel = document.querySelector(`label[for="${this.id}"]`);
-            selectedLabel.style.transform = 'translateY(-5px)';
-
-            // Show appropriate message
-            if (this.value === 'branch_church') {
-                showPrimary('You will need an invitation code from your headquarters');
-            }
-        });
-    });
-
     // Form submission
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
+    form.addEventListener('submit', function(e) {
         // Validate password match
         if (password.value !== confirmPassword.value) {
+            e.preventDefault();
             showDanger('Passwords do not match');
             confirmPassword.focus();
             return;
@@ -741,6 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validate password strength
         if (checkPasswordStrength(password.value) < 60) {
+            e.preventDefault();
             showDanger('Please use a stronger password');
             password.focus();
             return;
@@ -748,34 +672,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validate terms
         if (!form.terms.checked) {
+            e.preventDefault();
             showDanger('Please agree to the terms and conditions');
             return;
         }
 
-        // Show loading state
+        // Show loading state and let the form POST normally
         submitBtn.classList.add('is-loading');
         submitBtn.disabled = true;
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // In real implementation, you would submit the form
-            // form.submit();
-
-            // For demo, show success
-            showSuccess('Account created successfully! Redirecting...');
-
-            // Redirect after success
-            setTimeout(() => {
-                window.location.href = '/register/church-info';
-            }, 2000);
-
-        } catch (error) {
-            showDanger('Registration failed. Please try again.');
-            submitBtn.classList.remove('is-loading');
-            submitBtn.disabled = false;
-        }
     });
 
     // Toast notification functions

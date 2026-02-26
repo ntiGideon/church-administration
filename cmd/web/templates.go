@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ntiGideon/ui"
 	"html/template"
 	"io/fs"
@@ -40,6 +41,24 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+func formatMoney(amount float64) string {
+	abs := math.Abs(amount)
+	sign := ""
+	if amount < 0 {
+		sign = "-"
+	}
+	switch {
+	case abs >= 1_000_000_000:
+		return fmt.Sprintf("%s%.2fB", sign, abs/1_000_000_000)
+	case abs >= 1_000_000:
+		return fmt.Sprintf("%s%.2fM", sign, abs/1_000_000)
+	case abs >= 1_000:
+		return fmt.Sprintf("%s%.2fK", sign, abs/1_000)
+	default:
+		return fmt.Sprintf("%s%.2f", sign, abs)
+	}
 }
 
 func formatDate(t time.Time) string {
@@ -81,6 +100,7 @@ func toJSON(v interface{}) string {
 
 var functions = template.FuncMap{
 	"formatDate":       formatDate,
+	"formatMoney":      formatMoney,
 	"multiply":         func(a, b int) int { return a * b },
 	"multiplyF":        func(a, b float64) float64 { return a * b },
 	"initials":         initials,
@@ -98,5 +118,9 @@ var functions = template.FuncMap{
 	}, "isGT2": func(f float64) bool {
 		return f >= 2
 	},
-	"abs": math.Abs,
+	"abs":      math.Abs,
+	"subtract": func(a, b float64) float64 { return a - b },
+	"add":      func(a, b float64) float64 { return a + b },
+	"float64":  func(i int) float64 { return float64(i) },
+	"int":      func(f float64) int { return int(f) },
 }

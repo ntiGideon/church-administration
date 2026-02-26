@@ -86,6 +86,25 @@ type FinanceDto struct {
 	validator.Validator `form:"-"`
 }
 
+// ProgramDto is used to create/update a church calendar program entry.
+type ProgramDto struct {
+	Title             string `form:"title"`
+	ProgramType       string `form:"program_type"`
+	Date              string `form:"date"`
+	Theme             string `form:"theme"`
+	SermonTopic       string `form:"sermon_topic"`
+	VisionGoals       string `form:"vision_goals"`
+	Preacher          string `form:"preacher"`
+	OpeningPrayerBy   string `form:"opening_prayer_by"`
+	ClosingPrayerBy   string `form:"closing_prayer_by"`
+	WorshipLeader     string `form:"worship_leader"`
+	ResponsiblePerson string `form:"responsible_person"`
+	Notes             string `form:"notes"`
+	IsPublished       bool   `form:"is_published"`
+
+	validator.Validator `form:"-"`
+}
+
 // AnnouncementDto is used to create an announcement
 type AnnouncementDto struct {
 	Title       string `form:"title"`

@@ -71,6 +71,8 @@ const (
 	FieldHasSpouse = "has_spouse"
 	// FieldSpouseID holds the string denoting the spouse_id field in the database.
 	FieldSpouseID = "spouse_id"
+	// FieldChurchID holds the string denoting the church_id field in the database.
+	FieldChurchID = "church_id"
 	// FieldIsBaptized holds the string denoting the is_baptized field in the database.
 	FieldIsBaptized = "is_baptized"
 	// FieldBaptizedBy holds the string denoting the baptized_by field in the database.
@@ -87,6 +89,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeChurch holds the string denoting the church edge name in mutations.
+	EdgeChurch = "church"
 	// EdgeSpouseContact holds the string denoting the spouse_contact edge name in mutations.
 	EdgeSpouseContact = "spouse_contact"
 	// EdgeSpouseOfContact holds the string denoting the spouse_of_contact edge name in mutations.
@@ -100,6 +104,13 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "contact_user"
+	// ChurchTable is the table that holds the church relation/edge.
+	ChurchTable = "contacts"
+	// ChurchInverseTable is the table name for the Church entity.
+	// It exists in this package in order to avoid circular dependency with the "church" package.
+	ChurchInverseTable = "churches"
+	// ChurchColumn is the table column denoting the church relation/edge.
+	ChurchColumn = "church_id"
 	// SpouseContactTable is the table that holds the spouse_contact relation/edge.
 	SpouseContactTable = "contacts"
 	// SpouseContactColumn is the table column denoting the spouse_contact relation/edge.
@@ -141,6 +152,7 @@ var Columns = []string{
 	FieldMembershipYear,
 	FieldHasSpouse,
 	FieldSpouseID,
+	FieldChurchID,
 	FieldIsBaptized,
 	FieldBaptizedBy,
 	FieldBaptismChurch,
@@ -398,6 +410,11 @@ func BySpouseID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSpouseID, opts...).ToFunc()
 }
 
+// ByChurchID orders the results by the church_id field.
+func ByChurchID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldChurchID, opts...).ToFunc()
+}
+
 // ByIsBaptized orders the results by the is_baptized field.
 func ByIsBaptized(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsBaptized, opts...).ToFunc()
@@ -440,6 +457,13 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByChurchField orders the results by church field.
+func ByChurchField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newChurchStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // BySpouseContactField orders the results by spouse_contact field.
 func BySpouseContactField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -458,6 +482,13 @@ func newUserStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, UserTable, UserColumn),
+	)
+}
+func newChurchStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ChurchInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ChurchTable, ChurchColumn),
 	)
 }
 func newSpouseContactStep() *sqlgraph.Step {

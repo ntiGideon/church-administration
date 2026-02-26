@@ -26,6 +26,8 @@ type Tx struct {
 	Finance *FinanceClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// ProgramEntry is the client for interacting with the ProgramEntry builders.
+	ProgramEntry *ProgramEntryClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// User is the client for interacting with the User builders.
@@ -168,6 +170,7 @@ func (tx *Tx) init() {
 	tx.Event = NewEventClient(tx.config)
 	tx.Finance = NewFinanceClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
+	tx.ProgramEntry = NewProgramEntryClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

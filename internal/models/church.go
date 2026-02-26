@@ -7,6 +7,7 @@ import (
 	"github.com/ntiGideon/ent"
 	"github.com/ntiGideon/ent/church"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -46,7 +47,7 @@ func (m *ChurchModel) InviteChurch(ctx context.Context, dto *InviteDto) ModelRes
 		SetEmail(dto.Email).
 		SetName(dto.Name).
 		SetAddress(dto.Address).
-		SetType(church.Type(dto.Branch)).
+		SetType(church.Type(strings.ToLower(dto.Branch))).
 		SetRegistrationToken(token).
 		Save(ctx)
 	if err != nil {

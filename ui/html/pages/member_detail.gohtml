@@ -1,5 +1,5 @@
-{{define "title"}}Member Profile | FaithConnect{{end}}
-{{define "description"}}View member profile details{{end}}
+{{define "title"}}Member Profile | Ascension Baptist{{end}}
+{{define "description"}}View congregation member profile{{end}}
 
 {{define "main"}}
 <div class="page-wrapper">
@@ -18,37 +18,45 @@
         </a>
     </div>
 
+    {{if .Flash}}
+    <div class="notification is-success is-light mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
     {{if $member}}
     <div class="profile-layout">
-        <!-- Profile Card -->
         <div class="profile-card">
             <div class="profile-hero">
-                <div class="profile-avatar-lg">
-                    {{if $member.Edges.Contact}}
-                        {{if $member.Edges.Contact.ProfilePictureURL}}
-                        <img src="{{$member.Edges.Contact.ProfilePictureURL}}" alt="Profile">
+                <!-- Avatar with upload -->
+                <div class="profile-avatar-wrap">
+                    <div class="profile-avatar-lg {{if $member.ProfilePictureURL}}has-photo{{end}}">
+                        {{if $member.ProfilePictureURL}}
+                        <img src="{{$member.ProfilePictureURL}}" alt="Profile">
                         {{else}}
                         <div class="avatar-initials-lg">
-                            {{slice $member.Edges.Contact.FirstName 0 1}}{{slice $member.Edges.Contact.LastName 0 1}}
+                            {{slice $member.FirstName 0 1}}{{slice $member.LastName 0 1}}
                         </div>
                         {{end}}
-                    {{else}}
-                    <div class="avatar-initials-lg">?</div>
+                    </div>
+                    {{if $.IsAuthenticated}}
+                    <form action="/members/{{$member.ID}}/avatar" method="POST"
+                          enctype="multipart/form-data" class="avatar-upload-form">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <label class="avatar-upload-btn" title="Upload photo">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" name="avatar" accept="image/*" onchange="this.form.submit()">
+                        </label>
+                    </form>
                     {{end}}
                 </div>
                 <div class="profile-hero-info">
-                    {{if $member.Edges.Contact}}
-                    <h2>{{$member.Edges.Contact.FirstName}} {{$member.Edges.Contact.LastName}}</h2>
-                    <p class="profile-email">{{$member.Email}}</p>
-                    {{else}}
-                    <h2>{{$member.Email}}</h2>
-                    {{end}}
-                    <div class="member-role-badge role-{{$member.Role}} mt-2">{{$member.Role}}</div>
+                    <h2>{{$member.FirstName}} {{if $member.MiddleName}}{{$member.MiddleName}} {{end}}{{$member.LastName}}</h2>
+                    {{if $member.Email}}<p class="profile-email">{{$member.Email}}</p>{{end}}
+                    {{if $member.MembershipYear}}<span class="member-since-badge">Member since {{$member.MembershipYear}}</span>{{end}}
                 </div>
             </div>
-
-            {{if $member.Edges.Contact}}
-            {{$c := $member.Edges.Contact}}
 
             <!-- Personal -->
             <div class="detail-section">
@@ -56,40 +64,40 @@
                 <div class="profile-details-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
-                        <span class="detail-value">{{if $c.Phone}}{{$c.Phone}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.Phone}}{{$member.Phone}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-venus-mars"></i> Gender</span>
-                        <span class="detail-value">{{if $c.Gender}}{{$c.Gender}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.Gender}}{{$member.Gender}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-sun"></i> Day Born</span>
-                        <span class="detail-value">{{if $c.DayBorn}}{{$c.DayBorn}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.DayBorn}}{{$member.DayBorn}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-id-card"></i> National ID</span>
-                        <span class="detail-value">{{if $c.IDNumber}}{{$c.IDNumber}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.IDNumber}}{{$member.IDNumber}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-briefcase"></i> Occupation</span>
-                        <span class="detail-value">{{if $c.Occupation}}{{$c.Occupation}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.Occupation}}{{$member.Occupation}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-ring"></i> Marital Status</span>
-                        <span class="detail-value">{{if $c.MaritalStatus}}{{$c.MaritalStatus}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.MaritalStatus}}{{$member.MaritalStatus}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-home"></i> Hometown</span>
-                        <span class="detail-value">{{if $c.Hometown}}{{$c.Hometown}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.Hometown}}{{$member.Hometown}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-map"></i> Region</span>
-                        <span class="detail-value">{{if $c.Region}}{{$c.Region}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.Region}}{{$member.Region}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-map-marker-alt"></i> City / Country</span>
                         <span class="detail-value">
-                            {{if $c.City}}{{$c.City}}{{if $c.Country}}, {{$c.Country}}{{end}}{{else}}—{{end}}
+                            {{if $member.City}}{{$member.City}}{{if $member.Country}}, {{$member.Country}}{{end}}{{else}}—{{end}}
                         </span>
                     </div>
                 </div>
@@ -101,14 +109,14 @@
                 <div class="profile-details-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-book-open"></i> Sunday School Class</span>
-                        <span class="detail-value">{{if $c.SundaySchoolClass}}{{$c.SundaySchoolClass}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.SundaySchoolClass}}{{$member.SundaySchoolClass}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-calendar-plus"></i> Membership Year</span>
-                        <span class="detail-value">{{if $c.MembershipYear}}{{$c.MembershipYear}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.MembershipYear}}{{$member.MembershipYear}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label"><i class="fas fa-calendar-alt"></i> Joined Platform</span>
+                        <span class="detail-label"><i class="fas fa-calendar-alt"></i> Record Added</span>
                         <span class="detail-value">{{$member.CreatedAt.Format "Jan 2, 2006"}}</span>
                     </div>
                 </div>
@@ -120,15 +128,15 @@
                 <div class="profile-details-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-heart"></i> Has Spouse</span>
-                        <span class="detail-value">{{if $c.HasSpouse}}Yes{{else}}No{{end}}</span>
+                        <span class="detail-value">{{if $member.HasSpouse}}Yes{{else}}No{{end}}</span>
                     </div>
-                    {{if $c.HasSpouse}}
+                    {{if $member.HasSpouse}}
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-user-friends"></i> Spouse</span>
                         <span class="detail-value">
-                            {{if $c.Edges.SpouseContact}}
-                                {{$sp := $c.Edges.SpouseContact}}
-                                {{$sp.FirstName}} {{$sp.LastName}}
+                            {{if $member.Edges.SpouseContact}}
+                                {{$sp := $member.Edges.SpouseContact}}
+                                <a href="/members/{{$sp.ID}}" style="color:var(--primary)">{{$sp.FirstName}} {{$sp.LastName}}</a>
                             {{else}}—{{end}}
                         </span>
                     </div>
@@ -142,58 +150,44 @@
                 <div class="profile-details-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-water"></i> Baptized</span>
-                        <span class="detail-value">{{if $c.IsBaptized}}Yes{{else}}No{{end}}</span>
+                        <span class="detail-value">{{if $member.IsBaptized}}Yes{{else}}No{{end}}</span>
                     </div>
-                    {{if $c.IsBaptized}}
+                    {{if $member.IsBaptized}}
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-user-tie"></i> Baptized By</span>
-                        <span class="detail-value">{{if $c.BaptizedBy}}{{$c.BaptizedBy}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.BaptizedBy}}{{$member.BaptizedBy}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-church"></i> Baptism Church</span>
-                        <span class="detail-value">{{if $c.BaptismChurch}}{{$c.BaptismChurch}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.BaptismChurch}}{{$member.BaptismChurch}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-certificate"></i> Certificate No.</span>
-                        <span class="detail-value">{{if $c.BaptismCertNumber}}{{$c.BaptismCertNumber}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if $member.BaptismCertNumber}}{{$member.BaptismCertNumber}}{{else}}—{{end}}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-calendar-check"></i> Baptism Date</span>
-                        <span class="detail-value">{{if not $c.BaptismDate.IsZero}}{{$c.BaptismDate.Format "Jan 2, 2006"}}{{else}}—{{end}}</span>
+                        <span class="detail-value">{{if not $member.BaptismDate.IsZero}}{{$member.BaptismDate.Format "Jan 2, 2006"}}{{else}}—{{end}}</span>
                     </div>
                     {{end}}
                 </div>
             </div>
-            {{end}}
 
             <div class="profile-status">
                 <div class="status-row">
-                    {{if $member.IsActive}}
-                    <span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>
-                    {{else}}
-                    <span class="status-badge inactive"><i class="fas fa-times-circle"></i> Inactive</span>
-                    {{end}}
-
                     {{if $.IsAuthenticated}}
-                    {{if $.LoggedInUser}}
-                        {{$role := $.LoggedInUser.Role.String}}
-                        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
-                        <a href="/members/{{$member.ID}}/edit" class="button is-info is-small is-outlined">
-                            <span class="icon"><i class="fas fa-edit"></i></span>
-                            <span>Edit Details</span>
-                        </a>
-                        {{if $member.IsActive}}
-                        <form action="/members/{{$member.ID}}/deactivate" method="POST" style="margin:0"
-                              onsubmit="return confirm('Deactivate this member? They will lose access to the system.')">
-                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                            <button type="submit" class="button is-danger is-small is-outlined">
-                                <span class="icon"><i class="fas fa-user-slash"></i></span>
-                                <span>Deactivate</span>
-                            </button>
-                        </form>
-                        {{end}}
-                        {{end}}
-                    {{end}}
+                    <a href="/members/{{$member.ID}}/edit" class="button is-info is-small is-outlined">
+                        <span class="icon"><i class="fas fa-edit"></i></span>
+                        <span>Edit Details</span>
+                    </a>
+                    <form action="/members/{{$member.ID}}/delete" method="POST" style="margin:0"
+                          onsubmit="return confirm('Remove this member record? This cannot be undone.')">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <button type="submit" class="button is-danger is-small is-outlined">
+                            <span class="icon"><i class="fas fa-trash"></i></span>
+                            <span>Remove</span>
+                        </button>
+                    </form>
                     {{end}}
                 </div>
             </div>
@@ -209,22 +203,56 @@
 .breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
 .breadcrumb-simple a { color: var(--primary); text-decoration: none; }
 .breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+.mb-4 { margin-bottom: 1rem; }
 
 .profile-card { background: white; border-radius: 16px; border: 1px solid var(--light-gray); overflow: hidden; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
 .profile-hero { display: flex; align-items: center; gap: 1.5rem; padding: 2rem; background: linear-gradient(135deg, rgba(80,34,45,0.04), rgba(196,195,208,0.06)); border-bottom: 1px solid var(--light-gray); }
 
-.profile-avatar-lg img, .avatar-initials-lg {
-    width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+/* Avatar wrap — positions the upload button over the avatar */
+.profile-avatar-wrap { position: relative; flex-shrink: 0; width: 80px; height: 80px; }
+
+.profile-avatar-lg {
+    width: 80px; height: 80px; border-radius: 50%; overflow: hidden;
+}
+.profile-avatar-lg img {
+    width: 100%; height: 100%; object-fit: cover;
 }
 .avatar-initials-lg {
+    width: 80px; height: 80px; border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), #6B2F3D);
     color: white; display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 1.8rem; text-transform: uppercase;
 }
+
+/* Camera button overlaid on avatar */
+.avatar-upload-form { position: absolute; inset: 0; }
+.avatar-upload-btn {
+    position: absolute;
+    bottom: 0; right: -4px;
+    width: 26px; height: 26px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.65rem;
+    border: 2px solid white;
+    transition: background 0.2s;
+}
+.avatar-upload-btn:hover { background: #6B2F3D; }
+.avatar-upload-btn input[type="file"] { display: none; }
 .profile-hero-info h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 .profile-email { color: var(--text-light); font-size: 0.9rem; margin: 4px 0 0; }
+.member-since-badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; background: rgba(80,34,45,0.08); color: var(--primary); margin-top: 6px; }
 
-.profile-details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 2rem; }
+.detail-section { border-bottom: 1px solid var(--light-gray); }
+.detail-section:last-of-type { border-bottom: none; }
+.detail-section-title { padding: 1rem 2rem 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+.detail-section-title i { color: var(--primary); }
+
+.profile-details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 1rem 2rem 1.5rem; }
 
 .detail-item { display: flex; flex-direction: column; gap: 4px; }
 .detail-label { font-size: 0.78rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 6px; }
@@ -233,20 +261,18 @@
 
 .profile-status { padding: 1rem 2rem; border-top: 1px solid var(--light-gray); background: rgba(248,249,250,0.5); }
 .status-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
-.status-badge.active { background: rgba(40,167,69,0.1); color: #28A745; }
-.status-badge.inactive { background: rgba(220,53,69,0.1); color: #DC3545; }
-
-.member-role-badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; text-transform: capitalize; }
-.role-super_admin { background: rgba(80,34,45,0.1); color: var(--primary); }
-.role-branch_admin { background: rgba(158,143,181,0.15); color: var(--support-purple); }
-.role-pastor { background: rgba(122,140,163,0.15); color: var(--support-blue); }
-.role-secretary { background: rgba(212,165,165,0.15); color: #8B4A4A; }
-.role-member { background: rgba(108,117,125,0.1); color: #6C757D; }
 
 @media (max-width: 600px) {
     .profile-details-grid { grid-template-columns: repeat(2, 1fr); }
     .page-wrapper { padding: 1rem; }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.notification .delete').forEach(function (btn) {
+        btn.addEventListener('click', function () { this.closest('.notification').remove(); });
+    });
+});
+</script>
 {{end}}

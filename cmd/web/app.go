@@ -26,4 +26,5 @@ type application struct {
 	financeModel      *models.FinanceModel
 	invitationModel   *models.InvitationModel
 	announcementModel *models.AnnouncementModel
+	programModel      *models.ProgramModel
 }

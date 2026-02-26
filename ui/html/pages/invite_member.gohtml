@@ -1,18 +1,18 @@
-{{define "title"}}Invite Member | FaithConnect{{end}}
-{{define "description"}}Invite a new member or staff to your church{{end}}
+{{define "title"}}Invite Worker | Ascension Baptist{{end}}
+{{define "description"}}Invite a church worker to create a system account{{end}}
 
 {{define "main"}}
 <div class="page-wrapper">
     <div class="page-header-bar">
         <div>
             <nav class="breadcrumb-simple">
-                <a href="/members">Members</a> <i class="fas fa-chevron-right"></i>
-                <span>Invite Member</span>
+                <a href="/workers">Workers</a> <i class="fas fa-chevron-right"></i>
+                <span>Invite Worker</span>
             </nav>
-            <h1 class="page-title-text">Invite a Member</h1>
-            <p class="page-subtitle-text">Send an invitation email to a new member or staff</p>
+            <h1 class="page-title-text">Invite a Worker</h1>
+            <p class="page-subtitle-text">Send an invitation email to a church worker so they can create a system account</p>
         </div>
-        <a href="/members" class="button is-outlined">
+        <a href="/workers" class="button is-outlined">
             <span class="icon"><i class="fas fa-arrow-left"></i></span>
             <span>Back</span>
         </a>
@@ -33,7 +33,7 @@
                 {{end}}
                 {{end}}
 
-                <form action="/members/new" method="POST" id="inviteForm">
+                <form action="/workers/new" method="POST" id="inviteForm">
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
                     <div class="field">
@@ -79,7 +79,7 @@
                             <span class="icon"><i class="fas fa-paper-plane"></i></span>
                             <span>Send Invitation</span>
                         </button>
-                        <a href="/members" class="button is-medium ml-3">Cancel</a>
+                        <a href="/workers" class="button is-medium ml-3">Cancel</a>
                     </div>
                 </form>
             </div>

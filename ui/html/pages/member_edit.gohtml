@@ -3,7 +3,7 @@
 
 {{define "main"}}
 {{$member := index .Data "member"}}
-{{$allMembers := index .Data "allMembers"}}
+{{$allContacts := index .Data "allContacts"}}
 <div class="page-wrapper">
     <div class="page-header-bar">
         <div>
@@ -259,20 +259,18 @@
                 </div>
                 <div class="field spouse-select-field" id="spouseSelectWrap"
                      style="{{with .Form}}{{if not .HasSpouse}}display:none{{end}}{{end}}">
-                    <label class="label">Spouse (select from members)</label>
+                    <label class="label">Spouse (select from congregation)</label>
                     <div class="control">
                         <div class="select is-fullwidth">
                             <select name="spouse_id">
                                 <option value="0">— none —</option>
-                                {{if $allMembers}}
-                                {{range $allMembers}}
-                                {{if .Edges.Contact}}
-                                <option value="{{.Edges.Contact.ID}}"
-                                    {{with $.Form}}{{if eq .SpouseID $.Edges.Contact.ID}}selected{{end}}{{end}}>
-                                    {{.Edges.Contact.FirstName}} {{.Edges.Contact.LastName}}
-                                    {{if .Email}}({{.Email}}){{end}}
+                                {{if $allContacts}}
+                                {{range $c := $allContacts}}
+                                <option value="{{$c.ID}}"
+                                    {{with $.Form}}{{if eq .SpouseID $c.ID}}selected{{end}}{{end}}>
+                                    {{$c.FirstName}} {{$c.LastName}}
+                                    {{if $c.Phone}}({{$c.Phone}}){{end}}
                                 </option>
-                                {{end}}
                                 {{end}}
                                 {{end}}
                             </select>

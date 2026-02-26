@@ -6,6 +6,7 @@ import (
 
 	"github.com/ntiGideon/ent"
 	"github.com/ntiGideon/ent/announcement"
+	"github.com/ntiGideon/ent/church"
 )
 
 type AnnouncementModel struct {
@@ -34,11 +35,16 @@ func (m *AnnouncementModel) Create(ctx context.Context, dto *AnnouncementDto, ch
 	return a, nil
 }
 
-// ListByChurch returns all published announcements for a church, newest first.
+// ListByChurch returns all announcements for a church, newest first.
+// If churchID is 0, returns announcements across all churches (super_admin view).
 func (m *AnnouncementModel) ListByChurch(ctx context.Context, churchID int) ([]*ent.Announcement, error) {
-	return m.Db.Announcement.Query().
-		Where(announcement.HasChurchWith()).
-		WithAuthor(func(q *ent.UserQuery) { q.WithContact() }).
+	q := m.Db.Announcement.Query()
+	if churchID > 0 {
+		q = q.Where(announcement.HasChurchWith(church.IDEQ(churchID)))
+	} else {
+		q = q.Where(announcement.HasChurchWith())
+	}
+	return q.WithAuthor(func(q *ent.UserQuery) { q.WithContact() }).
 		Order(ent.Desc(announcement.FieldCreatedAt)).
 		All(ctx)
 }

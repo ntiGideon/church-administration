@@ -1,4 +1,4 @@
-{{define "title"}}Reports & Analytics | FaithConnect{{end}}
+{{define "title"}}Reports & Analytics | Ascension Baptist{{end}}
 {{define "description"}}View church statistics, financial summaries, and member reports{{end}}
 
 {{define "main"}}
@@ -160,7 +160,7 @@
                                 <td class="tx-date">{{.TransactionDate.Format "Jan 2"}}</td>
                                 <td class="tx-desc">{{.Description}}</td>
                                 <td><span class="tx-type-badge tx-{{.TransactionType}}">{{.TransactionType}}</span></td>
-                                <td class="tx-amount text-right">GHS {{printf "%.2f" .Amount}}</td>
+                                <td class="tx-amount text-right">GHS {{formatMoney .Amount}}</td>
                             </tr>
                             {{end}}
                         </tbody>

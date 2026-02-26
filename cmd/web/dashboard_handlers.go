@@ -27,23 +27,22 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 	isSuperAdmin := string(u.Role) == "super_admin"
 
 	if isSuperAdmin {
-		// Super admin: show network-wide overview
 		churches, _ := app.db.Church.Query().
 			WithUsers(func(uq *ent.UserQuery) {
 				uq.Where(user.IsActiveEQ(true))
 			}).
 			All(r.Context())
 
-		totalMembers := 0
+		totalUsers := 0
 		for _, c := range churches {
-			totalMembers += len(c.Edges.Users)
+			totalUsers += len(c.Edges.Users)
 		}
 
 		stats["churches"] = churches
 		stats["churchCount"] = len(churches)
-		stats["memberCount"] = totalMembers
+		stats["memberCount"] = totalUsers
+		stats["workerCount"] = totalUsers
 
-		// Global finance totals (all churches)
 		summary, _ := app.financeModel.Summary(r.Context(), 0)
 		if summary != nil {
 			stats["totalIncome"] = summary.TotalIncome
@@ -53,16 +52,35 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 			stats["thisMonthExpenses"] = summary.ThisMonthExpenses
 		}
 
+		upcomingEvents, _ := app.eventModel.Upcoming(r.Context(), 0, 5)
+		stats["upcomingEvents"] = upcomingEvents
+
+		recentTx, _ := app.financeModel.RecentTransactions(r.Context(), 0, 6)
+		stats["recentTransactions"] = recentTx
+
+		allEvents, _ := app.eventModel.List(r.Context(), 0)
+		stats["totalEvents"] = len(allEvents)
+
+		recentAnnounce, _ := app.announcementModel.ListByChurch(r.Context(), 0)
+		if len(recentAnnounce) > 4 {
+			recentAnnounce = recentAnnounce[:4]
+		}
+		stats["recentAnnouncements"] = recentAnnounce
+
 	} else {
-		// Branch admin / other roles: show church-scoped data
 		churchID := 0
 		if u.Edges.Church != nil {
 			churchID = u.Edges.Church.ID
 		}
 
 		if churchID > 0 {
-			memberCount, _ := app.memberModel.CountByChurch(r.Context(), churchID)
+			memberCount, _ := app.memberModel.CountContactsByChurch(r.Context(), churchID)
 			stats["memberCount"] = memberCount
+
+			workerCount, _ := app.memberModel.CountByChurch(r.Context(), churchID)
+			stats["workerCount"] = workerCount
+
+			stats["congregationSize"] = u.Edges.Church.CongregationSize
 
 			upcomingEvents, _ := app.eventModel.Upcoming(r.Context(), churchID, 5)
 			stats["upcomingEvents"] = upcomingEvents
@@ -76,13 +94,17 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 				stats["thisMonthExpenses"] = summary.ThisMonthExpenses
 			}
 
-			recentTx, _ := app.financeModel.RecentTransactions(r.Context(), churchID, 5)
+			recentTx, _ := app.financeModel.RecentTransactions(r.Context(), churchID, 6)
 			stats["recentTransactions"] = recentTx
 
-			// Congregation size from church record
-			if u.Edges.Church != nil {
-				stats["congregationSize"] = u.Edges.Church.CongregationSize
+			churchEvents, _ := app.eventModel.List(r.Context(), churchID)
+			stats["totalEvents"] = len(churchEvents)
+
+			recentAnnounce, _ := app.announcementModel.ListByChurch(r.Context(), churchID)
+			if len(recentAnnounce) > 4 {
+				recentAnnounce = recentAnnounce[:4]
 			}
+			stats["recentAnnouncements"] = recentAnnounce
 		}
 	}
 

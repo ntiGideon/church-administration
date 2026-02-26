@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -578,6 +579,26 @@ func (_u *ContactUpdate) ClearSpouseID() *ContactUpdate {
 	return _u
 }
 
+// SetChurchID sets the "church_id" field.
+func (_u *ContactUpdate) SetChurchID(v int) *ContactUpdate {
+	_u.mutation.SetChurchID(v)
+	return _u
+}
+
+// SetNillableChurchID sets the "church_id" field if the given value is not nil.
+func (_u *ContactUpdate) SetNillableChurchID(v *int) *ContactUpdate {
+	if v != nil {
+		_u.SetChurchID(*v)
+	}
+	return _u
+}
+
+// ClearChurchID clears the value of the "church_id" field.
+func (_u *ContactUpdate) ClearChurchID() *ContactUpdate {
+	_u.mutation.ClearChurchID()
+	return _u
+}
+
 // SetIsBaptized sets the "is_baptized" field.
 func (_u *ContactUpdate) SetIsBaptized(v bool) *ContactUpdate {
 	_u.mutation.SetIsBaptized(v)
@@ -711,6 +732,11 @@ func (_u *ContactUpdate) SetUser(v *User) *ContactUpdate {
 	return _u.SetUserID(v.ID)
 }
 
+// SetChurch sets the "church" edge to the Church entity.
+func (_u *ContactUpdate) SetChurch(v *Church) *ContactUpdate {
+	return _u.SetChurchID(v.ID)
+}
+
 // SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
 func (_u *ContactUpdate) SetSpouseContactID(id int) *ContactUpdate {
 	_u.mutation.SetSpouseContactID(id)
@@ -757,6 +783,12 @@ func (_u *ContactUpdate) Mutation() *ContactMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (_u *ContactUpdate) ClearUser() *ContactUpdate {
 	_u.mutation.ClearUser()
+	return _u
+}
+
+// ClearChurch clears the "church" edge to the Church entity.
+func (_u *ContactUpdate) ClearChurch() *ContactUpdate {
+	_u.mutation.ClearChurch()
 	return _u
 }
 
@@ -1051,6 +1083,35 @@ func (_u *ContactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ChurchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   contact.ChurchTable,
+			Columns: []string{contact.ChurchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ChurchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   contact.ChurchTable,
+			Columns: []string{contact.ChurchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1685,6 +1746,26 @@ func (_u *ContactUpdateOne) ClearSpouseID() *ContactUpdateOne {
 	return _u
 }
 
+// SetChurchID sets the "church_id" field.
+func (_u *ContactUpdateOne) SetChurchID(v int) *ContactUpdateOne {
+	_u.mutation.SetChurchID(v)
+	return _u
+}
+
+// SetNillableChurchID sets the "church_id" field if the given value is not nil.
+func (_u *ContactUpdateOne) SetNillableChurchID(v *int) *ContactUpdateOne {
+	if v != nil {
+		_u.SetChurchID(*v)
+	}
+	return _u
+}
+
+// ClearChurchID clears the value of the "church_id" field.
+func (_u *ContactUpdateOne) ClearChurchID() *ContactUpdateOne {
+	_u.mutation.ClearChurchID()
+	return _u
+}
+
 // SetIsBaptized sets the "is_baptized" field.
 func (_u *ContactUpdateOne) SetIsBaptized(v bool) *ContactUpdateOne {
 	_u.mutation.SetIsBaptized(v)
@@ -1818,6 +1899,11 @@ func (_u *ContactUpdateOne) SetUser(v *User) *ContactUpdateOne {
 	return _u.SetUserID(v.ID)
 }
 
+// SetChurch sets the "church" edge to the Church entity.
+func (_u *ContactUpdateOne) SetChurch(v *Church) *ContactUpdateOne {
+	return _u.SetChurchID(v.ID)
+}
+
 // SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
 func (_u *ContactUpdateOne) SetSpouseContactID(id int) *ContactUpdateOne {
 	_u.mutation.SetSpouseContactID(id)
@@ -1864,6 +1950,12 @@ func (_u *ContactUpdateOne) Mutation() *ContactMutation {
 // ClearUser clears the "user" edge to the User entity.
 func (_u *ContactUpdateOne) ClearUser() *ContactUpdateOne {
 	_u.mutation.ClearUser()
+	return _u
+}
+
+// ClearChurch clears the "church" edge to the Church entity.
+func (_u *ContactUpdateOne) ClearChurch() *ContactUpdateOne {
+	_u.mutation.ClearChurch()
 	return _u
 }
 
@@ -2188,6 +2280,35 @@ func (_u *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ChurchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   contact.ChurchTable,
+			Columns: []string{contact.ChurchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ChurchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   contact.ChurchTable,
+			Columns: []string{contact.ChurchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

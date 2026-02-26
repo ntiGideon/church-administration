@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/user"
 )
@@ -397,6 +398,20 @@ func (_c *ContactCreate) SetNillableSpouseID(v *int) *ContactCreate {
 	return _c
 }
 
+// SetChurchID sets the "church_id" field.
+func (_c *ContactCreate) SetChurchID(v int) *ContactCreate {
+	_c.mutation.SetChurchID(v)
+	return _c
+}
+
+// SetNillableChurchID sets the "church_id" field if the given value is not nil.
+func (_c *ContactCreate) SetNillableChurchID(v *int) *ContactCreate {
+	if v != nil {
+		_c.SetChurchID(*v)
+	}
+	return _c
+}
+
 // SetIsBaptized sets the "is_baptized" field.
 func (_c *ContactCreate) SetIsBaptized(v bool) *ContactCreate {
 	_c.mutation.SetIsBaptized(v)
@@ -512,6 +527,11 @@ func (_c *ContactCreate) SetNillableUserID(id *int) *ContactCreate {
 // SetUser sets the "user" edge to the User entity.
 func (_c *ContactCreate) SetUser(v *User) *ContactCreate {
 	return _c.SetUserID(v.ID)
+}
+
+// SetChurch sets the "church" edge to the Church entity.
+func (_c *ContactCreate) SetChurch(v *Church) *ContactCreate {
+	return _c.SetChurchID(v.ID)
 }
 
 // SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by ID.
@@ -816,6 +836,23 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ChurchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   contact.ChurchTable,
+			Columns: []string{contact.ChurchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ChurchID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.SpouseContactIDs(); len(nodes) > 0 {

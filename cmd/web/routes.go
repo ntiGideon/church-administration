@@ -48,14 +48,20 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /church/settings", protected.ThenFunc(app.churchSettingsPost))
 	mux.Handle("POST /church/settings/logo", adminOnly.ThenFunc(app.churchLogoPost))
 
-	// Members
+	// Congregation members (Contact records — no system account required)
 	mux.Handle("GET /members", protected.ThenFunc(app.membersList))
-	mux.Handle("GET /members/new", adminOnly.ThenFunc(app.inviteMemberGet))
-	mux.Handle("POST /members/new", adminOnly.ThenFunc(app.inviteMemberPost))
+	mux.Handle("GET /members/new", protected.ThenFunc(app.memberNewGet))
+	mux.Handle("POST /members/new", protected.ThenFunc(app.memberNewPost))
 	mux.Handle("GET /members/{id}", protected.ThenFunc(app.memberDetail))
-	mux.Handle("GET /members/{id}/edit", adminOnly.ThenFunc(app.memberEditGet))
-	mux.Handle("POST /members/{id}/edit", adminOnly.ThenFunc(app.memberEditPost))
-	mux.Handle("POST /members/{id}/deactivate", adminOnly.ThenFunc(app.memberDeactivate))
+	mux.Handle("GET /members/{id}/edit", protected.ThenFunc(app.memberEditGet))
+	mux.Handle("POST /members/{id}/edit", protected.ThenFunc(app.memberEditPost))
+	mux.Handle("POST /members/{id}/avatar", protected.ThenFunc(app.memberAvatarPost))
+	mux.Handle("POST /members/{id}/delete", protected.ThenFunc(app.memberDelete))
+
+	// Workers (system users — invited by admin, can log in)
+	mux.Handle("GET /workers", protected.ThenFunc(app.workersGet))
+	mux.Handle("GET /workers/new", adminOnly.ThenFunc(app.workerInviteGet))
+	mux.Handle("POST /workers/new", adminOnly.ThenFunc(app.workerInvitePost))
 
 	// Events
 	mux.Handle("GET /events", protected.ThenFunc(app.eventsList))
@@ -79,10 +85,20 @@ func (app *application) routes() http.Handler {
 	// Reports
 	mux.Handle("GET /reports", protected.ThenFunc(app.reports))
 
+	// Church Calendar
+	mux.Handle("GET /calendar", protected.ThenFunc(app.calendarList))
+	mux.Handle("GET /calendar/new", adminOnly.ThenFunc(app.calendarNewGet))
+	mux.Handle("POST /calendar/new", adminOnly.ThenFunc(app.calendarNewPost))
+	mux.Handle("GET /calendar/{id}", protected.ThenFunc(app.calendarDetail))
+	mux.Handle("GET /calendar/{id}/edit", adminOnly.ThenFunc(app.calendarEditGet))
+	mux.Handle("POST /calendar/{id}/edit", adminOnly.ThenFunc(app.calendarEditPost))
+	mux.Handle("POST /calendar/{id}/delete", adminOnly.ThenFunc(app.calendarDelete))
+
 	// Super-admin: church network
 	mux.Handle("GET /invite-church", superAdminOnly.ThenFunc(app.inviteChurch))
 	mux.Handle("POST /invite-church", superAdminOnly.ThenFunc(app.inviteChurchPost))
 	mux.Handle("GET /admin/churches", superAdminOnly.ThenFunc(app.adminChurches))
+	mux.Handle("GET /admin/churches/{id}", superAdminOnly.ThenFunc(app.adminChurchDetail))
 
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
 	return standard.Then(mux)

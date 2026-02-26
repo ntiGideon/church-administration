@@ -22,6 +22,7 @@ import (
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
 )
@@ -45,6 +46,8 @@ type Client struct {
 	Finance *FinanceClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// ProgramEntry is the client for interacting with the ProgramEntry builders.
+	ProgramEntry *ProgramEntryClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// User is the client for interacting with the User builders.
@@ -67,6 +70,7 @@ func (c *Client) init() {
 	c.Event = NewEventClient(c.config)
 	c.Finance = NewFinanceClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
+	c.ProgramEntry = NewProgramEntryClient(c.config)
 	c.Session = NewSessionClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -168,6 +172,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Event:        NewEventClient(cfg),
 		Finance:      NewFinanceClient(cfg),
 		Invitation:   NewInvitationClient(cfg),
+		ProgramEntry: NewProgramEntryClient(cfg),
 		Session:      NewSessionClient(cfg),
 		User:         NewUserClient(cfg),
 	}, nil
@@ -196,6 +201,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Event:        NewEventClient(cfg),
 		Finance:      NewFinanceClient(cfg),
 		Invitation:   NewInvitationClient(cfg),
+		ProgramEntry: NewProgramEntryClient(cfg),
 		Session:      NewSessionClient(cfg),
 		User:         NewUserClient(cfg),
 	}, nil
@@ -228,7 +234,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Announcement, c.Church, c.Contact, c.Department, c.Event, c.Finance,
-		c.Invitation, c.Session, c.User,
+		c.Invitation, c.ProgramEntry, c.Session, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -239,7 +245,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Announcement, c.Church, c.Contact, c.Department, c.Event, c.Finance,
-		c.Invitation, c.Session, c.User,
+		c.Invitation, c.ProgramEntry, c.Session, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -262,6 +268,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Finance.mutate(ctx, m)
 	case *InvitationMutation:
 		return c.Invitation.mutate(ctx, m)
+	case *ProgramEntryMutation:
+		return c.ProgramEntry.mutate(ctx, m)
 	case *SessionMutation:
 		return c.Session.mutate(ctx, m)
 	case *UserMutation:
@@ -672,6 +680,38 @@ func (c *ChurchClient) QueryAnnouncements(_m *Church) *AnnouncementQuery {
 	return query
 }
 
+// QueryContacts queries the contacts edge of a Church.
+func (c *ChurchClient) QueryContacts(_m *Church) *ContactQuery {
+	query := (&ContactClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, id),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.ContactsTable, church.ContactsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrograms queries the programs edge of a Church.
+func (c *ChurchClient) QueryPrograms(_m *Church) *ProgramEntryQuery {
+	query := (&ProgramEntryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, id),
+			sqlgraph.To(programentry.Table, programentry.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.ProgramsTable, church.ProgramsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChurchClient) Hooks() []Hook {
 	return c.hooks.Church
@@ -814,6 +854,22 @@ func (c *ContactClient) QueryUser(_m *Contact) *UserQuery {
 			sqlgraph.From(contact.Table, contact.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, contact.UserTable, contact.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChurch queries the church edge of a Contact.
+func (c *ContactClient) QueryChurch(_m *Contact) *ChurchQuery {
+	query := (&ChurchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, id),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, contact.ChurchTable, contact.ChurchColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1522,6 +1578,155 @@ func (c *InvitationClient) mutate(ctx context.Context, m *InvitationMutation) (V
 	}
 }
 
+// ProgramEntryClient is a client for the ProgramEntry schema.
+type ProgramEntryClient struct {
+	config
+}
+
+// NewProgramEntryClient returns a client for the ProgramEntry from the given config.
+func NewProgramEntryClient(c config) *ProgramEntryClient {
+	return &ProgramEntryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `programentry.Hooks(f(g(h())))`.
+func (c *ProgramEntryClient) Use(hooks ...Hook) {
+	c.hooks.ProgramEntry = append(c.hooks.ProgramEntry, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `programentry.Intercept(f(g(h())))`.
+func (c *ProgramEntryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProgramEntry = append(c.inters.ProgramEntry, interceptors...)
+}
+
+// Create returns a builder for creating a ProgramEntry entity.
+func (c *ProgramEntryClient) Create() *ProgramEntryCreate {
+	mutation := newProgramEntryMutation(c.config, OpCreate)
+	return &ProgramEntryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProgramEntry entities.
+func (c *ProgramEntryClient) CreateBulk(builders ...*ProgramEntryCreate) *ProgramEntryCreateBulk {
+	return &ProgramEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProgramEntryClient) MapCreateBulk(slice any, setFunc func(*ProgramEntryCreate, int)) *ProgramEntryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProgramEntryCreateBulk{err: fmt.Errorf("calling to ProgramEntryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProgramEntryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProgramEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProgramEntry.
+func (c *ProgramEntryClient) Update() *ProgramEntryUpdate {
+	mutation := newProgramEntryMutation(c.config, OpUpdate)
+	return &ProgramEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProgramEntryClient) UpdateOne(_m *ProgramEntry) *ProgramEntryUpdateOne {
+	mutation := newProgramEntryMutation(c.config, OpUpdateOne, withProgramEntry(_m))
+	return &ProgramEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProgramEntryClient) UpdateOneID(id int) *ProgramEntryUpdateOne {
+	mutation := newProgramEntryMutation(c.config, OpUpdateOne, withProgramEntryID(id))
+	return &ProgramEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProgramEntry.
+func (c *ProgramEntryClient) Delete() *ProgramEntryDelete {
+	mutation := newProgramEntryMutation(c.config, OpDelete)
+	return &ProgramEntryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProgramEntryClient) DeleteOne(_m *ProgramEntry) *ProgramEntryDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProgramEntryClient) DeleteOneID(id int) *ProgramEntryDeleteOne {
+	builder := c.Delete().Where(programentry.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProgramEntryDeleteOne{builder}
+}
+
+// Query returns a query builder for ProgramEntry.
+func (c *ProgramEntryClient) Query() *ProgramEntryQuery {
+	return &ProgramEntryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProgramEntry},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProgramEntry entity by its id.
+func (c *ProgramEntryClient) Get(ctx context.Context, id int) (*ProgramEntry, error) {
+	return c.Query().Where(programentry.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProgramEntryClient) GetX(ctx context.Context, id int) *ProgramEntry {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChurch queries the church edge of a ProgramEntry.
+func (c *ProgramEntryClient) QueryChurch(_m *ProgramEntry) *ChurchQuery {
+	query := (&ChurchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(programentry.Table, programentry.FieldID, id),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, programentry.ChurchTable, programentry.ChurchColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProgramEntryClient) Hooks() []Hook {
+	return c.hooks.ProgramEntry
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProgramEntryClient) Interceptors() []Interceptor {
+	return c.inters.ProgramEntry
+}
+
+func (c *ProgramEntryClient) mutate(ctx context.Context, m *ProgramEntryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProgramEntryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProgramEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProgramEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProgramEntryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProgramEntry mutation op: %q", m.Op())
+	}
+}
+
 // SessionClient is a client for the Session schema.
 type SessionClient struct {
 	config
@@ -1887,11 +2092,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Announcement, Church, Contact, Department, Event, Finance, Invitation, Session,
-		User []ent.Hook
+		Announcement, Church, Contact, Department, Event, Finance, Invitation,
+		ProgramEntry, Session, User []ent.Hook
 	}
 	inters struct {
-		Announcement, Church, Contact, Department, Event, Finance, Invitation, Session,
-		User []ent.Interceptor
+		Announcement, Church, Contact, Department, Event, Finance, Invitation,
+		ProgramEntry, Session, User []ent.Interceptor
 	}
 )

@@ -103,6 +103,7 @@ func main() {
 		financeModel:      &models.FinanceModel{Db: db},
 		invitationModel:   &models.InvitationModel{Db: db},
 		announcementModel: &models.AnnouncementModel{Db: db},
+		programModel:      &models.ProgramModel{Db: db},
 	}
 
 	server := &http.Server{

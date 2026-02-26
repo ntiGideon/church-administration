@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/ntiGideon/ent"
+	entchurch "github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/user"
 	"github.com/ntiGideon/internal/models"
 	"github.com/ntiGideon/internal/validator"
@@ -58,13 +61,14 @@ func (app *application) inviteChurchPost(w http.ResponseWriter, r *http.Request)
 
 	resp := app.churchModel.InviteChurch(r.Context(), &dto)
 	if resp.Error != nil {
-		if resp.Error == models.EmailAlreadyExist {
+		if errors.Is(resp.Error, models.EmailAlreadyExist) {
 			dto.AddFieldError("email", "A church with this email already exists")
 			data := app.newTemplateData(r)
 			data.Form = dto
 			app.render(w, r, http.StatusUnprocessableEntity, "invite_church.gohtml", data)
 			return
 		}
+
 		app.serverError(w, r, resp.Error)
 		return
 	}
@@ -86,6 +90,54 @@ func (app *application) inviteChurchPost(w http.ResponseWriter, r *http.Request)
 
 	app.sessionManager.Put(r.Context(), "flash", "Invitation sent to "+dto.Email)
 	http.Redirect(w, r, "/admin/churches", http.StatusSeeOther)
+}
+
+// GET /admin/churches/{id}  — detailed view of a single church (superadmin only)
+func (app *application) adminChurchDetail(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	// Load the church with all its edges
+	church, err := app.db.Church.Query().
+		Where(entchurch.IDEQ(id)).
+		WithUsers(func(uq *ent.UserQuery) {
+			uq.WithContact()
+		}).
+		WithContacts().
+		WithAnnouncements(func(aq *ent.AnnouncementQuery) {
+			aq.WithAuthor(func(uq *ent.UserQuery) { uq.WithContact() }).
+				Order(ent.Desc("created_at")).Limit(10)
+		}).
+		Only(r.Context())
+	if err != nil {
+		if ent.IsNotFound(err) {
+			app.clientError(w, http.StatusNotFound)
+			return
+		}
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Finance summary and recent activity scoped to this church
+	summary, _ := app.financeModel.Summary(r.Context(), id)
+	recentTx, _ := app.financeModel.RecentTransactions(r.Context(), id, 8)
+	upcomingEvents, _ := app.eventModel.Upcoming(r.Context(), id, 5)
+	allEvents, _ := app.eventModel.List(r.Context(), id)
+
+	data := app.newTemplateData(r)
+	data.Data = map[string]interface{}{
+		"church":         church,
+		"summary":        summary,
+		"recentTx":       recentTx,
+		"upcomingEvents": upcomingEvents,
+		"totalEvents":    len(allEvents),
+		"workerCount":    len(church.Edges.Users),
+		"memberCount":    len(church.Edges.Contacts),
+	}
+	app.render(w, r, http.StatusOK, "admin_church_detail.gohtml", data)
 }
 
 // GET /admin/churches  — list all churches with stats (superadmin only)

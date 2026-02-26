@@ -180,6 +180,11 @@ func SpouseID(v int) predicate.Contact {
 	return predicate.Contact(sql.FieldEQ(FieldSpouseID, v))
 }
 
+// ChurchID applies equality check predicate on the "church_id" field. It's identical to ChurchIDEQ.
+func ChurchID(v int) predicate.Contact {
+	return predicate.Contact(sql.FieldEQ(FieldChurchID, v))
+}
+
 // IsBaptized applies equality check predicate on the "is_baptized" field. It's identical to IsBaptizedEQ.
 func IsBaptized(v bool) predicate.Contact {
 	return predicate.Contact(sql.FieldEQ(FieldIsBaptized, v))
@@ -2000,6 +2005,36 @@ func SpouseIDNotNil() predicate.Contact {
 	return predicate.Contact(sql.FieldNotNull(FieldSpouseID))
 }
 
+// ChurchIDEQ applies the EQ predicate on the "church_id" field.
+func ChurchIDEQ(v int) predicate.Contact {
+	return predicate.Contact(sql.FieldEQ(FieldChurchID, v))
+}
+
+// ChurchIDNEQ applies the NEQ predicate on the "church_id" field.
+func ChurchIDNEQ(v int) predicate.Contact {
+	return predicate.Contact(sql.FieldNEQ(FieldChurchID, v))
+}
+
+// ChurchIDIn applies the In predicate on the "church_id" field.
+func ChurchIDIn(vs ...int) predicate.Contact {
+	return predicate.Contact(sql.FieldIn(FieldChurchID, vs...))
+}
+
+// ChurchIDNotIn applies the NotIn predicate on the "church_id" field.
+func ChurchIDNotIn(vs ...int) predicate.Contact {
+	return predicate.Contact(sql.FieldNotIn(FieldChurchID, vs...))
+}
+
+// ChurchIDIsNil applies the IsNil predicate on the "church_id" field.
+func ChurchIDIsNil() predicate.Contact {
+	return predicate.Contact(sql.FieldIsNull(FieldChurchID))
+}
+
+// ChurchIDNotNil applies the NotNil predicate on the "church_id" field.
+func ChurchIDNotNil() predicate.Contact {
+	return predicate.Contact(sql.FieldNotNull(FieldChurchID))
+}
+
 // IsBaptizedEQ applies the EQ predicate on the "is_baptized" field.
 func IsBaptizedEQ(v bool) predicate.Contact {
 	return predicate.Contact(sql.FieldEQ(FieldIsBaptized, v))
@@ -2380,6 +2415,29 @@ func HasUser() predicate.Contact {
 func HasUserWith(preds ...predicate.User) predicate.Contact {
 	return predicate.Contact(func(s *sql.Selector) {
 		step := newUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChurch applies the HasEdge predicate on the "church" edge.
+func HasChurch() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ChurchTable, ChurchColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChurchWith applies the HasEdge predicate on the "church" edge with a given conditions (other predicates).
+func HasChurchWith(preds ...predicate.Church) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newChurchStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

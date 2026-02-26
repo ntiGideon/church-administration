@@ -1,579 +1,696 @@
-{{define "title"}}Dashboard | FaithConnect{{end}}
+{{define "title"}}Dashboard | Ascension Baptist{{end}}
 {{define "description"}}Church administration dashboard{{end}}
 
 {{define "main"}}
-<div class="page-wrapper">
-    <!-- Page Header -->
-    <div class="page-header-bar">
-        <div>
-            <h1 class="page-title-text">
-                {{if .LoggedInUser}}
-                    Welcome back, {{with .LoggedInUser.Edges.Contact}}{{.FirstName}}{{end}} 👋
-                {{else}}
-                    Dashboard
-                {{end}}
-            </h1>
-            <p class="page-subtitle-text">
-                {{if .LoggedInUser}}
-                    Here's what's happening with your church today.
-                {{end}}
-            </p>
+{{$role := ""}}
+{{if .LoggedInUser}}{{$role = printf "%s" .LoggedInUser.Role}}{{end}}
+{{$isSA := eq $role "super_admin"}}
+{{$isAdmin := or (eq $role "super_admin") (eq $role "branch_admin")}}
+
+<div class="dash-wrapper">
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <div class="dash-header">
+        <div class="dash-header-left">
+            <div class="greeting-block">
+                <p class="greeting-time" id="greetingLine">Welcome back</p>
+                <h1 class="greeting-name">
+                    {{if .LoggedInUser}}
+                        {{with .LoggedInUser.Edges.Contact}}{{.FirstName}} {{.LastName}}{{else}}Admin{{end}}
+                    {{end}}
+                </h1>
+                <p class="greeting-sub" id="dateDisplay">
+                    {{if and .LoggedInUser .LoggedInUser.Edges.Church}}
+                        <i class="fas fa-church"></i> {{.LoggedInUser.Edges.Church.Name}}
+                        &nbsp;·&nbsp;
+                    {{end}}
+                    <i class="fas fa-calendar"></i> <span id="todayDate"></span>
+                </p>
+            </div>
         </div>
-        <div class="header-actions">
-            <a href="/events/new" class="button is-primary">
-                <span class="icon"><i class="fas fa-plus"></i></span>
-                <span>New Event</span>
+        <div class="dash-header-right">
+            {{if $isAdmin}}
+            <a href="/announcements/new" class="hdr-btn outlined">
+                <i class="fas fa-bullhorn"></i> Announce
             </a>
-            <a href="/giving/new" class="button is-outlined is-primary ml-2">
-                <span class="icon"><i class="fas fa-donate"></i></span>
-                <span>Record Giving</span>
+            <a href="/events/new" class="hdr-btn outlined">
+                <i class="fas fa-calendar-plus"></i> New Event
             </a>
+            <a href="/giving/new" class="hdr-btn primary">
+                <i class="fas fa-plus"></i> Record Giving
+            </a>
+            {{end}}
         </div>
     </div>
 
     {{if .Flash}}
-    <div class="notification is-success is-light flash-notification mb-5">
+    <div class="notification is-success is-light flash-notification mb-4">
         <button class="delete"></button>
         <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
     </div>
     {{end}}
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-widget churches">
-            <div class="stat-icon"><i class="fas fa-church"></i></div>
-            <div class="stat-content">
-                {{if .LoggedInUser}}
-                    {{if eq (printf "%s" .LoggedInUser.Role) "super_admin"}}
-                    <div class="stat-number">{{with index .Data "churchCount"}}{{.}}{{else}}0{{end}}</div>
-                    <div class="stat-label">Total Branches</div>
-                    {{else}}
-                    <div class="stat-number">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
-                    <div class="stat-label">Total Members</div>
-                    {{end}}
-                {{end}}
+    <!-- ── KPI Row ───────────────────────────────────────────────────────── -->
+    <div class="kpi-row">
+
+        {{if $isSA}}
+        <!-- Super admin KPIs -->
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,var(--primary),#6B2F3D)">
+                <i class="fas fa-church"></i>
             </div>
-            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Active</div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{with index .Data "churchCount"}}{{.}}{{else}}0{{end}}</div>
+                <div class="kpi-lbl">Branches</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#7A8CA3,#5A6B7A)">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
+                <div class="kpi-lbl">Network Users</div>
+            </div>
         </div>
 
-        <div class="stat-widget members">
-            <div class="stat-icon"><i class="fas fa-users"></i></div>
-            <div class="stat-content">
-                <div class="stat-number">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
-                <div class="stat-label">Congregation</div>
+        {{else}}
+        <!-- Branch KPIs -->
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,var(--primary),#6B2F3D)">
+                <i class="fas fa-people-group"></i>
             </div>
-            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Growing</div>
-        </div>
-
-        <div class="stat-widget income">
-            <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
-            <div class="stat-content">
-                <div class="stat-number">GH₵ {{printf "%.2f" (index .Data "thisMonthIncome")}}</div>
-                <div class="stat-label">This Month's Income</div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{with index .Data "memberCount"}}{{.}}{{else}}0{{end}}</div>
+                <div class="kpi-lbl">Congregation</div>
             </div>
-            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> Income</div>
         </div>
-
-        <div class="stat-widget expenses">
-            <div class="stat-icon"><i class="fas fa-receipt"></i></div>
-            <div class="stat-content">
-                <div class="stat-number">GH₵ {{printf "%.2f" (index .Data "thisMonthExpenses")}}</div>
-                <div class="stat-label">This Month's Expenses</div>
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#7A8CA3,#5A6B7A)">
+                <i class="fas fa-user-tie"></i>
             </div>
-            <div class="stat-trend neutral"><i class="fas fa-minus"></i> Expenses</div>
-        </div>
-    </div>
-
-    <!-- Super Admin: Church Network Overview -->
-    {{if .LoggedInUser}}
-    {{if eq (printf "%s" .LoggedInUser.Role) "super_admin"}}
-    {{$churches := index .Data "churches"}}
-    {{if $churches}}
-    <div class="sa-section-header">
-        <h3><i class="fas fa-network-wired mr-2"></i>Church Network</h3>
-        <a href="/admin/churches" class="view-all-link">Manage All <i class="fas fa-arrow-right ml-1"></i></a>
-    </div>
-    <div class="churches-overview-grid">
-        {{range $churches}}
-        <div class="co-card">
-            <div class="co-type-stripe type-{{.Type}}"></div>
-            <div class="co-body">
-                <div class="co-top">
-                    <div class="co-name">{{.Name}}</div>
-                    <span class="co-badge co-{{.Type}}">{{.Type}}</span>
-                </div>
-                <div class="co-stats">
-                    <span><i class="fas fa-users"></i> {{len .Edges.Users}} members</span>
-                    {{if gt .CongregationSize 0}}
-                    <span><i class="fas fa-people-group"></i> {{.CongregationSize}} total</span>
-                    {{end}}
-                </div>
-                {{if .RegistrationToken}}
-                <span class="co-pending"><i class="fas fa-clock"></i> Pending setup</span>
-                {{end}}
+            <div class="kpi-right">
+                <div class="kpi-val">{{with index .Data "workerCount"}}{{.}}{{else}}0{{end}}</div>
+                <div class="kpi-lbl">Platform Workers</div>
             </div>
         </div>
         {{end}}
+
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#28A745,#20883A)">
+                <i class="fas fa-arrow-trend-up"></i>
+            </div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{formatMoney (index .Data "totalIncome")}}</div>
+                <div class="kpi-lbl">Total Income</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#DC3545,#C82333)">
+                <i class="fas fa-arrow-trend-down"></i>
+            </div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{formatMoney (index .Data "totalExpenses")}}</div>
+                <div class="kpi-lbl">Total Expenses</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#17A2B8,#138496)">
+                <i class="fas fa-scale-balanced"></i>
+            </div>
+            <div class="kpi-right">
+                {{$net := index .Data "netBalance"}}
+                <div class="kpi-val {{if isPositive $net}}kpi-green{{else}}kpi-red{{end}}">
+                    {{formatMoney $net}}
+                </div>
+                <div class="kpi-lbl">Net Balance</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-left" style="background:linear-gradient(135deg,#9E8FB5,#7A6B94)">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="kpi-right">
+                <div class="kpi-val">{{with index .Data "totalEvents"}}{{.}}{{else}}0{{end}}</div>
+                <div class="kpi-lbl">Total Events</div>
+            </div>
+        </div>
     </div>
-    <div class="sa-invite-cta">
-        <a href="/invite-church" class="button is-primary is-outlined is-small">
-            <span class="icon"><i class="fas fa-plus"></i></span>
-            <span>Invite New Branch</span>
+
+    <!-- ── This Month Strip ───────────────────────────────────────────── -->
+    <div class="month-strip">
+        <div class="month-strip-label"><i class="fas fa-calendar-day"></i> This Month</div>
+        <div class="month-strip-stats">
+            <div class="month-item">
+                <span class="mi-label">Income</span>
+                <span class="mi-val income">GH₵ {{formatMoney (index .Data "thisMonthIncome")}}</span>
+            </div>
+            <div class="month-sep"></div>
+            <div class="month-item">
+                <span class="mi-label">Expenses</span>
+                <span class="mi-val expense">GH₵ {{formatMoney (index .Data "thisMonthExpenses")}}</span>
+            </div>
+            <div class="month-sep"></div>
+            <div class="month-item">
+                <span class="mi-label">Net</span>
+                {{$mNet := subtract (index .Data "thisMonthIncome") (index .Data "thisMonthExpenses")}}
+                <span class="mi-val {{if isPositive $mNet}}income{{else}}expense{{end}}">GH₵ {{formatMoney $mNet}}</span>
+            </div>
+        </div>
+        <a href="/giving/donations" class="month-strip-link">View Finance <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <!-- ── Super Admin: Church Network ───────────────────────────────── -->
+    {{if $isSA}}
+    {{$churches := index .Data "churches"}}
+    {{if $churches}}
+    <div class="section-header">
+        <div class="sh-title"><i class="fas fa-network-wired"></i> Church Network</div>
+        <a href="/admin/churches" class="sh-link">Manage all <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="network-grid">
+        {{range $churches}}
+        <a href="/admin/churches/{{.ID}}" class="nc-card">
+            <div class="nc-stripe type-{{.Type}}"></div>
+            <div class="nc-body">
+                <div class="nc-top">
+                    <span class="nc-name">{{.Name}}</span>
+                    <span class="nc-type type-badge-{{.Type}}">{{.Type}}</span>
+                </div>
+                <div class="nc-stats">
+                    <span><i class="fas fa-users"></i> {{len .Edges.Users}}</span>
+                    {{if gt .CongregationSize 0}}
+                    <span><i class="fas fa-people-group"></i> {{.CongregationSize}}</span>
+                    {{end}}
+                    {{if .IsActive}}<span class="nc-active"><i class="fas fa-circle"></i> Active</span>{{end}}
+                </div>
+                {{if .RegistrationToken}}
+                <div class="nc-pending"><i class="fas fa-clock"></i> Pending setup</div>
+                {{end}}
+            </div>
+        </a>
+        {{end}}
+        <a href="/invite-church" class="nc-card nc-add">
+            <i class="fas fa-plus-circle"></i>
+            <span>Invite Branch</span>
         </a>
     </div>
     {{end}}
     {{end}}
-    {{end}}
 
-    <!-- Content Row -->
-    <div class="columns mt-5">
-        <!-- Upcoming Events -->
-        <div class="column is-7">
-            <div class="content-card">
-                <div class="card-header-bar">
-                    <h3><i class="fas fa-calendar-alt mr-2"></i>Upcoming Events</h3>
-                    <a href="/events/new" class="button is-small is-primary is-outlined">
-                        <span class="icon is-small"><i class="fas fa-plus"></i></span>
-                        <span>Add Event</span>
-                    </a>
+    <!-- ── Main 2-column grid ─────────────────────────────────────────── -->
+    <div class="main-grid">
+
+        <!-- Left column -->
+        <div class="main-left">
+
+            <!-- Upcoming Events -->
+            <div class="dash-card">
+                <div class="dc-header">
+                    <div class="dc-title"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
+                    {{if $isAdmin}}
+                    <a href="/events/new" class="dc-action"><i class="fas fa-plus"></i> Add</a>
+                    {{end}}
                 </div>
-                <div class="card-body-content">
+                <div class="dc-body p0">
                     {{$events := index .Data "upcomingEvents"}}
                     {{if $events}}
-                    <div class="event-list">
+                    <div class="event-feed">
                         {{range $events}}
-                        <a href="/events/{{.ID}}" class="event-row">
-                            <div class="event-date-badge">
-                                <span class="event-day">{{.StartTime.Day}}</span>
-                                <span class="event-month">{{.StartTime.Format "Jan"}}</span>
+                        <a href="/events/{{.ID}}" class="ef-item">
+                            <div class="ef-cal">
+                                <div class="ef-day">{{.StartTime.Day}}</div>
+                                <div class="ef-mon">{{.StartTime.Format "Jan"}}</div>
                             </div>
-                            <div class="event-info">
-                                <div class="event-title">{{.Title}}</div>
-                                <div class="event-meta">
-                                    <span><i class="fas fa-map-marker-alt"></i> {{.Location}}</span>
+                            <div class="ef-detail">
+                                <div class="ef-title">{{.Title}}</div>
+                                <div class="ef-meta">
                                     <span><i class="fas fa-clock"></i> {{.StartTime.Format "3:04 PM"}}</span>
+                                    {{if .Location}}<span><i class="fas fa-map-marker-alt"></i> {{.Location}}</span>{{end}}
                                 </div>
                             </div>
-                            <div class="event-type-badge event-{{.EventType}}">{{.EventType}}</div>
+                            <span class="ef-type ev-{{.EventType}}">{{.EventType}}</span>
                         </a>
                         {{end}}
                     </div>
                     {{else}}
-                    <div class="empty-state">
+                    <div class="dc-empty">
                         <i class="fas fa-calendar-plus"></i>
-                        <p>No upcoming events</p>
-                        <a href="/events/new" class="button is-primary is-small mt-3">Schedule Event</a>
+                        <p>No upcoming events scheduled</p>
+                        {{if $isAdmin}}
+                        <a href="/events/new" class="button is-primary is-small mt-2">Schedule Event</a>
+                        {{end}}
                     </div>
                     {{end}}
                 </div>
-                <div class="card-footer-bar">
-                    <a href="/events" class="view-all-link">View all events <i class="fas fa-arrow-right ml-1"></i></a>
+                <div class="dc-footer">
+                    <a href="/events" class="dc-footer-link">View all events <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
-        </div>
 
-        <!-- Financial Summary -->
-        <div class="column is-5">
-            <div class="content-card">
-                <div class="card-header-bar">
-                    <h3><i class="fas fa-chart-pie mr-2"></i>Financial Overview</h3>
-                    <a href="/giving/new" class="button is-small is-primary is-outlined">Record</a>
+            <!-- Recent Activity -->
+            {{$recentTx := index .Data "recentTransactions"}}
+            {{if $recentTx}}
+            <div class="dash-card mt-4">
+                <div class="dc-header">
+                    <div class="dc-title"><i class="fas fa-receipt"></i> Recent Transactions</div>
+                    <a href="/giving/donations" class="dc-action">View all</a>
                 </div>
-                <div class="card-body-content">
-                    <div class="finance-metric">
-                        <div class="metric-label">Total Income</div>
-                        <div class="metric-value income">GH₵ {{printf "%.2f" (index .Data "totalIncome")}}</div>
+                <div class="dc-body p0">
+                    <div class="tx-feed">
+                        {{range $recentTx}}
+                        {{$isExpense := or (eq (printf "%s" .TransactionType) "expense") (eq (printf "%s" .TransactionType) "salary")}}
+                        <div class="txf-item">
+                            <div class="txf-icon {{if $isExpense}}txf-out{{else}}txf-in{{end}}">
+                                {{if $isExpense}}<i class="fas fa-arrow-up"></i>{{else}}<i class="fas fa-arrow-down"></i>{{end}}
+                            </div>
+                            <div class="txf-detail">
+                                <div class="txf-desc">{{.Description}}</div>
+                                <div class="txf-meta">
+                                    <span class="txf-type tx-{{.TransactionType}}">{{.TransactionType}}</span>
+                                    <span>{{.TransactionDate.Format "Jan 2, 2006"}}</span>
+                                </div>
+                            </div>
+                            <div class="txf-amount {{if $isExpense}}neg{{else}}pos{{end}}">
+                                {{if $isExpense}}−{{else}}+{{end}}{{.Currency}} {{formatMoney .Amount}}
+                            </div>
+                        </div>
+                        {{end}}
                     </div>
-                    <div class="finance-metric">
-                        <div class="metric-label">Total Expenses</div>
-                        <div class="metric-value expense">GH₵ {{printf "%.2f" (index .Data "totalExpenses")}}</div>
+                </div>
+            </div>
+            {{end}}
+
+        </div><!-- /main-left -->
+
+        <!-- Right column -->
+        <div class="main-right">
+
+            <!-- Financial Overview -->
+            <div class="dash-card">
+                <div class="dc-header">
+                    <div class="dc-title"><i class="fas fa-chart-pie"></i> Financial Overview</div>
+                    {{if $isAdmin}}
+                    <a href="/giving/new" class="dc-action"><i class="fas fa-plus"></i> Record</a>
+                    {{end}}
+                </div>
+                <div class="dc-body">
+                    <div class="fin-row">
+                        <span class="fin-lbl"><i class="fas fa-circle" style="color:#28A745;font-size:.55rem"></i> Total Income</span>
+                        <span class="fin-amt income-txt">GH₵ {{formatMoney (index .Data "totalIncome")}}</span>
                     </div>
-                    <div class="finance-divider"></div>
-                    <div class="finance-metric net">
-                        <div class="metric-label">Net Balance</div>
-                        <div class="metric-value">GH₵ {{printf "%.2f" (index .Data "netBalance")}}</div>
+                    <div class="fin-row">
+                        <span class="fin-lbl"><i class="fas fa-circle" style="color:#DC3545;font-size:.55rem"></i> Total Expenses</span>
+                        <span class="fin-amt expense-txt">GH₵ {{formatMoney (index .Data "totalExpenses")}}</span>
                     </div>
 
-                    <!-- Simple bar chart -->
-                    <div class="mini-chart mt-4">
-                        <div class="mini-bar-label">Income vs Expenses</div>
-                        <div class="mini-bars">
-                            <div class="mini-bar income-bar" style="width: 100%">
-                                <span>Income</span>
+                    <!-- Visual ratio bars -->
+                    <div class="fin-bars-wrap">
+                        <div class="fin-bar-row">
+                            <span class="fbr-label">Income</span>
+                            <div class="fbr-track">
+                                <div class="fbr-fill fbr-income" id="incomeBar" style="width:0%"></div>
                             </div>
-                            {{$income := index .Data "totalIncome"}}
-                            {{$expenses := index .Data "totalExpenses"}}
-                            <div class="mini-bar expense-bar">
-                                <span>Expenses</span>
+                        </div>
+                        <div class="fin-bar-row">
+                            <span class="fbr-label">Expenses</span>
+                            <div class="fbr-track">
+                                <div class="fbr-fill fbr-expense" id="expenseBar" style="width:0%"></div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="fin-net-row">
+                        <span class="fin-net-lbl">Net Balance</span>
+                        {{$net := index .Data "netBalance"}}
+                        <span class="fin-net-val {{if isPositive $net}}income-txt{{else}}expense-txt{{end}}">
+                            GH₵ {{formatMoney $net}}
+                        </span>
+                    </div>
                 </div>
-                <div class="card-footer-bar">
-                    <a href="/giving/donations" class="view-all-link">View all transactions <i class="fas fa-arrow-right ml-1"></i></a>
+                <div class="dc-footer">
+                    <a href="/giving/donations" class="dc-footer-link">All transactions <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
 
             <!-- Quick Actions -->
-            <div class="content-card mt-4">
-                <div class="card-header-bar">
-                    <h3><i class="fas fa-bolt mr-2"></i>Quick Actions</h3>
+            <div class="dash-card mt-4">
+                <div class="dc-header">
+                    <div class="dc-title"><i class="fas fa-bolt"></i> Quick Actions</div>
                 </div>
-                <div class="card-body-content">
-                    <div class="quick-action-grid">
-                        <a href="/members/new" class="quick-action-btn">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Invite Member</span>
+                <div class="dc-body">
+                    <div class="qa-grid">
+                        {{if $isSA}}
+                        <a href="/admin/churches" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,var(--primary),#6B2F3D)"><i class="fas fa-network-wired"></i></div>
+                            <span>Network</span>
                         </a>
-                        <a href="/events/new" class="quick-action-btn">
-                            <i class="fas fa-calendar-plus"></i>
+                        <a href="/invite-church" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#7A8CA3,#5A6B7A)"><i class="fas fa-plus"></i></div>
+                            <span>Invite Branch</span>
+                        </a>
+                        {{else}}
+                        <a href="/members/new" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,var(--primary),#6B2F3D)"><i class="fas fa-user-plus"></i></div>
+                            <span>Add Member</span>
+                        </a>
+                        <a href="/workers/new" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#7A8CA3,#5A6B7A)"><i class="fas fa-user-tie"></i></div>
+                            <span>Invite Worker</span>
+                        </a>
+                        {{end}}
+                        <a href="/events/new" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#28A745,#20883A)"><i class="fas fa-calendar-plus"></i></div>
                             <span>New Event</span>
                         </a>
-                        <a href="/giving/new" class="quick-action-btn">
-                            <i class="fas fa-donate"></i>
+                        <a href="/giving/new" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#DC3545,#C82333)"><i class="fas fa-donate"></i></div>
                             <span>Record Giving</span>
                         </a>
-                        <a href="/members" class="quick-action-btn">
-                            <i class="fas fa-users"></i>
-                            <span>View Members</span>
+                        <a href="/members" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#17A2B8,#138496)"><i class="fas fa-users"></i></div>
+                            <span>Members</span>
+                        </a>
+                        <a href="/reports" class="qa-btn">
+                            <div class="qa-icon" style="background:linear-gradient(135deg,#9E8FB5,#7A6B94)"><i class="fas fa-chart-bar"></i></div>
+                            <span>Reports</span>
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- Announcements -->
+            {{$announcements := index .Data "recentAnnouncements"}}
+            {{if $announcements}}
+            <div class="dash-card mt-4">
+                <div class="dc-header">
+                    <div class="dc-title"><i class="fas fa-bullhorn"></i> Announcements</div>
+                    {{if $isAdmin}}
+                    <a href="/announcements/new" class="dc-action"><i class="fas fa-plus"></i> New</a>
+                    {{end}}
+                </div>
+                <div class="dc-body p0">
+                    <div class="ann-list">
+                        {{range $announcements}}
+                        <div class="ann-item">
+                            <div class="ann-dot {{if .IsPublished}}pub{{else}}draft{{end}}"></div>
+                            <div class="ann-body">
+                                <div class="ann-title">{{.Title}}</div>
+                                <div class="ann-meta">
+                                    <span class="ann-cat">{{.Category}}</span>
+                                    &middot;
+                                    <span>{{.CreatedAt.Format "Jan 2"}}</span>
+                                    {{if .IsPublished}}
+                                    <span class="ann-badge-pub">Live</span>
+                                    {{else}}
+                                    <span class="ann-badge-draft">Draft</span>
+                                    {{end}}
+                                </div>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="dc-footer">
+                    <a href="/announcements" class="dc-footer-link">All announcements <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {{end}}
+
+        </div><!-- /main-right -->
+    </div><!-- /main-grid -->
 </div>
 
 <style>
-.page-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.dash-wrapper { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.dash-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 1.75rem; gap: 1rem; flex-wrap: wrap;
 }
-
-.page-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+.greeting-time {
+    font-size: 0.8rem; font-weight: 600; color: var(--primary);
+    text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 4px;
 }
-
-.page-title-text {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0;
-}
-
-.page-subtitle-text {
-    color: var(--text-light);
-    margin: 4px 0 0;
-    font-size: 0.9rem;
-}
-
-.header-actions { display: flex; align-items: center; }
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-}
-
-.stat-widget {
-    background: white;
-    border-radius: 14px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-    border: 1px solid var(--light-gray);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.stat-widget:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
-}
-
-.stat-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    flex-shrink: 0;
-    color: white;
-}
-
-.stat-widget.churches .stat-icon { background: linear-gradient(135deg, #50222D, #6B2F3D); }
-.stat-widget.members .stat-icon { background: linear-gradient(135deg, #7A8CA3, #5A6B7A); }
-.stat-widget.income .stat-icon { background: linear-gradient(135deg, #28A745, #20883A); }
-.stat-widget.expenses .stat-icon { background: linear-gradient(135deg, #DC3545, #C82333); }
-
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text-dark);
+.greeting-name {
+    font-size: 2rem; font-weight: 800; color: var(--text-dark); margin: 0 0 4px;
     line-height: 1.1;
 }
-
-.stat-label {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    font-weight: 500;
-    margin-top: 4px;
+.greeting-sub {
+    font-size: 0.82rem; color: var(--text-light); margin: 0;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
 }
-
-.stat-trend {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
+.greeting-sub i { color: var(--primary); font-size: 0.72rem; }
+.dash-header-right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.hdr-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.5rem 1rem; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 600; text-decoration: none;
+    transition: all 0.15s; white-space: nowrap;
 }
-
-.stat-trend.up { background: rgba(40,167,69,0.1); color: #28A745; }
-.stat-trend.down { background: rgba(220,53,69,0.1); color: #DC3545; }
-.stat-trend.neutral { background: rgba(108,117,125,0.1); color: #6C757D; }
-
-/* Content Cards */
-.content-card {
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-    border: 1px solid var(--light-gray);
-    overflow: hidden;
+.hdr-btn.outlined {
+    border: 1.5px solid var(--light-gray); color: var(--text-dark); background: white;
 }
+.hdr-btn.outlined:hover { border-color: var(--primary); color: var(--primary); }
+.hdr-btn.primary { background: var(--primary); color: white; border: 1.5px solid var(--primary); }
+.hdr-btn.primary:hover { background: #6B2F3D; }
+.mb-4 { margin-bottom: 1rem; }
 
-.card-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.card-header-bar h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin: 0;
-}
-
-.card-body-content { padding: 1.2rem 1.5rem; }
-
-.card-footer-bar {
-    padding: 0.8rem 1.5rem;
-    border-top: 1px solid var(--light-gray);
-    background: rgba(248,249,250,0.5);
-}
-
-.view-all-link {
-    font-size: 0.85rem;
-    color: var(--primary);
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.view-all-link:hover { color: var(--primary-dark); }
-
-/* Events */
-.event-list { display: flex; flex-direction: column; gap: 0.8rem; }
-
-.event-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.8rem;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: background 0.2s;
-    border: 1px solid transparent;
-}
-
-.event-row:hover {
-    background: rgba(80,34,45,0.04);
-    border-color: var(--light-gray);
-}
-
-.event-date-badge {
-    width: 48px;
-    height: 52px;
-    border-radius: 10px;
-    background: var(--primary);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: white;
-}
-
-.event-day { font-size: 1.3rem; font-weight: 700; line-height: 1; }
-.event-month { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; }
-
-.event-info { flex: 1; min-width: 0; }
-
-.event-title {
-    font-weight: 600;
-    color: var(--text-dark);
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.event-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.77rem;
-    color: var(--text-light);
-    margin-top: 3px;
-}
-
-.event-meta span { display: flex; align-items: center; gap: 4px; }
-
-.event-type-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-transform: capitalize;
-    flex-shrink: 0;
-}
-
-.event-service { background: rgba(80,34,45,0.1); color: var(--primary); }
-.event-meeting { background: rgba(122,140,163,0.15); color: var(--support-blue); }
-.event-conference { background: rgba(158,143,181,0.15); color: var(--support-purple); }
-.event-outreach { background: rgba(212,165,165,0.2); color: #8B4A4A; }
-.event-training { background: rgba(40,167,69,0.1); color: #28A745; }
-
-/* Finance metrics */
-.finance-metric {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.7rem 0;
-}
-
-.metric-label { font-size: 0.85rem; color: var(--text-light); }
-.metric-value { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
-.metric-value.income { color: #28A745; }
-.metric-value.expense { color: #DC3545; }
-.finance-metric.net .metric-value { font-size: 1.3rem; color: var(--primary); }
-.finance-divider { height: 1px; background: var(--light-gray); margin: 0.5rem 0; }
-
-.mini-chart { border-top: 1px solid var(--light-gray); padding-top: 1rem; }
-.mini-bar-label { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; }
-.mini-bars { display: flex; flex-direction: column; gap: 6px; }
-.mini-bar {
-    height: 24px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    padding: 0 8px;
-    font-size: 0.75rem;
-    color: white;
-    font-weight: 600;
-}
-.income-bar { background: linear-gradient(90deg, #28A745, #20C997); width: 100%; }
-.expense-bar { background: linear-gradient(90deg, #DC3545, #E05D6F); width: 60%; }
-
-/* Quick actions */
-.quick-action-grid {
+/* ── KPI Row ─────────────────────────────────────────────────────────── */
+.kpi-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem; margin-bottom: 1rem;
 }
-
-.quick-action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 10px;
-    border: 2px solid var(--light-gray);
-    text-decoration: none;
-    color: var(--text-dark);
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: all 0.2s;
+.kpi-card {
+    background: white; border-radius: 14px; border: 1px solid var(--light-gray);
+    display: flex; align-items: center; gap: 0; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
-
-.quick-action-btn i {
-    font-size: 1.3rem;
-    color: var(--primary);
+.kpi-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.09); transform: translateY(-2px); }
+.kpi-left {
+    width: 52px; min-height: 72px; display: flex; align-items: center;
+    justify-content: center; color: white; font-size: 1.05rem; flex-shrink: 0;
 }
+.kpi-right { padding: 0.75rem 0.9rem; flex: 1; min-width: 0; }
+.kpi-val { font-size: 1.25rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
+.kpi-lbl { font-size: 0.68rem; color: var(--text-light); font-weight: 500; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-green { color: #28A745 !important; }
+.kpi-red   { color: #DC3545 !important; }
 
-.quick-action-btn:hover {
-    border-color: var(--primary);
-    background: rgba(80,34,45,0.04);
-    color: var(--primary);
-    transform: translateY(-2px);
+/* ── Month Strip ─────────────────────────────────────────────────────── */
+.month-strip {
+    background: linear-gradient(135deg, var(--primary) 0%, #6B2F3D 100%);
+    border-radius: 14px; padding: 1rem 1.5rem; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+    box-shadow: 0 4px 18px rgba(80,34,45,0.25);
 }
-
-/* Empty state */
-.empty-state {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-light);
+.month-strip-label {
+    font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.75);
+    text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
 }
-.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: var(--medium-gray); }
-.empty-state p { font-size: 0.9rem; }
+.month-strip-stats { display: flex; align-items: center; gap: 1.5rem; flex: 1; flex-wrap: wrap; }
+.month-item { display: flex; flex-direction: column; gap: 1px; }
+.mi-label { font-size: 0.68rem; color: rgba(255,255,255,0.65); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+.mi-val { font-size: 1.1rem; font-weight: 700; }
+.mi-val.income { color: #7EE8A2; }
+.mi-val.expense { color: #FFAAB0; }
+.month-sep { width: 1px; height: 36px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+.month-strip-link { font-size: 0.78rem; color: rgba(255,255,255,0.8); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 5px; margin-left: auto; }
+.month-strip-link:hover { color: white; }
 
-/* Super admin church network section */
-.sa-section-header { display: flex; justify-content: space-between; align-items: center; margin: 2rem 0 1rem; }
-.sa-section-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-dark); margin: 0; }
+/* ── Section Headers ─────────────────────────────────────────────────── */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+.sh-title { font-size: 1rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+.sh-title i { color: var(--primary); }
+.sh-link { font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 4px; }
 
-.churches-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-
-.co-card { background: white; border-radius: 12px; border: 1px solid var(--light-gray); overflow: hidden; transition: box-shadow 0.15s; }
-.co-card:hover { box-shadow: 0 4px 16px rgba(80,34,45,0.09); }
-.co-type-stripe { height: 3px; }
-.type-headquarters { background: linear-gradient(90deg, var(--primary), #6B2F3D); }
-.type-branch { background: linear-gradient(90deg, var(--support-blue), #7A8CA3); }
-.type-mission { background: linear-gradient(90deg, var(--support-purple), #9E8FB5); }
-.co-body { padding: 1rem 1.2rem; }
-.co-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-.co-name { font-weight: 600; font-size: 0.88rem; color: var(--text-dark); }
-.co-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; text-transform: capitalize; flex-shrink: 0; }
-.co-headquarters { background: rgba(80,34,45,0.1); color: var(--primary); }
-.co-branch { background: rgba(122,140,163,0.15); color: var(--support-blue); }
-.co-mission { background: rgba(158,143,181,0.15); color: var(--support-purple); }
-.co-stats { display: flex; gap: 10px; flex-wrap: wrap; }
-.co-stats span { font-size: 0.75rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
-.co-stats i { color: var(--primary); font-size: 0.7rem; }
-.co-pending { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #856404; background: rgba(255,193,7,0.1); padding: 2px 7px; border-radius: 8px; margin-top: 4px; }
-.sa-invite-cta { margin-bottom: 1rem; }
-
-@media (max-width: 1024px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+/* ── Church Network Grid ─────────────────────────────────────────────── */
+.network-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.9rem; margin-bottom: 1.5rem; }
+.nc-card {
+    background: white; border-radius: 12px; border: 1px solid var(--light-gray);
+    overflow: hidden; text-decoration: none; color: inherit;
+    transition: box-shadow 0.18s, transform 0.18s; display: block;
 }
+.nc-card:hover { box-shadow: 0 5px 18px rgba(80,34,45,0.1); transform: translateY(-2px); }
+.nc-stripe { height: 3px; }
+.type-headquarters { background: linear-gradient(90deg,var(--primary),#6B2F3D); }
+.type-branch { background: linear-gradient(90deg,var(--support-blue),#7A8CA3); }
+.type-mission { background: linear-gradient(90deg,var(--support-purple),#9E8FB5); }
+.nc-body { padding: 0.9rem 1.1rem; }
+.nc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 6px; }
+.nc-name { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+.nc-type { font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; text-transform: capitalize; flex-shrink: 0; }
+.type-badge-headquarters { background: rgba(80,34,45,0.1); color: var(--primary); }
+.type-badge-branch { background: rgba(122,140,163,0.12); color: var(--support-blue); }
+.type-badge-mission { background: rgba(158,143,181,0.12); color: var(--support-purple); }
+.nc-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.nc-stats span { font-size: 0.72rem; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+.nc-stats i { color: var(--primary); font-size: 0.65rem; }
+.nc-active { color: #28A745 !important; }
+.nc-active i { color: #28A745 !important; font-size: 0.45rem !important; }
+.nc-pending { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; color: #856404; background: rgba(255,193,7,0.1); padding: 2px 7px; border-radius: 8px; margin-top: 5px; }
+.nc-add { display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 1.5rem; border: 2px dashed var(--light-gray); color: var(--text-light); font-size: 0.82rem; font-weight: 500; min-height: 90px; }
+.nc-add i { font-size: 1.5rem; color: var(--medium-gray); }
+.nc-add:hover { border-color: var(--primary); color: var(--primary); }
+.nc-add:hover i { color: var(--primary); }
 
+/* ── Main Grid ───────────────────────────────────────────────────────── */
+.main-grid { display: grid; grid-template-columns: 58fr 42fr; gap: 1.25rem; }
+.mt-4 { margin-top: 1.1rem; }
+
+/* ── Dash Cards ──────────────────────────────────────────────────────── */
+.dash-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+.dc-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.3rem; border-bottom: 1px solid var(--light-gray); }
+.dc-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+.dc-title i { color: var(--primary); }
+.dc-action { font-size: 0.78rem; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(80,34,45,0.2); }
+.dc-action:hover { background: rgba(80,34,45,0.05); }
+.dc-body { padding: 1.1rem 1.3rem; }
+.dc-body.p0 { padding: 0; }
+.dc-footer { padding: 0.7rem 1.3rem; border-top: 1px solid var(--light-gray); background: rgba(248,249,250,0.6); }
+.dc-footer-link { font-size: 0.78rem; color: var(--primary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+.dc-empty { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-light); }
+.dc-empty i { font-size: 2.2rem; color: var(--medium-gray); display: block; margin-bottom: 0.75rem; }
+.dc-empty p { font-size: 0.85rem; }
+
+/* ── Event Feed ──────────────────────────────────────────────────────── */
+.event-feed { display: flex; flex-direction: column; }
+.ef-item {
+    display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1.3rem;
+    border-bottom: 1px solid rgba(0,0,0,0.04); text-decoration: none; color: inherit;
+    transition: background 0.15s;
+}
+.ef-item:last-child { border-bottom: none; }
+.ef-item:hover { background: rgba(80,34,45,0.025); }
+.ef-cal { width: 44px; height: 48px; border-radius: 10px; background: linear-gradient(135deg,var(--primary),#6B2F3D); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+.ef-day { font-size: 1.25rem; font-weight: 800; line-height: 1; }
+.ef-mon { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.ef-detail { flex: 1; min-width: 0; }
+.ef-title { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ef-meta { display: flex; gap: 1rem; font-size: 0.73rem; color: var(--text-light); margin-top: 2px; flex-wrap: wrap; }
+.ef-meta span { display: flex; align-items: center; gap: 4px; }
+.ef-type { font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: capitalize; white-space: nowrap; flex-shrink: 0; }
+.ev-service     { background: rgba(80,34,45,0.08);   color: var(--primary); }
+.ev-meeting     { background: rgba(122,140,163,0.12); color: var(--support-blue); }
+.ev-conference  { background: rgba(158,143,181,0.12); color: var(--support-purple); }
+.ev-outreach    { background: rgba(212,165,165,0.15); color: #8B4A4A; }
+.ev-training    { background: rgba(40,167,69,0.1);   color: #28A745; }
+.ev-worship     { background: rgba(255,193,7,0.12);  color: #856404; }
+.ev-other       { background: rgba(108,117,125,0.1); color: #6C757D; }
+
+/* ── Transaction Feed ────────────────────────────────────────────────── */
+.tx-feed { display: flex; flex-direction: column; }
+.txf-item { display: flex; align-items: center; gap: 0.85rem; padding: 0.8rem 1.3rem; border-bottom: 1px solid rgba(0,0,0,0.04); transition: background 0.15s; }
+.txf-item:last-child { border-bottom: none; }
+.txf-item:hover { background: rgba(80,34,45,0.02); }
+.txf-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
+.txf-in  { background: rgba(40,167,69,0.1);  color: #28A745; }
+.txf-out { background: rgba(220,53,69,0.1);  color: #DC3545; }
+.txf-detail { flex: 1; min-width: 0; }
+.txf-desc { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.txf-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 0.72rem; color: var(--text-light); }
+.txf-type { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 700; }
+.tx-donation  { background: rgba(40,167,69,0.1);   color: #28A745; }
+.tx-tithe     { background: rgba(80,34,45,0.1);    color: var(--primary); }
+.tx-offering  { background: rgba(122,140,163,0.12); color: var(--support-blue); }
+.tx-expense   { background: rgba(220,53,69,0.1);   color: #DC3545; }
+.tx-salary    { background: rgba(255,193,7,0.12);  color: #856404; }
+.tx-other     { background: rgba(108,117,125,0.1); color: #6C757D; }
+.txf-amount { font-size: 0.88rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+.txf-amount.pos { color: #28A745; }
+.txf-amount.neg { color: #DC3545; }
+
+/* ── Finance card ────────────────────────────────────────────────────── */
+.fin-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; }
+.fin-lbl { font-size: 0.82rem; color: var(--text-light); display: flex; align-items: center; gap: 6px; }
+.fin-amt { font-size: 0.95rem; font-weight: 700; }
+.income-txt { color: #28A745; }
+.expense-txt { color: #DC3545; }
+.fin-bars-wrap { margin: 1rem 0; display: flex; flex-direction: column; gap: 10px; }
+.fin-bar-row { display: flex; align-items: center; gap: 10px; }
+.fbr-label { font-size: 0.7rem; color: var(--text-light); width: 54px; flex-shrink: 0; }
+.fbr-track { flex: 1; height: 10px; background: var(--light-gray); border-radius: 6px; overflow: hidden; }
+.fbr-fill { height: 100%; border-radius: 6px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.fbr-income { background: linear-gradient(90deg,#28A745,#20C997); }
+.fbr-expense { background: linear-gradient(90deg,#DC3545,#E05D6F); }
+.fin-net-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--light-gray); padding-top: 0.85rem; margin-top: 0.25rem; }
+.fin-net-lbl { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); }
+.fin-net-val { font-size: 1.2rem; font-weight: 800; }
+
+/* ── Quick Actions ───────────────────────────────────────────────────── */
+.qa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+.qa-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--text-dark); padding: 0.85rem 0.5rem; border-radius: 10px; border: 1px solid var(--light-gray); font-size: 0.72rem; font-weight: 600; text-align: center; transition: all 0.15s; }
+.qa-btn:hover { border-color: var(--primary); background: rgba(80,34,45,0.03); color: var(--primary); transform: translateY(-1px); box-shadow: 0 3px 10px rgba(80,34,45,0.08); }
+.qa-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+/* ── Announcements ───────────────────────────────────────────────────── */
+.ann-list { display: flex; flex-direction: column; }
+.ann-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.8rem 1.3rem; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.ann-item:last-child { border-bottom: none; }
+.ann-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.ann-dot.pub { background: #28A745; }
+.ann-dot.draft { background: #D6A000; }
+.ann-body { flex: 1; min-width: 0; }
+.ann-title { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ann-meta { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 0.7rem; color: var(--text-light); flex-wrap: wrap; }
+.ann-cat { text-transform: capitalize; }
+.ann-badge-pub  { background: rgba(40,167,69,0.1); color: #28A745; padding: 1px 6px; border-radius: 8px; font-weight: 700; font-size: 0.65rem; }
+.ann-badge-draft { background: rgba(214,160,0,0.1); color: #856404; padding: 1px 6px; border-radius: 8px; font-weight: 700; font-size: 0.65rem; }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .qa-grid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 600px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .page-wrapper { padding: 1rem; }
+    .dash-wrapper { padding: 1rem; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .greeting-name { font-size: 1.5rem; }
+    .dash-header-right { width: 100%; }
+    .hdr-btn { flex: 1; justify-content: center; }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Time-aware greeting
+    var h = new Date().getHours();
+    var greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    var el = document.getElementById('greetingLine');
+    if (el) el.textContent = greet;
+
+    // Today's date
+    var dateEl = document.getElementById('todayDate');
+    if (dateEl) {
+        var d = new Date();
+        var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = d.toLocaleDateString('en-GB', opts);
+    }
+
+    // Animated finance bars
+    var income   = {{index .Data "totalIncome"}};
+    var expenses = {{index .Data "totalExpenses"}};
+    var max = Math.max(income, expenses, 1);
+    var iBar = document.getElementById('incomeBar');
+    var eBar = document.getElementById('expenseBar');
+    if (iBar) setTimeout(function(){ iBar.style.width = (income / max * 100) + '%'; }, 100);
+    if (eBar) setTimeout(function(){ eBar.style.width = (expenses / max * 100) + '%'; }, 200);
+
+    // Flash dismiss
     document.querySelectorAll('.notification .delete').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            this.closest('.notification').remove();
-        });
+        btn.addEventListener('click', function () { this.closest('.notification').remove(); });
     });
 });
 </script>

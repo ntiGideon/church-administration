@@ -1,0 +1,503 @@
+{{define "title"}}Church Calendar | Ascension Baptist{{end}}
+{{define "description"}}Monthly program planner and church calendar{{end}}
+
+{{define "main"}}
+{{$calDays    := index .Data "calDays"}}
+{{$entries    := index .Data "entries"}}
+{{$year       := index .Data "year"}}
+{{$month      := index .Data "month"}}
+{{$monthName  := index .Data "monthName"}}
+{{$prevYear   := index .Data "prevYear"}}
+{{$prevMonth  := index .Data "prevMonth"}}
+{{$nextYear   := index .Data "nextYear"}}
+{{$nextMonth  := index .Data "nextMonth"}}
+{{$isCurrent  := index .Data "isCurrentMonth"}}
+
+<div class="cal-page">
+    <!-- Page Header -->
+    <div class="cal-page-header">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Church Calendar</span>
+            </nav>
+            <h1 class="page-title-text">Church Calendar</h1>
+        </div>
+        <div class="cal-header-actions">
+            {{if .IsAuthenticated}}{{if .LoggedInUser}}
+                {{$role := .LoggedInUser.Role.String}}
+                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                <a href="/calendar/new" class="btn-add-program">
+                    <i class="fas fa-plus"></i> Add Program
+                </a>
+                {{end}}
+            {{end}}{{end}}
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="flash-bar success"><i class="fas fa-check-circle"></i> {{.Flash}}</div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="flash-bar error"><i class="fas fa-exclamation-circle"></i> {{.FlashError}}</div>
+    {{end}}
+
+    <div class="cal-layout">
+        <!-- Calendar Grid Panel -->
+        <div class="cal-grid-panel">
+            <!-- Month Navigation -->
+            <div class="month-nav">
+                <a href="/calendar?year={{$prevYear}}&month={{$prevMonth}}" class="month-nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <div class="month-title">
+                    <span class="month-name">{{$monthName}}</span>
+                    <span class="month-year">{{$year}}</span>
+                    {{if $isCurrent}}<span class="current-badge">This Month</span>{{end}}
+                </div>
+                <a href="/calendar?year={{$nextYear}}&month={{$nextMonth}}" class="month-nav-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <!-- Day Labels -->
+            <div class="cal-grid">
+                <div class="cal-day-label">Sun</div>
+                <div class="cal-day-label">Mon</div>
+                <div class="cal-day-label">Tue</div>
+                <div class="cal-day-label">Wed</div>
+                <div class="cal-day-label">Thu</div>
+                <div class="cal-day-label">Fri</div>
+                <div class="cal-day-label">Sat</div>
+
+                {{range $calDays}}
+                {{if eq .Day 0}}
+                <div class="cal-cell empty"></div>
+                {{else}}
+                <div class="cal-cell {{if .IsToday}}today{{end}} {{if .Entries}}has-entries{{end}}"
+                     onclick="window.location='/calendar/new?date={{$year}}-{{printf "%02d" $month}}-{{printf "%02d" .Day}}'">
+                    <span class="cal-day-num {{if .IsToday}}today-num{{end}}">{{.Day}}</span>
+                    {{if .Entries}}
+                    <div class="cal-entries">
+                        {{range $i, $e := .Entries}}
+                        {{if lt $i 2}}
+                        <a href="/calendar/{{$e.ID}}" class="cal-entry-dot pt-{{$e.ProgramType}}" onclick="event.stopPropagation()">
+                            {{$e.Title}}
+                        </a>
+                        {{end}}
+                        {{end}}
+                        {{if gt (len .Entries) 2}}
+                        <span class="cal-more">+{{subtract (len .Entries | float64) 2 | int}} more</span>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+
+            <!-- Legend -->
+            <div class="cal-legend">
+                <span class="legend-label">Program Types:</span>
+                <span class="legend-dot pt-service">Service</span>
+                <span class="legend-dot pt-prayer_meeting">Prayer</span>
+                <span class="legend-dot pt-bible_study">Bible Study</span>
+                <span class="legend-dot pt-conference">Conference</span>
+                <span class="legend-dot pt-outreach">Outreach</span>
+                <span class="legend-dot pt-youth_service">Youth</span>
+                <span class="legend-dot pt-special_event">Special</span>
+                <span class="legend-dot pt-other">Other</span>
+            </div>
+        </div>
+
+        <!-- Program List Panel -->
+        <div class="cal-list-panel">
+            <div class="list-panel-header">
+                <h3><i class="fas fa-list-ul mr-2"></i>Programs This Month</h3>
+                <span class="program-count">{{len $entries}} program{{if ne (len $entries) 1}}s{{end}}</span>
+            </div>
+
+            {{if $entries}}
+            <div class="program-list">
+                {{range $entries}}
+                <a href="/calendar/{{.ID}}" class="program-item">
+                    <div class="prog-date-col">
+                        <span class="prog-day">{{.Date.Day}}</span>
+                        <span class="prog-month">{{.Date.Format "Jan"}}</span>
+                    </div>
+                    <div class="prog-info">
+                        <span class="prog-type-chip pt-chip-{{.ProgramType}}">{{.ProgramType}}</span>
+                        <span class="prog-title">{{.Title}}</span>
+                        {{if .Edges.Church}}
+                        <span class="prog-church"><i class="fas fa-church"></i> {{.Edges.Church.Name}}</span>
+                        {{end}}
+                        {{if .Preacher}}<span class="prog-meta"><i class="fas fa-microphone"></i> {{.Preacher}}</span>{{end}}
+                    </div>
+                    <div class="prog-status-col">
+                        {{if .IsPublished}}
+                        <span class="pub-pill pub"><i class="fas fa-globe"></i> Live</span>
+                        {{else}}
+                        <span class="pub-pill draft"><i class="fas fa-pencil-alt"></i> Draft</span>
+                        {{end}}
+                        <i class="fas fa-chevron-right prog-arrow"></i>
+                    </div>
+                </a>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="empty-programs">
+                <i class="fas fa-calendar-times"></i>
+                <p>No programs scheduled for {{$monthName}} {{$year}}</p>
+                {{if .IsAuthenticated}}{{if .LoggedInUser}}
+                    {{$role := .LoggedInUser.Role.String}}
+                    {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                    <a href="/calendar/new" class="btn-add-program-sm">Add First Program</a>
+                    {{end}}
+                {{end}}{{end}}
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<style>
+.cal-page { max-width: 1300px; margin: 0 auto; padding: 2rem; }
+
+.cal-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+
+.cal-header-actions { display: flex; gap: 10px; align-items: center; }
+
+.btn-add-program {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: var(--primary);
+    color: white;
+    border-radius: 9px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.btn-add-program:hover { background: var(--primary-dark); color: white; }
+
+.flash-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+}
+.flash-bar.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.flash-bar.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+.cal-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* ─── Calendar Grid ─────────────────────────────── */
+.cal-grid-panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+}
+
+.month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    background: linear-gradient(135deg, #50222D 0%, #6B2F3D 100%);
+}
+.month-nav-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    text-decoration: none;
+    transition: background 0.15s;
+    font-size: 0.85rem;
+}
+.month-nav-btn:hover { background: rgba(255,255,255,0.28); color: white; }
+.month-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.month-name { font-size: 1.3rem; font-weight: 700; color: white; }
+.month-year { font-size: 1.1rem; font-weight: 400; color: rgba(255,255,255,0.8); }
+.current-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.25);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+}
+.cal-day-label {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 4px 8px;
+    border-bottom: 1px solid var(--light-gray);
+}
+.cal-cell {
+    min-height: 90px;
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+}
+.cal-cell:hover { background: rgba(80,34,45,0.04); }
+.cal-cell.empty { cursor: default; background: #fafafa; }
+.cal-cell.empty:hover { background: #fafafa; }
+.cal-cell.today { background: rgba(80,34,45,0.05); }
+.cal-cell.has-entries { }
+
+.cal-day-num {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    margin-bottom: 4px;
+}
+.today-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.cal-entries { display: flex; flex-direction: column; gap: 2px; }
+.cal-entry-dot {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.12s;
+}
+.cal-entry-dot:hover { opacity: 0.8; }
+.cal-more { font-size: 0.65rem; color: var(--text-light); font-style: italic; }
+
+/* Program type colors */
+.pt-service        { background: rgba(80,34,45,0.12); color: var(--primary); }
+.pt-prayer_meeting { background: rgba(158,143,181,0.18); color: #7A5A9C; }
+.pt-bible_study    { background: rgba(40,167,69,0.12); color: #1B6E30; }
+.pt-conference     { background: rgba(23,162,184,0.12); color: #0E6A7A; }
+.pt-outreach       { background: rgba(255,193,7,0.2); color: #856404; }
+.pt-youth_service  { background: rgba(220,53,69,0.1); color: #9B1C2A; }
+.pt-special_event  { background: rgba(122,140,163,0.18); color: var(--support-blue); }
+.pt-other          { background: rgba(108,117,125,0.12); color: #545b62; }
+
+/* Legend */
+.cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--light-gray);
+    background: #fafafa;
+}
+.legend-label { font-size: 0.72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+.legend-dot {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    cursor: default;
+}
+
+/* ─── Program List Panel ────────────────────────── */
+.cal-list-panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+}
+.list-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--light-gray);
+    flex-shrink: 0;
+}
+.list-panel-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.program-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(80,34,45,0.08);
+    color: var(--primary);
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.program-list { overflow-y: auto; flex: 1; }
+
+.program-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f5f5f5;
+    text-decoration: none;
+    transition: background 0.12s;
+    cursor: pointer;
+}
+.program-item:hover { background: rgba(80,34,45,0.04); }
+.program-item:last-child { border-bottom: none; }
+
+.prog-date-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 42px;
+    background: rgba(80,34,45,0.08);
+    border-radius: 8px;
+    justify-content: center;
+}
+.prog-day { font-size: 1rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.prog-month { font-size: 0.6rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; }
+
+.prog-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.prog-title { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-meta { font-size: 0.73rem; color: var(--text-light); }
+.prog-meta i { margin-right: 3px; }
+.prog-church { font-size: 0.72rem; color: var(--text-light); }
+.prog-church i { margin-right: 3px; }
+
+.prog-type-chip {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+}
+.pt-chip-service        { background: rgba(80,34,45,0.1); color: var(--primary); }
+.pt-chip-prayer_meeting { background: rgba(158,143,181,0.18); color: #7A5A9C; }
+.pt-chip-bible_study    { background: rgba(40,167,69,0.12); color: #1B6E30; }
+.pt-chip-conference     { background: rgba(23,162,184,0.12); color: #0E6A7A; }
+.pt-chip-outreach       { background: rgba(255,193,7,0.18); color: #856404; }
+.pt-chip-youth_service  { background: rgba(220,53,69,0.1); color: #9B1C2A; }
+.pt-chip-special_event  { background: rgba(122,140,163,0.18); color: var(--support-blue); }
+.pt-chip-other          { background: rgba(108,117,125,0.12); color: #545b62; }
+
+.prog-status-col { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.pub-pill {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.pub-pill.pub   { background: #d1fae5; color: #065f46; }
+.pub-pill.draft { background: #f3f4f6; color: #6b7280; }
+.prog-arrow { font-size: 0.7rem; color: var(--text-light); }
+
+/* Empty state */
+.empty-programs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--text-light);
+    gap: 12px;
+}
+.empty-programs i { font-size: 2.5rem; opacity: 0.3; }
+.empty-programs p { font-size: 0.88rem; margin: 0; }
+.btn-add-program-sm {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 6px 16px;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+.btn-add-program-sm:hover { background: var(--primary); color: white; }
+
+@media (max-width: 1024px) {
+    .cal-layout { grid-template-columns: 1fr; }
+    .cal-list-panel { position: static; max-height: none; }
+}
+@media (max-width: 600px) {
+    .cal-page { padding: 1rem; }
+    .cal-cell { min-height: 60px; padding: 4px; }
+    .cal-entry-dot { display: none; }
+    .cal-day-num { font-size: 0.78rem; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Flash dismiss
+    document.querySelectorAll('.flash-bar').forEach(function (el) {
+        setTimeout(function () { el.style.display = 'none'; }, 5000);
+    });
+});
+</script>
+{{end}}

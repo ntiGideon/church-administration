@@ -13,11 +13,13 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -517,6 +519,36 @@ func (_u *ChurchUpdate) AddAnnouncements(v ...*Announcement) *ChurchUpdate {
 	return _u.AddAnnouncementIDs(ids...)
 }
 
+// AddContactIDs adds the "contacts" edge to the Contact entity by IDs.
+func (_u *ChurchUpdate) AddContactIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddContactIDs(ids...)
+	return _u
+}
+
+// AddContacts adds the "contacts" edges to the Contact entity.
+func (_u *ChurchUpdate) AddContacts(v ...*Contact) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddContactIDs(ids...)
+}
+
+// AddProgramIDs adds the "programs" edge to the ProgramEntry entity by IDs.
+func (_u *ChurchUpdate) AddProgramIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddProgramIDs(ids...)
+	return _u
+}
+
+// AddPrograms adds the "programs" edges to the ProgramEntry entity.
+func (_u *ChurchUpdate) AddPrograms(v ...*ProgramEntry) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddProgramIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdate) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -673,6 +705,48 @@ func (_u *ChurchUpdate) RemoveAnnouncements(v ...*Announcement) *ChurchUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAnnouncementIDs(ids...)
+}
+
+// ClearContacts clears all "contacts" edges to the Contact entity.
+func (_u *ChurchUpdate) ClearContacts() *ChurchUpdate {
+	_u.mutation.ClearContacts()
+	return _u
+}
+
+// RemoveContactIDs removes the "contacts" edge to Contact entities by IDs.
+func (_u *ChurchUpdate) RemoveContactIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemoveContactIDs(ids...)
+	return _u
+}
+
+// RemoveContacts removes "contacts" edges to Contact entities.
+func (_u *ChurchUpdate) RemoveContacts(v ...*Contact) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveContactIDs(ids...)
+}
+
+// ClearPrograms clears all "programs" edges to the ProgramEntry entity.
+func (_u *ChurchUpdate) ClearPrograms() *ChurchUpdate {
+	_u.mutation.ClearPrograms()
+	return _u
+}
+
+// RemoveProgramIDs removes the "programs" edge to ProgramEntry entities by IDs.
+func (_u *ChurchUpdate) RemoveProgramIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemoveProgramIDs(ids...)
+	return _u
+}
+
+// RemovePrograms removes "programs" edges to ProgramEntry entities.
+func (_u *ChurchUpdate) RemovePrograms(v ...*ProgramEntry) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProgramIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1169,6 +1243,96 @@ func (_u *ChurchUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(announcement.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ContactsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedContactsIDs(); len(nodes) > 0 && !_u.mutation.ContactsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ContactsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ProgramsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedProgramsIDs(); len(nodes) > 0 && !_u.mutation.ProgramsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProgramsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1679,6 +1843,36 @@ func (_u *ChurchUpdateOne) AddAnnouncements(v ...*Announcement) *ChurchUpdateOne
 	return _u.AddAnnouncementIDs(ids...)
 }
 
+// AddContactIDs adds the "contacts" edge to the Contact entity by IDs.
+func (_u *ChurchUpdateOne) AddContactIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddContactIDs(ids...)
+	return _u
+}
+
+// AddContacts adds the "contacts" edges to the Contact entity.
+func (_u *ChurchUpdateOne) AddContacts(v ...*Contact) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddContactIDs(ids...)
+}
+
+// AddProgramIDs adds the "programs" edge to the ProgramEntry entity by IDs.
+func (_u *ChurchUpdateOne) AddProgramIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddProgramIDs(ids...)
+	return _u
+}
+
+// AddPrograms adds the "programs" edges to the ProgramEntry entity.
+func (_u *ChurchUpdateOne) AddPrograms(v ...*ProgramEntry) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddProgramIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdateOne) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -1835,6 +2029,48 @@ func (_u *ChurchUpdateOne) RemoveAnnouncements(v ...*Announcement) *ChurchUpdate
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAnnouncementIDs(ids...)
+}
+
+// ClearContacts clears all "contacts" edges to the Contact entity.
+func (_u *ChurchUpdateOne) ClearContacts() *ChurchUpdateOne {
+	_u.mutation.ClearContacts()
+	return _u
+}
+
+// RemoveContactIDs removes the "contacts" edge to Contact entities by IDs.
+func (_u *ChurchUpdateOne) RemoveContactIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemoveContactIDs(ids...)
+	return _u
+}
+
+// RemoveContacts removes "contacts" edges to Contact entities.
+func (_u *ChurchUpdateOne) RemoveContacts(v ...*Contact) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveContactIDs(ids...)
+}
+
+// ClearPrograms clears all "programs" edges to the ProgramEntry entity.
+func (_u *ChurchUpdateOne) ClearPrograms() *ChurchUpdateOne {
+	_u.mutation.ClearPrograms()
+	return _u
+}
+
+// RemoveProgramIDs removes the "programs" edge to ProgramEntry entities by IDs.
+func (_u *ChurchUpdateOne) RemoveProgramIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemoveProgramIDs(ids...)
+	return _u
+}
+
+// RemovePrograms removes "programs" edges to ProgramEntry entities.
+func (_u *ChurchUpdateOne) RemovePrograms(v ...*ProgramEntry) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProgramIDs(ids...)
 }
 
 // Where appends a list predicates to the ChurchUpdate builder.
@@ -2361,6 +2597,96 @@ func (_u *ChurchUpdateOne) sqlSave(ctx context.Context) (_node *Church, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(announcement.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ContactsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedContactsIDs(); len(nodes) > 0 && !_u.mutation.ContactsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ContactsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ProgramsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedProgramsIDs(); len(nodes) > 0 && !_u.mutation.ProgramsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProgramsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

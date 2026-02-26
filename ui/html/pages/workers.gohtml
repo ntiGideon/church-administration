@@ -1,0 +1,176 @@
+{{define "title"}}Workers | Ascension Baptist{{end}}
+{{define "description"}}Manage church workers and staff accounts{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text"><i class="fas fa-user-tie mr-2 has-text-primary"></i>Church Workers</h1>
+            <p class="page-subtitle-text">Manage staff and workers who have system access</p>
+        </div>
+        <div class="header-actions">
+            {{if .LoggedInUser}}
+            {{$role := .LoggedInUser.Role.String}}
+            {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+            <a href="/workers/new" class="button is-primary">
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+                <span>Invite Worker</span>
+            </a>
+            {{end}}
+            {{end}}
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="workerSearch" placeholder="Search by name, email or role..." class="search-input-field">
+        </div>
+        <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="pastor">Pastors</button>
+            <button class="filter-pill" data-filter="branch_admin">Admins</button>
+            <button class="filter-pill" data-filter="secretary">Secretaries</button>
+            <button class="filter-pill" data-filter="finance_officer">Finance</button>
+        </div>
+    </div>
+
+    {{$workers := index .Data "workers"}}
+    {{if $workers}}
+    <div class="members-grid" id="workersGrid">
+        {{range $workers}}
+        <div class="member-card" data-role="{{.Role}}">
+            <div class="member-avatar">
+                {{if and .Edges.Contact .Edges.Contact.ProfilePictureURL}}
+                <img src="{{.Edges.Contact.ProfilePictureURL}}" alt="Profile">
+                {{else if .Edges.Contact}}
+                <div class="avatar-initials">
+                    {{slice .Edges.Contact.FirstName 0 1}}{{slice .Edges.Contact.LastName 0 1}}
+                </div>
+                {{else}}
+                <div class="avatar-initials"><i class="fas fa-user"></i></div>
+                {{end}}
+                <div class="member-status {{if .IsActive}}active{{else}}inactive{{end}}"></div>
+            </div>
+            <div class="member-info">
+                {{if .Edges.Contact}}
+                <div class="member-name">{{.Edges.Contact.FirstName}} {{.Edges.Contact.LastName}}</div>
+                {{else}}
+                <div class="member-name">{{.Email}}</div>
+                {{end}}
+                <div class="member-sub">{{.Email}}</div>
+                <div class="member-role-badge role-{{.Role}}">{{.Role}}</div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+
+    <div class="table-summary">
+        Showing <strong>{{len $workers}}</strong> worker(s)
+    </div>
+    {{else}}
+    <div class="empty-page-state">
+        <div class="empty-icon"><i class="fas fa-user-tie"></i></div>
+        <h3>No workers yet</h3>
+        <p>Invite church workers by sending them an email invitation with a role assignment.</p>
+        {{if .LoggedInUser}}
+        {{$role := .LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+        <a href="/workers/new" class="button is-primary mt-4">
+            <span class="icon"><i class="fas fa-user-plus"></i></span>
+            <span>Invite First Worker</span>
+        </a>
+        {{end}}
+        {{end}}
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle-text { color: var(--text-light); margin: 4px 0 0; font-size: 0.9rem; }
+
+.filter-bar { display: flex; align-items: center; gap: 1rem; background: white; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--light-gray); margin-bottom: 1.5rem; flex-wrap: wrap; }
+.search-box { position: relative; flex: 1; min-width: 200px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+.search-input-field { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border 0.2s; }
+.search-input-field:focus { border-color: var(--primary); }
+.filter-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-pill { padding: 0.4rem 1rem; border-radius: 20px; border: 1.5px solid var(--light-gray); background: none; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; color: var(--text-dark); font-weight: 500; }
+.filter-pill.active, .filter-pill:hover { background: var(--primary); border-color: var(--primary); color: white; }
+
+.members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.member-card { background: white; border-radius: 12px; border: 1px solid var(--light-gray); padding: 1.2rem; display: flex; align-items: center; gap: 1rem; }
+.member-avatar { position: relative; flex-shrink: 0; }
+.member-avatar img, .avatar-initials { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+.avatar-initials { background: linear-gradient(135deg, var(--primary), #6B2F3D); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; }
+.member-status { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; }
+.member-status.active { background: #28A745; }
+.member-status.inactive { background: #DC3545; }
+.member-info { flex: 1; min-width: 0; }
+.member-name { font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
+.member-sub { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 6px; }
+.member-role-badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; text-transform: capitalize; }
+.role-super_admin { background: rgba(80,34,45,0.1); color: var(--primary); }
+.role-branch_admin { background: rgba(158,143,181,0.15); color: var(--support-purple); }
+.role-pastor { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.role-secretary { background: rgba(212,165,165,0.15); color: #8B4A4A; }
+.role-records_keeper { background: rgba(255,193,7,0.15); color: #856404; }
+.role-finance_officer { background: rgba(40,167,69,0.1); color: #28A745; }
+.role-member { background: rgba(108,117,125,0.1); color: #6C757D; }
+
+.table-summary { margin-top: 1rem; font-size: 0.85rem; color: var(--text-light); }
+
+.empty-page-state { text-align: center; padding: 4rem 2rem; background: white; border-radius: 14px; border: 1px solid var(--light-gray); }
+.empty-icon { font-size: 3.5rem; color: var(--medium-gray); margin-bottom: 1rem; }
+.empty-page-state h3 { font-size: 1.3rem; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-page-state p { color: var(--text-light); font-size: 0.9rem; }
+
+@media (max-width: 600px) { .members-grid { grid-template-columns: 1fr; } .page-wrapper { padding: 1rem; } }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('workerSearch');
+    const cards = document.querySelectorAll('.member-card');
+    const pills = document.querySelectorAll('.filter-pill');
+    let currentFilter = 'all';
+
+    function filter() {
+        cards.forEach(function (card) {
+            const role = card.dataset.role || '';
+            const text = card.textContent.toLowerCase();
+            const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const matchFilter = currentFilter === 'all' || role.includes(currentFilter);
+            const matchSearch = q === '' || text.includes(q);
+            card.style.display = (matchFilter && matchSearch) ? '' : 'none';
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filter);
+
+    pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+            pills.forEach(function (p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            filter();
+        });
+    });
+
+    document.querySelectorAll('.notification .delete').forEach(function (btn) {
+        btn.addEventListener('click', function () { this.closest('.notification').remove(); });
+    });
+});
+</script>
+{{end}}

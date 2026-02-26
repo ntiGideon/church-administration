@@ -12,10 +12,12 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -406,6 +408,36 @@ func (_c *ChurchCreate) AddAnnouncements(v ...*Announcement) *ChurchCreate {
 	return _c.AddAnnouncementIDs(ids...)
 }
 
+// AddContactIDs adds the "contacts" edge to the Contact entity by IDs.
+func (_c *ChurchCreate) AddContactIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddContactIDs(ids...)
+	return _c
+}
+
+// AddContacts adds the "contacts" edges to the Contact entity.
+func (_c *ChurchCreate) AddContacts(v ...*Contact) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddContactIDs(ids...)
+}
+
+// AddProgramIDs adds the "programs" edge to the ProgramEntry entity by IDs.
+func (_c *ChurchCreate) AddProgramIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddProgramIDs(ids...)
+	return _c
+}
+
+// AddPrograms adds the "programs" edges to the ProgramEntry entity.
+func (_c *ChurchCreate) AddPrograms(v ...*ProgramEntry) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddProgramIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_c *ChurchCreate) Mutation() *ChurchMutation {
 	return _c.mutation
@@ -736,6 +768,38 @@ func (_c *ChurchCreate) createSpec() (*Church, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(announcement.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ContactsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ContactsTable,
+			Columns: []string{church.ContactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ProgramsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.ProgramsTable,
+			Columns: []string{church.ProgramsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

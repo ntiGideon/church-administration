@@ -27,6 +27,9 @@ type Finance func(*sql.Selector)
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 
+// ProgramEntry is the predicate function for programentry builders.
+type ProgramEntry func(*sql.Selector)
+
 // Session is the predicate function for session builders.
 type Session func(*sql.Selector)
 

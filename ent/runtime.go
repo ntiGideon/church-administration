@@ -12,6 +12,7 @@ import (
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/schema"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
@@ -72,15 +73,15 @@ func init() {
 	// contact.DefaultHasSpouse holds the default value on creation for the has_spouse field.
 	contact.DefaultHasSpouse = contactDescHasSpouse.Default.(bool)
 	// contactDescIsBaptized is the schema descriptor for is_baptized field.
-	contactDescIsBaptized := contactFields[28].Descriptor()
+	contactDescIsBaptized := contactFields[29].Descriptor()
 	// contact.DefaultIsBaptized holds the default value on creation for the is_baptized field.
 	contact.DefaultIsBaptized = contactDescIsBaptized.Default.(bool)
 	// contactDescCreatedAt is the schema descriptor for created_at field.
-	contactDescCreatedAt := contactFields[33].Descriptor()
+	contactDescCreatedAt := contactFields[34].Descriptor()
 	// contact.DefaultCreatedAt holds the default value on creation for the created_at field.
 	contact.DefaultCreatedAt = contactDescCreatedAt.Default.(func() time.Time)
 	// contactDescUpdatedAt is the schema descriptor for updated_at field.
-	contactDescUpdatedAt := contactFields[34].Descriptor()
+	contactDescUpdatedAt := contactFields[35].Descriptor()
 	// contact.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	contact.DefaultUpdatedAt = contactDescUpdatedAt.Default.(func() time.Time)
 	// contact.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -119,6 +120,16 @@ func init() {
 	invitation.DefaultUpdatedAt = invitationDescUpdatedAt.Default.(func() time.Time)
 	// invitation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	invitation.UpdateDefaultUpdatedAt = invitationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	programentryFields := schema.ProgramEntry{}.Fields()
+	_ = programentryFields
+	// programentryDescIsPublished is the schema descriptor for is_published field.
+	programentryDescIsPublished := programentryFields[12].Descriptor()
+	// programentry.DefaultIsPublished holds the default value on creation for the is_published field.
+	programentry.DefaultIsPublished = programentryDescIsPublished.Default.(bool)
+	// programentryDescCreatedAt is the schema descriptor for created_at field.
+	programentryDescCreatedAt := programentryFields[13].Descriptor()
+	// programentry.DefaultCreatedAt holds the default value on creation for the created_at field.
+	programentry.DefaultCreatedAt = programentryDescCreatedAt.Default.(func() time.Time)
 	sessionFields := schema.Session{}.Fields()
 	_ = sessionFields
 	// sessionDescToken is the schema descriptor for token field.

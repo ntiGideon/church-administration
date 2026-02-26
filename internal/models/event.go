@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ntiGideon/ent"
+	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/event"
 )
 
@@ -39,20 +40,25 @@ func (m *EventModel) Create(ctx context.Context, dto *EventDto, churchID int) (*
 }
 
 // List returns all events for a church, newest first.
+// If churchID is 0, returns events across all churches (super_admin view).
 func (m *EventModel) List(ctx context.Context, churchID int) ([]*ent.Event, error) {
-	return m.Db.Event.Query().
-		Where(event.HasChurchWith()).
-		Order(ent.Desc(event.FieldStartTime)).
-		All(ctx)
+	q := m.Db.Event.Query()
+	if churchID > 0 {
+		q = q.Where(event.HasChurchWith(church.IDEQ(churchID)))
+	} else {
+		q = q.Where(event.HasChurchWith())
+	}
+	return q.Order(ent.Desc(event.FieldStartTime)).All(ctx)
 }
 
 // Upcoming returns events that start in the future.
+// If churchID is 0, returns upcoming events across all churches (super_admin view).
 func (m *EventModel) Upcoming(ctx context.Context, churchID int, limit int) ([]*ent.Event, error) {
-	return m.Db.Event.Query().
-		Where(event.StartTimeGTE(time.Now())).
-		Order(ent.Asc(event.FieldStartTime)).
-		Limit(limit).
-		All(ctx)
+	q := m.Db.Event.Query().Where(event.StartTimeGTE(time.Now()))
+	if churchID > 0 {
+		q = q.Where(event.HasChurchWith(church.IDEQ(churchID)))
+	}
+	return q.Order(ent.Asc(event.FieldStartTime)).Limit(limit).All(ctx)
 }
 
 // GetByID returns a single event.

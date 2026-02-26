@@ -19,6 +19,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
 )
@@ -39,6 +40,7 @@ const (
 	TypeEvent        = "Event"
 	TypeFinance      = "Finance"
 	TypeInvitation   = "Invitation"
+	TypeProgramEntry = "ProgramEntry"
 	TypeSession      = "Session"
 	TypeUser         = "User"
 )
@@ -894,6 +896,12 @@ type ChurchMutation struct {
 	announcements        map[int]struct{}
 	removedannouncements map[int]struct{}
 	clearedannouncements bool
+	contacts             map[int]struct{}
+	removedcontacts      map[int]struct{}
+	clearedcontacts      bool
+	programs             map[int]struct{}
+	removedprograms      map[int]struct{}
+	clearedprograms      bool
 	done                 bool
 	oldValue             func(context.Context) (*Church, error)
 	predicates           []predicate.Church
@@ -2363,6 +2371,114 @@ func (m *ChurchMutation) ResetAnnouncements() {
 	m.removedannouncements = nil
 }
 
+// AddContactIDs adds the "contacts" edge to the Contact entity by ids.
+func (m *ChurchMutation) AddContactIDs(ids ...int) {
+	if m.contacts == nil {
+		m.contacts = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.contacts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearContacts clears the "contacts" edge to the Contact entity.
+func (m *ChurchMutation) ClearContacts() {
+	m.clearedcontacts = true
+}
+
+// ContactsCleared reports if the "contacts" edge to the Contact entity was cleared.
+func (m *ChurchMutation) ContactsCleared() bool {
+	return m.clearedcontacts
+}
+
+// RemoveContactIDs removes the "contacts" edge to the Contact entity by IDs.
+func (m *ChurchMutation) RemoveContactIDs(ids ...int) {
+	if m.removedcontacts == nil {
+		m.removedcontacts = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.contacts, ids[i])
+		m.removedcontacts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedContacts returns the removed IDs of the "contacts" edge to the Contact entity.
+func (m *ChurchMutation) RemovedContactsIDs() (ids []int) {
+	for id := range m.removedcontacts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ContactsIDs returns the "contacts" edge IDs in the mutation.
+func (m *ChurchMutation) ContactsIDs() (ids []int) {
+	for id := range m.contacts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetContacts resets all changes to the "contacts" edge.
+func (m *ChurchMutation) ResetContacts() {
+	m.contacts = nil
+	m.clearedcontacts = false
+	m.removedcontacts = nil
+}
+
+// AddProgramIDs adds the "programs" edge to the ProgramEntry entity by ids.
+func (m *ChurchMutation) AddProgramIDs(ids ...int) {
+	if m.programs == nil {
+		m.programs = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.programs[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPrograms clears the "programs" edge to the ProgramEntry entity.
+func (m *ChurchMutation) ClearPrograms() {
+	m.clearedprograms = true
+}
+
+// ProgramsCleared reports if the "programs" edge to the ProgramEntry entity was cleared.
+func (m *ChurchMutation) ProgramsCleared() bool {
+	return m.clearedprograms
+}
+
+// RemoveProgramIDs removes the "programs" edge to the ProgramEntry entity by IDs.
+func (m *ChurchMutation) RemoveProgramIDs(ids ...int) {
+	if m.removedprograms == nil {
+		m.removedprograms = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.programs, ids[i])
+		m.removedprograms[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPrograms returns the removed IDs of the "programs" edge to the ProgramEntry entity.
+func (m *ChurchMutation) RemovedProgramsIDs() (ids []int) {
+	for id := range m.removedprograms {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProgramsIDs returns the "programs" edge IDs in the mutation.
+func (m *ChurchMutation) ProgramsIDs() (ids []int) {
+	for id := range m.programs {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPrograms resets all changes to the "programs" edge.
+func (m *ChurchMutation) ResetPrograms() {
+	m.programs = nil
+	m.clearedprograms = false
+	m.removedprograms = nil
+}
+
 // Where appends a list predicates to the ChurchMutation builder.
 func (m *ChurchMutation) Where(ps ...predicate.Church) {
 	m.predicates = append(m.predicates, ps...)
@@ -2944,7 +3060,7 @@ func (m *ChurchMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChurchMutation) AddedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 10)
 	if m.parent != nil {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -2968,6 +3084,12 @@ func (m *ChurchMutation) AddedEdges() []string {
 	}
 	if m.announcements != nil {
 		edges = append(edges, church.EdgeAnnouncements)
+	}
+	if m.contacts != nil {
+		edges = append(edges, church.EdgeContacts)
+	}
+	if m.programs != nil {
+		edges = append(edges, church.EdgePrograms)
 	}
 	return edges
 }
@@ -3022,13 +3144,25 @@ func (m *ChurchMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgeContacts:
+		ids := make([]ent.Value, 0, len(m.contacts))
+		for id := range m.contacts {
+			ids = append(ids, id)
+		}
+		return ids
+	case church.EdgePrograms:
+		ids := make([]ent.Value, 0, len(m.programs))
+		for id := range m.programs {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChurchMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 10)
 	if m.removedchildren != nil {
 		edges = append(edges, church.EdgeChildren)
 	}
@@ -3049,6 +3183,12 @@ func (m *ChurchMutation) RemovedEdges() []string {
 	}
 	if m.removedannouncements != nil {
 		edges = append(edges, church.EdgeAnnouncements)
+	}
+	if m.removedcontacts != nil {
+		edges = append(edges, church.EdgeContacts)
+	}
+	if m.removedprograms != nil {
+		edges = append(edges, church.EdgePrograms)
 	}
 	return edges
 }
@@ -3099,13 +3239,25 @@ func (m *ChurchMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgeContacts:
+		ids := make([]ent.Value, 0, len(m.removedcontacts))
+		for id := range m.removedcontacts {
+			ids = append(ids, id)
+		}
+		return ids
+	case church.EdgePrograms:
+		ids := make([]ent.Value, 0, len(m.removedprograms))
+		for id := range m.removedprograms {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChurchMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 10)
 	if m.clearedparent {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -3130,6 +3282,12 @@ func (m *ChurchMutation) ClearedEdges() []string {
 	if m.clearedannouncements {
 		edges = append(edges, church.EdgeAnnouncements)
 	}
+	if m.clearedcontacts {
+		edges = append(edges, church.EdgeContacts)
+	}
+	if m.clearedprograms {
+		edges = append(edges, church.EdgePrograms)
+	}
 	return edges
 }
 
@@ -3153,6 +3311,10 @@ func (m *ChurchMutation) EdgeCleared(name string) bool {
 		return m.clearedinvitations
 	case church.EdgeAnnouncements:
 		return m.clearedannouncements
+	case church.EdgeContacts:
+		return m.clearedcontacts
+	case church.EdgePrograms:
+		return m.clearedprograms
 	}
 	return false
 }
@@ -3195,6 +3357,12 @@ func (m *ChurchMutation) ResetEdge(name string) error {
 		return nil
 	case church.EdgeAnnouncements:
 		m.ResetAnnouncements()
+		return nil
+	case church.EdgeContacts:
+		m.ResetContacts()
+		return nil
+	case church.EdgePrograms:
+		m.ResetPrograms()
 		return nil
 	}
 	return fmt.Errorf("unknown Church edge %s", name)
@@ -3244,6 +3412,8 @@ type ContactMutation struct {
 	clearedFields                  map[string]struct{}
 	user                           *int
 	cleareduser                    bool
+	church                         *int
+	clearedchurch                  bool
 	spouse_contact                 *int
 	clearedspouse_contact          bool
 	spouse_of_contact              *int
@@ -4705,6 +4875,55 @@ func (m *ContactMutation) ResetSpouseID() {
 	delete(m.clearedFields, contact.FieldSpouseID)
 }
 
+// SetChurchID sets the "church_id" field.
+func (m *ContactMutation) SetChurchID(i int) {
+	m.church = &i
+}
+
+// ChurchID returns the value of the "church_id" field in the mutation.
+func (m *ContactMutation) ChurchID() (r int, exists bool) {
+	v := m.church
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChurchID returns the old "church_id" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldChurchID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChurchID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChurchID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChurchID: %w", err)
+	}
+	return oldValue.ChurchID, nil
+}
+
+// ClearChurchID clears the value of the "church_id" field.
+func (m *ContactMutation) ClearChurchID() {
+	m.church = nil
+	m.clearedFields[contact.FieldChurchID] = struct{}{}
+}
+
+// ChurchIDCleared returns if the "church_id" field was cleared in this mutation.
+func (m *ContactMutation) ChurchIDCleared() bool {
+	_, ok := m.clearedFields[contact.FieldChurchID]
+	return ok
+}
+
+// ResetChurchID resets all changes to the "church_id" field.
+func (m *ContactMutation) ResetChurchID() {
+	m.church = nil
+	delete(m.clearedFields, contact.FieldChurchID)
+}
+
 // SetIsBaptized sets the "is_baptized" field.
 func (m *ContactMutation) SetIsBaptized(b bool) {
 	m.is_baptized = &b
@@ -5048,6 +5267,33 @@ func (m *ContactMutation) ResetUser() {
 	m.cleareduser = false
 }
 
+// ClearChurch clears the "church" edge to the Church entity.
+func (m *ContactMutation) ClearChurch() {
+	m.clearedchurch = true
+	m.clearedFields[contact.FieldChurchID] = struct{}{}
+}
+
+// ChurchCleared reports if the "church" edge to the Church entity was cleared.
+func (m *ContactMutation) ChurchCleared() bool {
+	return m.ChurchIDCleared() || m.clearedchurch
+}
+
+// ChurchIDs returns the "church" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChurchID instead. It exists only for internal usage by the builders.
+func (m *ContactMutation) ChurchIDs() (ids []int) {
+	if id := m.church; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChurch resets all changes to the "church" edge.
+func (m *ContactMutation) ResetChurch() {
+	m.church = nil
+	m.clearedchurch = false
+}
+
 // SetSpouseContactID sets the "spouse_contact" edge to the Contact entity by id.
 func (m *ContactMutation) SetSpouseContactID(id int) {
 	m.spouse_contact = &id
@@ -5162,7 +5408,7 @@ func (m *ContactMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ContactMutation) Fields() []string {
-	fields := make([]string, 0, 35)
+	fields := make([]string, 0, 36)
 	if m.first_name != nil {
 		fields = append(fields, contact.FieldFirstName)
 	}
@@ -5246,6 +5492,9 @@ func (m *ContactMutation) Fields() []string {
 	}
 	if m.spouse_contact != nil {
 		fields = append(fields, contact.FieldSpouseID)
+	}
+	if m.church != nil {
+		fields = append(fields, contact.FieldChurchID)
 	}
 	if m.is_baptized != nil {
 		fields = append(fields, contact.FieldIsBaptized)
@@ -5332,6 +5581,8 @@ func (m *ContactMutation) Field(name string) (ent.Value, bool) {
 		return m.HasSpouse()
 	case contact.FieldSpouseID:
 		return m.SpouseID()
+	case contact.FieldChurchID:
+		return m.ChurchID()
 	case contact.FieldIsBaptized:
 		return m.IsBaptized()
 	case contact.FieldBaptizedBy:
@@ -5411,6 +5662,8 @@ func (m *ContactMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldHasSpouse(ctx)
 	case contact.FieldSpouseID:
 		return m.OldSpouseID(ctx)
+	case contact.FieldChurchID:
+		return m.OldChurchID(ctx)
 	case contact.FieldIsBaptized:
 		return m.OldIsBaptized(ctx)
 	case contact.FieldBaptizedBy:
@@ -5630,6 +5883,13 @@ func (m *ContactMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSpouseID(v)
 		return nil
+	case contact.FieldChurchID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChurchID(v)
+		return nil
 	case contact.FieldIsBaptized:
 		v, ok := value.(bool)
 		if !ok {
@@ -5799,6 +6059,9 @@ func (m *ContactMutation) ClearedFields() []string {
 	if m.FieldCleared(contact.FieldSpouseID) {
 		fields = append(fields, contact.FieldSpouseID)
 	}
+	if m.FieldCleared(contact.FieldChurchID) {
+		fields = append(fields, contact.FieldChurchID)
+	}
 	if m.FieldCleared(contact.FieldBaptizedBy) {
 		fields = append(fields, contact.FieldBaptizedBy)
 	}
@@ -5899,6 +6162,9 @@ func (m *ContactMutation) ClearField(name string) error {
 		return nil
 	case contact.FieldSpouseID:
 		m.ClearSpouseID()
+		return nil
+	case contact.FieldChurchID:
+		m.ClearChurchID()
 		return nil
 	case contact.FieldBaptizedBy:
 		m.ClearBaptizedBy()
@@ -6004,6 +6270,9 @@ func (m *ContactMutation) ResetField(name string) error {
 	case contact.FieldSpouseID:
 		m.ResetSpouseID()
 		return nil
+	case contact.FieldChurchID:
+		m.ResetChurchID()
+		return nil
 	case contact.FieldIsBaptized:
 		m.ResetIsBaptized()
 		return nil
@@ -6031,9 +6300,12 @@ func (m *ContactMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ContactMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.user != nil {
 		edges = append(edges, contact.EdgeUser)
+	}
+	if m.church != nil {
+		edges = append(edges, contact.EdgeChurch)
 	}
 	if m.spouse_contact != nil {
 		edges = append(edges, contact.EdgeSpouseContact)
@@ -6052,6 +6324,10 @@ func (m *ContactMutation) AddedIDs(name string) []ent.Value {
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
 		}
+	case contact.EdgeChurch:
+		if id := m.church; id != nil {
+			return []ent.Value{*id}
+		}
 	case contact.EdgeSpouseContact:
 		if id := m.spouse_contact; id != nil {
 			return []ent.Value{*id}
@@ -6066,7 +6342,7 @@ func (m *ContactMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ContactMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	return edges
 }
 
@@ -6078,9 +6354,12 @@ func (m *ContactMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ContactMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleareduser {
 		edges = append(edges, contact.EdgeUser)
+	}
+	if m.clearedchurch {
+		edges = append(edges, contact.EdgeChurch)
 	}
 	if m.clearedspouse_contact {
 		edges = append(edges, contact.EdgeSpouseContact)
@@ -6097,6 +6376,8 @@ func (m *ContactMutation) EdgeCleared(name string) bool {
 	switch name {
 	case contact.EdgeUser:
 		return m.cleareduser
+	case contact.EdgeChurch:
+		return m.clearedchurch
 	case contact.EdgeSpouseContact:
 		return m.clearedspouse_contact
 	case contact.EdgeSpouseOfContact:
@@ -6111,6 +6392,9 @@ func (m *ContactMutation) ClearEdge(name string) error {
 	switch name {
 	case contact.EdgeUser:
 		m.ClearUser()
+		return nil
+	case contact.EdgeChurch:
+		m.ClearChurch()
 		return nil
 	case contact.EdgeSpouseContact:
 		m.ClearSpouseContact()
@@ -6128,6 +6412,9 @@ func (m *ContactMutation) ResetEdge(name string) error {
 	switch name {
 	case contact.EdgeUser:
 		m.ResetUser()
+		return nil
+	case contact.EdgeChurch:
+		m.ResetChurch()
 		return nil
 	case contact.EdgeSpouseContact:
 		m.ResetSpouseContact()
@@ -9466,6 +9753,1275 @@ func (m *InvitationMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Invitation edge %s", name)
+}
+
+// ProgramEntryMutation represents an operation that mutates the ProgramEntry nodes in the graph.
+type ProgramEntryMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *int
+	title              *string
+	program_type       *programentry.ProgramType
+	date               *time.Time
+	theme              *string
+	sermon_topic       *string
+	vision_goals       *string
+	preacher           *string
+	opening_prayer_by  *string
+	closing_prayer_by  *string
+	worship_leader     *string
+	responsible_person *string
+	notes              *string
+	is_published       *bool
+	created_at         *time.Time
+	clearedFields      map[string]struct{}
+	church             *int
+	clearedchurch      bool
+	done               bool
+	oldValue           func(context.Context) (*ProgramEntry, error)
+	predicates         []predicate.ProgramEntry
+}
+
+var _ ent.Mutation = (*ProgramEntryMutation)(nil)
+
+// programentryOption allows management of the mutation configuration using functional options.
+type programentryOption func(*ProgramEntryMutation)
+
+// newProgramEntryMutation creates new mutation for the ProgramEntry entity.
+func newProgramEntryMutation(c config, op Op, opts ...programentryOption) *ProgramEntryMutation {
+	m := &ProgramEntryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProgramEntry,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProgramEntryID sets the ID field of the mutation.
+func withProgramEntryID(id int) programentryOption {
+	return func(m *ProgramEntryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProgramEntry
+		)
+		m.oldValue = func(ctx context.Context) (*ProgramEntry, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProgramEntry.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProgramEntry sets the old ProgramEntry of the mutation.
+func withProgramEntry(node *ProgramEntry) programentryOption {
+	return func(m *ProgramEntryMutation) {
+		m.oldValue = func(context.Context) (*ProgramEntry, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProgramEntryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProgramEntryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProgramEntryMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProgramEntryMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProgramEntry.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTitle sets the "title" field.
+func (m *ProgramEntryMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *ProgramEntryMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *ProgramEntryMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetProgramType sets the "program_type" field.
+func (m *ProgramEntryMutation) SetProgramType(pt programentry.ProgramType) {
+	m.program_type = &pt
+}
+
+// ProgramType returns the value of the "program_type" field in the mutation.
+func (m *ProgramEntryMutation) ProgramType() (r programentry.ProgramType, exists bool) {
+	v := m.program_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProgramType returns the old "program_type" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldProgramType(ctx context.Context) (v programentry.ProgramType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProgramType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProgramType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProgramType: %w", err)
+	}
+	return oldValue.ProgramType, nil
+}
+
+// ResetProgramType resets all changes to the "program_type" field.
+func (m *ProgramEntryMutation) ResetProgramType() {
+	m.program_type = nil
+}
+
+// SetDate sets the "date" field.
+func (m *ProgramEntryMutation) SetDate(t time.Time) {
+	m.date = &t
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *ProgramEntryMutation) Date() (r time.Time, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *ProgramEntryMutation) ResetDate() {
+	m.date = nil
+}
+
+// SetTheme sets the "theme" field.
+func (m *ProgramEntryMutation) SetTheme(s string) {
+	m.theme = &s
+}
+
+// Theme returns the value of the "theme" field in the mutation.
+func (m *ProgramEntryMutation) Theme() (r string, exists bool) {
+	v := m.theme
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTheme returns the old "theme" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldTheme(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTheme is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTheme requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTheme: %w", err)
+	}
+	return oldValue.Theme, nil
+}
+
+// ClearTheme clears the value of the "theme" field.
+func (m *ProgramEntryMutation) ClearTheme() {
+	m.theme = nil
+	m.clearedFields[programentry.FieldTheme] = struct{}{}
+}
+
+// ThemeCleared returns if the "theme" field was cleared in this mutation.
+func (m *ProgramEntryMutation) ThemeCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldTheme]
+	return ok
+}
+
+// ResetTheme resets all changes to the "theme" field.
+func (m *ProgramEntryMutation) ResetTheme() {
+	m.theme = nil
+	delete(m.clearedFields, programentry.FieldTheme)
+}
+
+// SetSermonTopic sets the "sermon_topic" field.
+func (m *ProgramEntryMutation) SetSermonTopic(s string) {
+	m.sermon_topic = &s
+}
+
+// SermonTopic returns the value of the "sermon_topic" field in the mutation.
+func (m *ProgramEntryMutation) SermonTopic() (r string, exists bool) {
+	v := m.sermon_topic
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSermonTopic returns the old "sermon_topic" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldSermonTopic(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSermonTopic is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSermonTopic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSermonTopic: %w", err)
+	}
+	return oldValue.SermonTopic, nil
+}
+
+// ClearSermonTopic clears the value of the "sermon_topic" field.
+func (m *ProgramEntryMutation) ClearSermonTopic() {
+	m.sermon_topic = nil
+	m.clearedFields[programentry.FieldSermonTopic] = struct{}{}
+}
+
+// SermonTopicCleared returns if the "sermon_topic" field was cleared in this mutation.
+func (m *ProgramEntryMutation) SermonTopicCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldSermonTopic]
+	return ok
+}
+
+// ResetSermonTopic resets all changes to the "sermon_topic" field.
+func (m *ProgramEntryMutation) ResetSermonTopic() {
+	m.sermon_topic = nil
+	delete(m.clearedFields, programentry.FieldSermonTopic)
+}
+
+// SetVisionGoals sets the "vision_goals" field.
+func (m *ProgramEntryMutation) SetVisionGoals(s string) {
+	m.vision_goals = &s
+}
+
+// VisionGoals returns the value of the "vision_goals" field in the mutation.
+func (m *ProgramEntryMutation) VisionGoals() (r string, exists bool) {
+	v := m.vision_goals
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisionGoals returns the old "vision_goals" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldVisionGoals(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisionGoals is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisionGoals requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisionGoals: %w", err)
+	}
+	return oldValue.VisionGoals, nil
+}
+
+// ClearVisionGoals clears the value of the "vision_goals" field.
+func (m *ProgramEntryMutation) ClearVisionGoals() {
+	m.vision_goals = nil
+	m.clearedFields[programentry.FieldVisionGoals] = struct{}{}
+}
+
+// VisionGoalsCleared returns if the "vision_goals" field was cleared in this mutation.
+func (m *ProgramEntryMutation) VisionGoalsCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldVisionGoals]
+	return ok
+}
+
+// ResetVisionGoals resets all changes to the "vision_goals" field.
+func (m *ProgramEntryMutation) ResetVisionGoals() {
+	m.vision_goals = nil
+	delete(m.clearedFields, programentry.FieldVisionGoals)
+}
+
+// SetPreacher sets the "preacher" field.
+func (m *ProgramEntryMutation) SetPreacher(s string) {
+	m.preacher = &s
+}
+
+// Preacher returns the value of the "preacher" field in the mutation.
+func (m *ProgramEntryMutation) Preacher() (r string, exists bool) {
+	v := m.preacher
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPreacher returns the old "preacher" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldPreacher(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPreacher is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPreacher requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPreacher: %w", err)
+	}
+	return oldValue.Preacher, nil
+}
+
+// ClearPreacher clears the value of the "preacher" field.
+func (m *ProgramEntryMutation) ClearPreacher() {
+	m.preacher = nil
+	m.clearedFields[programentry.FieldPreacher] = struct{}{}
+}
+
+// PreacherCleared returns if the "preacher" field was cleared in this mutation.
+func (m *ProgramEntryMutation) PreacherCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldPreacher]
+	return ok
+}
+
+// ResetPreacher resets all changes to the "preacher" field.
+func (m *ProgramEntryMutation) ResetPreacher() {
+	m.preacher = nil
+	delete(m.clearedFields, programentry.FieldPreacher)
+}
+
+// SetOpeningPrayerBy sets the "opening_prayer_by" field.
+func (m *ProgramEntryMutation) SetOpeningPrayerBy(s string) {
+	m.opening_prayer_by = &s
+}
+
+// OpeningPrayerBy returns the value of the "opening_prayer_by" field in the mutation.
+func (m *ProgramEntryMutation) OpeningPrayerBy() (r string, exists bool) {
+	v := m.opening_prayer_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOpeningPrayerBy returns the old "opening_prayer_by" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldOpeningPrayerBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOpeningPrayerBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOpeningPrayerBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOpeningPrayerBy: %w", err)
+	}
+	return oldValue.OpeningPrayerBy, nil
+}
+
+// ClearOpeningPrayerBy clears the value of the "opening_prayer_by" field.
+func (m *ProgramEntryMutation) ClearOpeningPrayerBy() {
+	m.opening_prayer_by = nil
+	m.clearedFields[programentry.FieldOpeningPrayerBy] = struct{}{}
+}
+
+// OpeningPrayerByCleared returns if the "opening_prayer_by" field was cleared in this mutation.
+func (m *ProgramEntryMutation) OpeningPrayerByCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldOpeningPrayerBy]
+	return ok
+}
+
+// ResetOpeningPrayerBy resets all changes to the "opening_prayer_by" field.
+func (m *ProgramEntryMutation) ResetOpeningPrayerBy() {
+	m.opening_prayer_by = nil
+	delete(m.clearedFields, programentry.FieldOpeningPrayerBy)
+}
+
+// SetClosingPrayerBy sets the "closing_prayer_by" field.
+func (m *ProgramEntryMutation) SetClosingPrayerBy(s string) {
+	m.closing_prayer_by = &s
+}
+
+// ClosingPrayerBy returns the value of the "closing_prayer_by" field in the mutation.
+func (m *ProgramEntryMutation) ClosingPrayerBy() (r string, exists bool) {
+	v := m.closing_prayer_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClosingPrayerBy returns the old "closing_prayer_by" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldClosingPrayerBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClosingPrayerBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClosingPrayerBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClosingPrayerBy: %w", err)
+	}
+	return oldValue.ClosingPrayerBy, nil
+}
+
+// ClearClosingPrayerBy clears the value of the "closing_prayer_by" field.
+func (m *ProgramEntryMutation) ClearClosingPrayerBy() {
+	m.closing_prayer_by = nil
+	m.clearedFields[programentry.FieldClosingPrayerBy] = struct{}{}
+}
+
+// ClosingPrayerByCleared returns if the "closing_prayer_by" field was cleared in this mutation.
+func (m *ProgramEntryMutation) ClosingPrayerByCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldClosingPrayerBy]
+	return ok
+}
+
+// ResetClosingPrayerBy resets all changes to the "closing_prayer_by" field.
+func (m *ProgramEntryMutation) ResetClosingPrayerBy() {
+	m.closing_prayer_by = nil
+	delete(m.clearedFields, programentry.FieldClosingPrayerBy)
+}
+
+// SetWorshipLeader sets the "worship_leader" field.
+func (m *ProgramEntryMutation) SetWorshipLeader(s string) {
+	m.worship_leader = &s
+}
+
+// WorshipLeader returns the value of the "worship_leader" field in the mutation.
+func (m *ProgramEntryMutation) WorshipLeader() (r string, exists bool) {
+	v := m.worship_leader
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorshipLeader returns the old "worship_leader" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldWorshipLeader(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorshipLeader is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorshipLeader requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorshipLeader: %w", err)
+	}
+	return oldValue.WorshipLeader, nil
+}
+
+// ClearWorshipLeader clears the value of the "worship_leader" field.
+func (m *ProgramEntryMutation) ClearWorshipLeader() {
+	m.worship_leader = nil
+	m.clearedFields[programentry.FieldWorshipLeader] = struct{}{}
+}
+
+// WorshipLeaderCleared returns if the "worship_leader" field was cleared in this mutation.
+func (m *ProgramEntryMutation) WorshipLeaderCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldWorshipLeader]
+	return ok
+}
+
+// ResetWorshipLeader resets all changes to the "worship_leader" field.
+func (m *ProgramEntryMutation) ResetWorshipLeader() {
+	m.worship_leader = nil
+	delete(m.clearedFields, programentry.FieldWorshipLeader)
+}
+
+// SetResponsiblePerson sets the "responsible_person" field.
+func (m *ProgramEntryMutation) SetResponsiblePerson(s string) {
+	m.responsible_person = &s
+}
+
+// ResponsiblePerson returns the value of the "responsible_person" field in the mutation.
+func (m *ProgramEntryMutation) ResponsiblePerson() (r string, exists bool) {
+	v := m.responsible_person
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResponsiblePerson returns the old "responsible_person" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldResponsiblePerson(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResponsiblePerson is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResponsiblePerson requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResponsiblePerson: %w", err)
+	}
+	return oldValue.ResponsiblePerson, nil
+}
+
+// ClearResponsiblePerson clears the value of the "responsible_person" field.
+func (m *ProgramEntryMutation) ClearResponsiblePerson() {
+	m.responsible_person = nil
+	m.clearedFields[programentry.FieldResponsiblePerson] = struct{}{}
+}
+
+// ResponsiblePersonCleared returns if the "responsible_person" field was cleared in this mutation.
+func (m *ProgramEntryMutation) ResponsiblePersonCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldResponsiblePerson]
+	return ok
+}
+
+// ResetResponsiblePerson resets all changes to the "responsible_person" field.
+func (m *ProgramEntryMutation) ResetResponsiblePerson() {
+	m.responsible_person = nil
+	delete(m.clearedFields, programentry.FieldResponsiblePerson)
+}
+
+// SetNotes sets the "notes" field.
+func (m *ProgramEntryMutation) SetNotes(s string) {
+	m.notes = &s
+}
+
+// Notes returns the value of the "notes" field in the mutation.
+func (m *ProgramEntryMutation) Notes() (r string, exists bool) {
+	v := m.notes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotes returns the old "notes" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldNotes(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotes: %w", err)
+	}
+	return oldValue.Notes, nil
+}
+
+// ClearNotes clears the value of the "notes" field.
+func (m *ProgramEntryMutation) ClearNotes() {
+	m.notes = nil
+	m.clearedFields[programentry.FieldNotes] = struct{}{}
+}
+
+// NotesCleared returns if the "notes" field was cleared in this mutation.
+func (m *ProgramEntryMutation) NotesCleared() bool {
+	_, ok := m.clearedFields[programentry.FieldNotes]
+	return ok
+}
+
+// ResetNotes resets all changes to the "notes" field.
+func (m *ProgramEntryMutation) ResetNotes() {
+	m.notes = nil
+	delete(m.clearedFields, programentry.FieldNotes)
+}
+
+// SetIsPublished sets the "is_published" field.
+func (m *ProgramEntryMutation) SetIsPublished(b bool) {
+	m.is_published = &b
+}
+
+// IsPublished returns the value of the "is_published" field in the mutation.
+func (m *ProgramEntryMutation) IsPublished() (r bool, exists bool) {
+	v := m.is_published
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsPublished returns the old "is_published" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldIsPublished(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsPublished is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsPublished requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsPublished: %w", err)
+	}
+	return oldValue.IsPublished, nil
+}
+
+// ResetIsPublished resets all changes to the "is_published" field.
+func (m *ProgramEntryMutation) ResetIsPublished() {
+	m.is_published = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProgramEntryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProgramEntryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProgramEntry entity.
+// If the ProgramEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgramEntryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProgramEntryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetChurchID sets the "church" edge to the Church entity by id.
+func (m *ProgramEntryMutation) SetChurchID(id int) {
+	m.church = &id
+}
+
+// ClearChurch clears the "church" edge to the Church entity.
+func (m *ProgramEntryMutation) ClearChurch() {
+	m.clearedchurch = true
+}
+
+// ChurchCleared reports if the "church" edge to the Church entity was cleared.
+func (m *ProgramEntryMutation) ChurchCleared() bool {
+	return m.clearedchurch
+}
+
+// ChurchID returns the "church" edge ID in the mutation.
+func (m *ProgramEntryMutation) ChurchID() (id int, exists bool) {
+	if m.church != nil {
+		return *m.church, true
+	}
+	return
+}
+
+// ChurchIDs returns the "church" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChurchID instead. It exists only for internal usage by the builders.
+func (m *ProgramEntryMutation) ChurchIDs() (ids []int) {
+	if id := m.church; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChurch resets all changes to the "church" edge.
+func (m *ProgramEntryMutation) ResetChurch() {
+	m.church = nil
+	m.clearedchurch = false
+}
+
+// Where appends a list predicates to the ProgramEntryMutation builder.
+func (m *ProgramEntryMutation) Where(ps ...predicate.ProgramEntry) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProgramEntryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProgramEntryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProgramEntry, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProgramEntryMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProgramEntryMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProgramEntry).
+func (m *ProgramEntryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProgramEntryMutation) Fields() []string {
+	fields := make([]string, 0, 14)
+	if m.title != nil {
+		fields = append(fields, programentry.FieldTitle)
+	}
+	if m.program_type != nil {
+		fields = append(fields, programentry.FieldProgramType)
+	}
+	if m.date != nil {
+		fields = append(fields, programentry.FieldDate)
+	}
+	if m.theme != nil {
+		fields = append(fields, programentry.FieldTheme)
+	}
+	if m.sermon_topic != nil {
+		fields = append(fields, programentry.FieldSermonTopic)
+	}
+	if m.vision_goals != nil {
+		fields = append(fields, programentry.FieldVisionGoals)
+	}
+	if m.preacher != nil {
+		fields = append(fields, programentry.FieldPreacher)
+	}
+	if m.opening_prayer_by != nil {
+		fields = append(fields, programentry.FieldOpeningPrayerBy)
+	}
+	if m.closing_prayer_by != nil {
+		fields = append(fields, programentry.FieldClosingPrayerBy)
+	}
+	if m.worship_leader != nil {
+		fields = append(fields, programentry.FieldWorshipLeader)
+	}
+	if m.responsible_person != nil {
+		fields = append(fields, programentry.FieldResponsiblePerson)
+	}
+	if m.notes != nil {
+		fields = append(fields, programentry.FieldNotes)
+	}
+	if m.is_published != nil {
+		fields = append(fields, programentry.FieldIsPublished)
+	}
+	if m.created_at != nil {
+		fields = append(fields, programentry.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProgramEntryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case programentry.FieldTitle:
+		return m.Title()
+	case programentry.FieldProgramType:
+		return m.ProgramType()
+	case programentry.FieldDate:
+		return m.Date()
+	case programentry.FieldTheme:
+		return m.Theme()
+	case programentry.FieldSermonTopic:
+		return m.SermonTopic()
+	case programentry.FieldVisionGoals:
+		return m.VisionGoals()
+	case programentry.FieldPreacher:
+		return m.Preacher()
+	case programentry.FieldOpeningPrayerBy:
+		return m.OpeningPrayerBy()
+	case programentry.FieldClosingPrayerBy:
+		return m.ClosingPrayerBy()
+	case programentry.FieldWorshipLeader:
+		return m.WorshipLeader()
+	case programentry.FieldResponsiblePerson:
+		return m.ResponsiblePerson()
+	case programentry.FieldNotes:
+		return m.Notes()
+	case programentry.FieldIsPublished:
+		return m.IsPublished()
+	case programentry.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProgramEntryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case programentry.FieldTitle:
+		return m.OldTitle(ctx)
+	case programentry.FieldProgramType:
+		return m.OldProgramType(ctx)
+	case programentry.FieldDate:
+		return m.OldDate(ctx)
+	case programentry.FieldTheme:
+		return m.OldTheme(ctx)
+	case programentry.FieldSermonTopic:
+		return m.OldSermonTopic(ctx)
+	case programentry.FieldVisionGoals:
+		return m.OldVisionGoals(ctx)
+	case programentry.FieldPreacher:
+		return m.OldPreacher(ctx)
+	case programentry.FieldOpeningPrayerBy:
+		return m.OldOpeningPrayerBy(ctx)
+	case programentry.FieldClosingPrayerBy:
+		return m.OldClosingPrayerBy(ctx)
+	case programentry.FieldWorshipLeader:
+		return m.OldWorshipLeader(ctx)
+	case programentry.FieldResponsiblePerson:
+		return m.OldResponsiblePerson(ctx)
+	case programentry.FieldNotes:
+		return m.OldNotes(ctx)
+	case programentry.FieldIsPublished:
+		return m.OldIsPublished(ctx)
+	case programentry.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProgramEntry field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProgramEntryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case programentry.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case programentry.FieldProgramType:
+		v, ok := value.(programentry.ProgramType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProgramType(v)
+		return nil
+	case programentry.FieldDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
+		return nil
+	case programentry.FieldTheme:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTheme(v)
+		return nil
+	case programentry.FieldSermonTopic:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSermonTopic(v)
+		return nil
+	case programentry.FieldVisionGoals:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisionGoals(v)
+		return nil
+	case programentry.FieldPreacher:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPreacher(v)
+		return nil
+	case programentry.FieldOpeningPrayerBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOpeningPrayerBy(v)
+		return nil
+	case programentry.FieldClosingPrayerBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClosingPrayerBy(v)
+		return nil
+	case programentry.FieldWorshipLeader:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorshipLeader(v)
+		return nil
+	case programentry.FieldResponsiblePerson:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResponsiblePerson(v)
+		return nil
+	case programentry.FieldNotes:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotes(v)
+		return nil
+	case programentry.FieldIsPublished:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsPublished(v)
+		return nil
+	case programentry.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProgramEntry field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProgramEntryMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProgramEntryMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProgramEntryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ProgramEntry numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProgramEntryMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(programentry.FieldTheme) {
+		fields = append(fields, programentry.FieldTheme)
+	}
+	if m.FieldCleared(programentry.FieldSermonTopic) {
+		fields = append(fields, programentry.FieldSermonTopic)
+	}
+	if m.FieldCleared(programentry.FieldVisionGoals) {
+		fields = append(fields, programentry.FieldVisionGoals)
+	}
+	if m.FieldCleared(programentry.FieldPreacher) {
+		fields = append(fields, programentry.FieldPreacher)
+	}
+	if m.FieldCleared(programentry.FieldOpeningPrayerBy) {
+		fields = append(fields, programentry.FieldOpeningPrayerBy)
+	}
+	if m.FieldCleared(programentry.FieldClosingPrayerBy) {
+		fields = append(fields, programentry.FieldClosingPrayerBy)
+	}
+	if m.FieldCleared(programentry.FieldWorshipLeader) {
+		fields = append(fields, programentry.FieldWorshipLeader)
+	}
+	if m.FieldCleared(programentry.FieldResponsiblePerson) {
+		fields = append(fields, programentry.FieldResponsiblePerson)
+	}
+	if m.FieldCleared(programentry.FieldNotes) {
+		fields = append(fields, programentry.FieldNotes)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProgramEntryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProgramEntryMutation) ClearField(name string) error {
+	switch name {
+	case programentry.FieldTheme:
+		m.ClearTheme()
+		return nil
+	case programentry.FieldSermonTopic:
+		m.ClearSermonTopic()
+		return nil
+	case programentry.FieldVisionGoals:
+		m.ClearVisionGoals()
+		return nil
+	case programentry.FieldPreacher:
+		m.ClearPreacher()
+		return nil
+	case programentry.FieldOpeningPrayerBy:
+		m.ClearOpeningPrayerBy()
+		return nil
+	case programentry.FieldClosingPrayerBy:
+		m.ClearClosingPrayerBy()
+		return nil
+	case programentry.FieldWorshipLeader:
+		m.ClearWorshipLeader()
+		return nil
+	case programentry.FieldResponsiblePerson:
+		m.ClearResponsiblePerson()
+		return nil
+	case programentry.FieldNotes:
+		m.ClearNotes()
+		return nil
+	}
+	return fmt.Errorf("unknown ProgramEntry nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProgramEntryMutation) ResetField(name string) error {
+	switch name {
+	case programentry.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case programentry.FieldProgramType:
+		m.ResetProgramType()
+		return nil
+	case programentry.FieldDate:
+		m.ResetDate()
+		return nil
+	case programentry.FieldTheme:
+		m.ResetTheme()
+		return nil
+	case programentry.FieldSermonTopic:
+		m.ResetSermonTopic()
+		return nil
+	case programentry.FieldVisionGoals:
+		m.ResetVisionGoals()
+		return nil
+	case programentry.FieldPreacher:
+		m.ResetPreacher()
+		return nil
+	case programentry.FieldOpeningPrayerBy:
+		m.ResetOpeningPrayerBy()
+		return nil
+	case programentry.FieldClosingPrayerBy:
+		m.ResetClosingPrayerBy()
+		return nil
+	case programentry.FieldWorshipLeader:
+		m.ResetWorshipLeader()
+		return nil
+	case programentry.FieldResponsiblePerson:
+		m.ResetResponsiblePerson()
+		return nil
+	case programentry.FieldNotes:
+		m.ResetNotes()
+		return nil
+	case programentry.FieldIsPublished:
+		m.ResetIsPublished()
+		return nil
+	case programentry.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProgramEntry field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProgramEntryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.church != nil {
+		edges = append(edges, programentry.EdgeChurch)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProgramEntryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case programentry.EdgeChurch:
+		if id := m.church; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProgramEntryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProgramEntryMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProgramEntryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedchurch {
+		edges = append(edges, programentry.EdgeChurch)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProgramEntryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case programentry.EdgeChurch:
+		return m.clearedchurch
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProgramEntryMutation) ClearEdge(name string) error {
+	switch name {
+	case programentry.EdgeChurch:
+		m.ClearChurch()
+		return nil
+	}
+	return fmt.Errorf("unknown ProgramEntry unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProgramEntryMutation) ResetEdge(name string) error {
+	switch name {
+	case programentry.EdgeChurch:
+		m.ResetChurch()
+		return nil
+	}
+	return fmt.Errorf("unknown ProgramEntry edge %s", name)
 }
 
 // SessionMutation represents an operation that mutates the Session nodes in the graph.

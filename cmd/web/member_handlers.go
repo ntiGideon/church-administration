@@ -4,12 +4,105 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
-	"github.com/ntiGideon/ent/user"
 	"github.com/ntiGideon/internal/models"
 	"github.com/ntiGideon/internal/validator"
 )
+
+// GET /members
+func (app *application) membersList(w http.ResponseWriter, r *http.Request) {
+	u := app.getAuthenticatedUser(r)
+	churchID := 0
+	if u != nil && u.Edges.Church != nil {
+		churchID = u.Edges.Church.ID
+	}
+
+	members, err := app.memberModel.ListContactsByChurch(r.Context(), churchID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.Data = map[string]interface{}{
+		"members": members,
+	}
+	app.render(w, r, http.StatusOK, "members.gohtml", data)
+}
+
+// GET /members/new
+func (app *application) memberNewGet(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = models.MemberDto{}
+	app.render(w, r, http.StatusOK, "member_new.gohtml", data)
+}
+
+// POST /members/new
+func (app *application) memberNewPost(w http.ResponseWriter, r *http.Request) {
+	var dto models.MemberDto
+	if err := app.decodePostForm(r, &dto); err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	dto.CheckField(validator.NotBlank(dto.FirstName), "first_name", "First name is required")
+	dto.CheckField(validator.NotBlank(dto.LastName), "last_name", "Last name is required")
+
+	if !dto.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = dto
+		app.render(w, r, http.StatusUnprocessableEntity, "member_new.gohtml", data)
+		return
+	}
+
+	u := app.getAuthenticatedUser(r)
+	churchID := 0
+	if u != nil && u.Edges.Church != nil {
+		churchID = u.Edges.Church.ID
+	}
+
+	if churchID == 0 {
+		dto.AddNonFieldError("Cannot determine church — please contact support.")
+		data := app.newTemplateData(r)
+		data.Form = dto
+		app.render(w, r, http.StatusUnprocessableEntity, "member_new.gohtml", data)
+		return
+	}
+
+	c, err := app.memberModel.CreateContact(r.Context(), &dto, churchID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", fmt.Sprintf("%s %s has been added to the congregation.", dto.FirstName, dto.LastName))
+	http.Redirect(w, r, fmt.Sprintf("/members/%d", c.ID), http.StatusSeeOther)
+}
+
+// GET /members/{id}
+func (app *application) memberDetail(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	member, err := app.memberModel.GetContactByID(r.Context(), id)
+	if err != nil {
+		if err == models.ErrRecordNotFound {
+			app.clientError(w, http.StatusNotFound)
+			return
+		}
+		app.serverError(w, r, err)
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.Data = map[string]interface{}{
+		"member": member,
+	}
+	app.render(w, r, http.StatusOK, "member_detail.gohtml", data)
+}
 
 // GET /members/{id}/edit
 func (app *application) memberEditGet(w http.ResponseWriter, r *http.Request) {
@@ -18,9 +111,10 @@ func (app *application) memberEditGet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
-	member, err := app.memberModel.GetByID(r.Context(), id)
+
+	member, err := app.memberModel.GetContactByID(r.Context(), id)
 	if err != nil {
-		if err == models.ErrUserNotFound {
+		if err == models.ErrRecordNotFound {
 			app.clientError(w, http.StatusNotFound)
 			return
 		}
@@ -29,52 +123,51 @@ func (app *application) memberEditGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Build DTO from existing contact
-	dto := models.MemberDto{}
-	if c := member.Edges.Contact; c != nil {
-		dto.FirstName = c.FirstName
-		dto.LastName = c.LastName
-		dto.MiddleName = c.MiddleName
-		dto.Email = c.Email
-		dto.Phone = c.Phone
-		dto.Gender = string(c.Gender)
-		if !c.DateOfBirth.IsZero() {
-			dto.DateOfBirth = c.DateOfBirth.Format("2006-01-02")
-		}
-		dto.MaritalStatus = string(c.MaritalStatus)
-		dto.Occupation = c.Occupation
-		dto.AddressLine1 = c.AddressLine1
-		dto.City = c.City
-		dto.Country = c.Country
-		dto.IDNumber = c.IDNumber
-		dto.Hometown = c.Hometown
-		dto.Region = c.Region
-		dto.SundaySchoolClass = c.SundaySchoolClass
-		dto.DayBorn = string(c.DayBorn)
-		dto.MembershipYear = c.MembershipYear
-		dto.HasSpouse = c.HasSpouse
-		dto.SpouseID = c.SpouseID
-		dto.IsBaptized = c.IsBaptized
-		dto.BaptizedBy = c.BaptizedBy
-		dto.BaptismChurch = c.BaptismChurch
-		dto.BaptismCertNumber = c.BaptismCertNumber
-		if !c.BaptismDate.IsZero() {
-			dto.BaptismDate = c.BaptismDate.Format("2006-01-02")
-		}
+	dto := models.MemberDto{
+		FirstName:         member.FirstName,
+		LastName:          member.LastName,
+		MiddleName:        member.MiddleName,
+		Email:             member.Email,
+		Phone:             member.Phone,
+		Gender:            string(member.Gender),
+		MaritalStatus:     string(member.MaritalStatus),
+		Occupation:        member.Occupation,
+		AddressLine1:      member.AddressLine1,
+		City:              member.City,
+		Country:           member.Country,
+		IDNumber:          member.IDNumber,
+		Hometown:          member.Hometown,
+		Region:            member.Region,
+		SundaySchoolClass: member.SundaySchoolClass,
+		DayBorn:           string(member.DayBorn),
+		MembershipYear:    member.MembershipYear,
+		HasSpouse:         member.HasSpouse,
+		SpouseID:          member.SpouseID,
+		IsBaptized:        member.IsBaptized,
+		BaptizedBy:        member.BaptizedBy,
+		BaptismChurch:     member.BaptismChurch,
+		BaptismCertNumber: member.BaptismCertNumber,
+	}
+	if !member.DateOfBirth.IsZero() {
+		dto.DateOfBirth = member.DateOfBirth.Format("2006-01-02")
+	}
+	if !member.BaptismDate.IsZero() {
+		dto.BaptismDate = member.BaptismDate.Format("2006-01-02")
 	}
 
-	// Load church members for spouse dropdown
+	// Load church contacts for spouse dropdown
 	u := app.getAuthenticatedUser(r)
 	churchID := 0
 	if u != nil && u.Edges.Church != nil {
 		churchID = u.Edges.Church.ID
 	}
-	allMembers, _ := app.memberModel.ListByChurch(r.Context(), churchID)
+	allContacts, _ := app.memberModel.ListContactsByChurch(r.Context(), churchID)
 
 	data := app.newTemplateData(r)
 	data.Form = dto
 	data.Data = map[string]interface{}{
-		"member":     member,
-		"allMembers": allMembers,
+		"member":      member,
+		"allContacts": allContacts,
 	}
 	app.render(w, r, http.StatusOK, "member_edit.gohtml", data)
 }
@@ -86,9 +179,10 @@ func (app *application) memberEditPost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
-	member, err := app.memberModel.GetByID(r.Context(), id)
+
+	member, err := app.memberModel.GetContactByID(r.Context(), id)
 	if err != nil {
-		if err == models.ErrUserNotFound {
+		if err == models.ErrRecordNotFound {
 			app.clientError(w, http.StatusNotFound)
 			return
 		}
@@ -111,45 +205,93 @@ func (app *application) memberEditPost(w http.ResponseWriter, r *http.Request) {
 		if u != nil && u.Edges.Church != nil {
 			churchID = u.Edges.Church.ID
 		}
-		allMembers, _ := app.memberModel.ListByChurch(r.Context(), churchID)
+		allContacts, _ := app.memberModel.ListContactsByChurch(r.Context(), churchID)
 		data := app.newTemplateData(r)
 		data.Form = dto
 		data.Data = map[string]interface{}{
-			"member":     member,
-			"allMembers": allMembers,
+			"member":      member,
+			"allContacts": allContacts,
 		}
 		app.render(w, r, http.StatusUnprocessableEntity, "member_edit.gohtml", data)
 		return
 	}
 
-	if member.Edges.Contact == nil {
-		app.serverError(w, r, models.ErrUserNotFound)
-		return
-	}
-	contactID := member.Edges.Contact.ID
-
-	if err := app.memberModel.UpdateContact(r.Context(), contactID, &dto); err != nil {
+	if err := app.memberModel.UpdateContact(r.Context(), id, &dto); err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
 	// Sync spouse link bidirectionally
-	if dto.HasSpouse && dto.SpouseID > 0 && dto.SpouseID != contactID {
-		// Set this contact's spouse_id
-		_, _ = app.db.Contact.UpdateOneID(contactID).SetSpouseID(dto.SpouseID).Save(r.Context())
-		// Set the other side too (if not already pointing to someone else)
-		_, _ = app.db.Contact.UpdateOneID(dto.SpouseID).SetSpouseID(contactID).SetHasSpouse(true).Save(r.Context())
+	if dto.HasSpouse && dto.SpouseID > 0 && dto.SpouseID != id {
+		_, _ = app.db.Contact.UpdateOneID(id).SetSpouseID(dto.SpouseID).Save(r.Context())
+		_, _ = app.db.Contact.UpdateOneID(dto.SpouseID).SetSpouseID(id).SetHasSpouse(true).Save(r.Context())
 	} else if !dto.HasSpouse {
-		// Clear both sides
-		old := member.Edges.Contact.SpouseID
-		_, _ = app.db.Contact.UpdateOneID(contactID).ClearSpouseID().Save(r.Context())
-		if old != 0 {
-			_, _ = app.db.Contact.UpdateOneID(old).ClearSpouseID().SetHasSpouse(false).Save(r.Context())
+		oldSpouseID := member.SpouseID
+		_, _ = app.db.Contact.UpdateOneID(id).ClearSpouseID().Save(r.Context())
+		if oldSpouseID != 0 {
+			_, _ = app.db.Contact.UpdateOneID(oldSpouseID).ClearSpouseID().SetHasSpouse(false).Save(r.Context())
 		}
 	}
 
 	app.sessionManager.Put(r.Context(), "flash", "Member details updated successfully.")
 	http.Redirect(w, r, fmt.Sprintf("/members/%d", id), http.StatusSeeOther)
+}
+
+// POST /members/{id}/avatar
+func (app *application) memberAvatarPost(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	redirectURL := fmt.Sprintf("/members/%d", id)
+
+	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+		app.sessionManager.Put(r.Context(), "flash_error", "File too large — maximum size is 5 MB.")
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+
+	file, header, err := r.FormFile("avatar")
+	if err != nil {
+		app.sessionManager.Put(r.Context(), "flash_error", "No file selected.")
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+	defer file.Close()
+
+	url, err := app.uploadImage(file, header, "member-avatars")
+	if err != nil {
+		app.sessionManager.Put(r.Context(), "flash_error", err.Error())
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+
+	if _, err := app.db.Contact.UpdateOneID(id).SetProfilePictureURL(url).Save(r.Context()); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Profile picture updated.")
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+}
+
+// POST /members/{id}/delete
+func (app *application) memberDelete(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	if err := app.memberModel.DeleteContact(r.Context(), id); err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Member record has been removed.")
+	http.Redirect(w, r, "/members", http.StatusSeeOther)
 }
 
 // derefStr safely dereferences an optional string pointer.
@@ -168,141 +310,7 @@ func derefInt(i *int) int {
 	return *i
 }
 
-// GET /members
-func (app *application) membersList(w http.ResponseWriter, r *http.Request) {
-	u := app.getAuthenticatedUser(r)
-	// super_admin sees all members; others see only their church
-	churchID := 0
-	if u != nil && u.Role != user.RoleSuperAdmin && u.Edges.Church != nil {
-		churchID = u.Edges.Church.ID
-	}
-
-	members, err := app.memberModel.ListByChurch(r.Context(), churchID)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
-	data.Data = map[string]interface{}{
-		"members": members,
-	}
-	app.render(w, r, http.StatusOK, "members.gohtml", data)
-}
-
-// GET /members/{id}
-func (app *application) memberDetail(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
-		app.clientError(w, http.StatusNotFound)
-		return
-	}
-
-	member, err := app.memberModel.GetByID(r.Context(), id)
-	if err != nil {
-		if err == models.ErrUserNotFound {
-			app.clientError(w, http.StatusNotFound)
-			return
-		}
-		app.serverError(w, r, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
-	data.Data = map[string]interface{}{
-		"member": member,
-	}
-	app.render(w, r, http.StatusOK, "member_detail.gohtml", data)
-}
-
-// POST /members/{id}/deactivate
-func (app *application) memberDeactivate(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
-		app.clientError(w, http.StatusNotFound)
-		return
-	}
-
-	if err := app.memberModel.Deactivate(r.Context(), id); err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	app.sessionManager.Put(r.Context(), "flash", "Member has been deactivated.")
-	http.Redirect(w, r, "/members", http.StatusSeeOther)
-}
-
-// GET /members/new — show invite member form
-func (app *application) inviteMemberGet(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
-	data.Form = models.MemberInviteDto{}
-	app.render(w, r, http.StatusOK, "invite_member.gohtml", data)
-}
-
-// POST /members/new — create invitation record and send email
-func (app *application) inviteMemberPost(w http.ResponseWriter, r *http.Request) {
-	var dto models.MemberInviteDto
-	if err := app.decodePostForm(r, &dto); err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	dto.CheckField(validator.NotBlank(dto.Email), "email", "Email is required")
-	dto.CheckField(validator.Matches(dto.Email, validator.EmailRX), "email", "Must be a valid email address")
-	dto.CheckField(validator.NotBlank(dto.Role), "role", "Role is required")
-
-	if !dto.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = dto
-		app.render(w, r, http.StatusUnprocessableEntity, "invite_member.gohtml", data)
-		return
-	}
-
-	u := app.getAuthenticatedUser(r)
-	churchID := 0
-	inviterID := 0
-	if u != nil {
-		inviterID = u.ID
-		if u.Edges.Church != nil {
-			churchID = u.Edges.Church.ID
-		}
-	}
-
-	if churchID == 0 {
-		dto.AddNonFieldError("Cannot determine church — please contact support.")
-		data := app.newTemplateData(r)
-		data.Form = dto
-		app.render(w, r, http.StatusUnprocessableEntity, "invite_member.gohtml", data)
-		return
-	}
-
-	// Generate a JWT token that embeds the invitee's email
-	token, err := app.churchModel.GenerateToken(dto.Email, 72)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	expiresAt := time.Now().Add(72 * time.Hour)
-	_, err = app.invitationModel.Create(r.Context(), churchID, inviterID, &dto, token, expiresAt)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	// Send invitation email (fire-and-forget)
-	acceptURL := fmt.Sprintf("http://localhost:3000/invite/accept?token=%s", token)
-	inviteeName := dto.Name
-	if inviteeName == "" {
-		inviteeName = dto.Email
-	}
-	htmlBody := buildMemberInviteEmail(inviteeName, acceptURL)
-	go func() { _ = sendHTMLEmail(dto.Email, "You're invited to join FaithConnect", htmlBody) }()
-
-	app.sessionManager.Put(r.Context(), "flash", "Invitation sent to "+dto.Email)
-	http.Redirect(w, r, "/members", http.StatusSeeOther)
-}
-
+// buildMemberInviteEmail constructs the HTML invitation email body.
 func buildMemberInviteEmail(name, acceptURL string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html><body style="font-family:sans-serif;background:#f8f9fa;padding:40px 20px">
@@ -327,3 +335,4 @@ func buildMemberInviteEmail(name, acceptURL string) string {
 </div>
 </body></html>`, name, acceptURL)
 }
+

@@ -134,6 +134,7 @@ var (
 		{Name: "baptism_date", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt, Nullable: true},
 		{Name: "spouse_id", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ContactsTable holds the schema information for the "contacts" table.
@@ -143,8 +144,14 @@ var (
 		PrimaryKey: []*schema.Column{ContactsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "contacts_contacts_spouse_contact",
+				Symbol:     "contacts_churches_contacts",
 				Columns:    []*schema.Column{ContactsColumns[35]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "contacts_contacts_spouse_contact",
+				Columns:    []*schema.Column{ContactsColumns[36]},
 				RefColumns: []*schema.Column{ContactsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -270,6 +277,46 @@ var (
 			},
 		},
 	}
+	// ProgramEntriesColumns holds the columns for the "program_entries" table.
+	ProgramEntriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "program_type", Type: field.TypeEnum, Enums: []string{"service", "prayer_meeting", "bible_study", "conference", "outreach", "youth_service", "special_event", "other"}},
+		{Name: "date", Type: field.TypeTime},
+		{Name: "theme", Type: field.TypeString, Nullable: true},
+		{Name: "sermon_topic", Type: field.TypeString, Nullable: true},
+		{Name: "vision_goals", Type: field.TypeString, Nullable: true},
+		{Name: "preacher", Type: field.TypeString, Nullable: true},
+		{Name: "opening_prayer_by", Type: field.TypeString, Nullable: true},
+		{Name: "closing_prayer_by", Type: field.TypeString, Nullable: true},
+		{Name: "worship_leader", Type: field.TypeString, Nullable: true},
+		{Name: "responsible_person", Type: field.TypeString, Nullable: true},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "is_published", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_programs", Type: field.TypeInt, Nullable: true},
+	}
+	// ProgramEntriesTable holds the schema information for the "program_entries" table.
+	ProgramEntriesTable = &schema.Table{
+		Name:       "program_entries",
+		Columns:    ProgramEntriesColumns,
+		PrimaryKey: []*schema.Column{ProgramEntriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "program_entries_churches_programs",
+				Columns:    []*schema.Column{ProgramEntriesColumns[15]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "programentry_date",
+				Unique:  false,
+				Columns: []*schema.Column{ProgramEntriesColumns[3]},
+			},
+		},
+	}
 	// SessionsColumns holds the columns for the "sessions" table.
 	SessionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -351,6 +398,7 @@ var (
 		EventsTable,
 		FinancesTable,
 		InvitationsTable,
+		ProgramEntriesTable,
 		SessionsTable,
 		UsersTable,
 	}
@@ -360,13 +408,15 @@ func init() {
 	AnnouncementsTable.ForeignKeys[0].RefTable = ChurchesTable
 	AnnouncementsTable.ForeignKeys[1].RefTable = UsersTable
 	ChurchesTable.ForeignKeys[0].RefTable = ChurchesTable
-	ContactsTable.ForeignKeys[0].RefTable = ContactsTable
+	ContactsTable.ForeignKeys[0].RefTable = ChurchesTable
+	ContactsTable.ForeignKeys[1].RefTable = ContactsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = ChurchesTable
 	EventsTable.ForeignKeys[0].RefTable = ChurchesTable
 	FinancesTable.ForeignKeys[0].RefTable = ChurchesTable
 	FinancesTable.ForeignKeys[1].RefTable = UsersTable
 	InvitationsTable.ForeignKeys[0].RefTable = ChurchesTable
 	InvitationsTable.ForeignKeys[1].RefTable = UsersTable
+	ProgramEntriesTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[1].RefTable = ContactsTable
 	UsersTable.ForeignKeys[2].RefTable = InvitationsTable

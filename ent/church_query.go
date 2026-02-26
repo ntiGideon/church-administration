@@ -14,11 +14,13 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/programentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -37,6 +39,8 @@ type ChurchQuery struct {
 	withFinances      *FinanceQuery
 	withInvitations   *InvitationQuery
 	withAnnouncements *AnnouncementQuery
+	withContacts      *ContactQuery
+	withPrograms      *ProgramEntryQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -249,6 +253,50 @@ func (_q *ChurchQuery) QueryAnnouncements() *AnnouncementQuery {
 	return query
 }
 
+// QueryContacts chains the current query on the "contacts" edge.
+func (_q *ChurchQuery) QueryContacts() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.ContactsTable, church.ContactsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPrograms chains the current query on the "programs" edge.
+func (_q *ChurchQuery) QueryPrograms() *ProgramEntryQuery {
+	query := (&ProgramEntryClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(programentry.Table, programentry.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.ProgramsTable, church.ProgramsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Church entity from the query.
 // Returns a *NotFoundError when no Church was found.
 func (_q *ChurchQuery) First(ctx context.Context) (*Church, error) {
@@ -449,6 +497,8 @@ func (_q *ChurchQuery) Clone() *ChurchQuery {
 		withFinances:      _q.withFinances.Clone(),
 		withInvitations:   _q.withInvitations.Clone(),
 		withAnnouncements: _q.withAnnouncements.Clone(),
+		withContacts:      _q.withContacts.Clone(),
+		withPrograms:      _q.withPrograms.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -543,6 +593,28 @@ func (_q *ChurchQuery) WithAnnouncements(opts ...func(*AnnouncementQuery)) *Chur
 	return _q
 }
 
+// WithContacts tells the query-builder to eager-load the nodes that are connected to
+// the "contacts" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithContacts(opts ...func(*ContactQuery)) *ChurchQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withContacts = query
+	return _q
+}
+
+// WithPrograms tells the query-builder to eager-load the nodes that are connected to
+// the "programs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithPrograms(opts ...func(*ProgramEntryQuery)) *ChurchQuery {
+	query := (&ProgramEntryClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPrograms = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -621,7 +693,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 	var (
 		nodes       = []*Church{}
 		_spec       = _q.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [10]bool{
 			_q.withParent != nil,
 			_q.withChildren != nil,
 			_q.withUsers != nil,
@@ -630,6 +702,8 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 			_q.withFinances != nil,
 			_q.withInvitations != nil,
 			_q.withAnnouncements != nil,
+			_q.withContacts != nil,
+			_q.withPrograms != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -702,6 +776,20 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 		if err := _q.loadAnnouncements(ctx, query, nodes,
 			func(n *Church) { n.Edges.Announcements = []*Announcement{} },
 			func(n *Church, e *Announcement) { n.Edges.Announcements = append(n.Edges.Announcements, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withContacts; query != nil {
+		if err := _q.loadContacts(ctx, query, nodes,
+			func(n *Church) { n.Edges.Contacts = []*Contact{} },
+			func(n *Church, e *Contact) { n.Edges.Contacts = append(n.Edges.Contacts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPrograms; query != nil {
+		if err := _q.loadPrograms(ctx, query, nodes,
+			func(n *Church) { n.Edges.Programs = []*ProgramEntry{} },
+			func(n *Church, e *ProgramEntry) { n.Edges.Programs = append(n.Edges.Programs, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -948,6 +1036,67 @@ func (_q *ChurchQuery) loadAnnouncements(ctx context.Context, query *Announcemen
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "church_announcements" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadContacts(ctx context.Context, query *ContactQuery, nodes []*Church, init func(*Church), assign func(*Church, *Contact)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(contact.FieldChurchID)
+	}
+	query.Where(predicate.Contact(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.ContactsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadPrograms(ctx context.Context, query *ProgramEntryQuery, nodes []*Church, init func(*Church), assign func(*Church, *ProgramEntry)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ProgramEntry(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.ProgramsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.church_programs
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "church_programs" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_programs" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

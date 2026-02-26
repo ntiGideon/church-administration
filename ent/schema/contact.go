@@ -63,6 +63,9 @@ func (Contact) Fields() []ent.Field {
 		field.Bool("has_spouse").Default(false),
 		field.Int("spouse_id").Optional(),
 
+		// Church membership (for congregation members without a system account)
+		field.Int("church_id").Optional(),
+
 		// Baptism
 		field.Bool("is_baptized").Default(false),
 		field.String("baptized_by").Optional(),
@@ -78,6 +81,11 @@ func (Contact) Fields() []ent.Field {
 func (Contact) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user", User.Type).
+			Unique(),
+
+		edge.From("church", Church.Type).
+			Ref("contacts").
+			Field("church_id").
 			Unique(),
 
 		// Self-referential spouse relationship.

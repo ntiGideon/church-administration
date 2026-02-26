@@ -5,13 +5,13 @@
 <div class="page-wrapper">
     <div class="page-header-bar">
         <div>
-            <h1 class="page-title-text"><i class="fas fa-users mr-2 has-text-primary"></i>Members</h1>
-            <p class="page-subtitle-text">Manage your congregation and staff</p>
+            <h1 class="page-title-text"><i class="fas fa-users mr-2 has-text-primary"></i>Congregation Members</h1>
+            <p class="page-subtitle-text">View and manage your church congregation records</p>
         </div>
         <div class="header-actions">
             <a href="/members/new" class="button is-primary">
                 <span class="icon"><i class="fas fa-user-plus"></i></span>
-                <span>Invite Member</span>
+                <span>Add Member</span>
             </a>
         </div>
     </div>
@@ -23,17 +23,11 @@
     </div>
     {{end}}
 
-    <!-- Search & Filter Bar -->
+    <!-- Search Bar -->
     <div class="filter-bar">
         <div class="search-box">
             <span class="search-icon"><i class="fas fa-search"></i></span>
-            <input type="text" id="memberSearch" placeholder="Search members by name, email or role..." class="search-input-field">
-        </div>
-        <div class="filter-pills">
-            <button class="filter-pill active" data-filter="all">All</button>
-            <button class="filter-pill" data-filter="pastor">Pastors</button>
-            <button class="filter-pill" data-filter="branch_admin">Admins</button>
-            <button class="filter-pill" data-filter="member">Members</button>
+            <input type="text" id="memberSearch" placeholder="Search by name, phone or email..." class="search-input-field">
         </div>
     </div>
 
@@ -42,29 +36,22 @@
     <!-- Members Grid -->
     <div class="members-grid" id="membersGrid">
         {{range $members}}
-        <a href="/members/{{.ID}}" class="member-card" data-role="{{.Role}}">
+        <a href="/members/{{.ID}}" class="member-card">
             <div class="member-avatar">
-                {{if .Edges.Contact}}
-                    {{if .Edges.Contact.ProfilePictureURL}}
-                    <img src="{{.Edges.Contact.ProfilePictureURL}}" alt="Profile">
-                    {{else}}
-                    <div class="avatar-initials">
-                        {{slice .Edges.Contact.FirstName 0 1}}{{slice .Edges.Contact.LastName 0 1}}
-                    </div>
-                    {{end}}
+                {{if .ProfilePictureURL}}
+                <img src="{{.ProfilePictureURL}}" alt="Profile">
                 {{else}}
-                <div class="avatar-initials">?</div>
+                <div class="avatar-initials">
+                    {{slice .FirstName 0 1}}{{slice .LastName 0 1}}
+                </div>
                 {{end}}
-                <div class="member-status {{if .IsActive}}active{{else}}inactive{{end}}"></div>
             </div>
             <div class="member-info">
-                {{if .Edges.Contact}}
-                <div class="member-name">{{.Edges.Contact.FirstName}} {{.Edges.Contact.LastName}}</div>
-                <div class="member-email">{{.Edges.Contact.Email}}</div>
-                {{else}}
-                <div class="member-name">{{.Email}}</div>
-                {{end}}
-                <div class="member-role-badge role-{{.Role}}">{{.Role}}</div>
+                <div class="member-name">{{.FirstName}} {{.LastName}}</div>
+                {{if .Phone}}<div class="member-sub">{{.Phone}}</div>
+                {{else if .Email}}<div class="member-sub">{{.Email}}</div>
+                {{else}}<div class="member-sub">No contact info</div>{{end}}
+                {{if .MembershipYear}}<div class="member-badge">Since {{.MembershipYear}}</div>{{end}}
             </div>
             <div class="member-arrow"><i class="fas fa-chevron-right"></i></div>
         </a>
@@ -72,16 +59,16 @@
     </div>
 
     <div class="table-summary">
-        Showing <strong>{{len $members}}</strong> member(s)
+        Showing <strong>{{len $members}}</strong> congregation member(s)
     </div>
     {{else}}
     <div class="empty-page-state">
         <div class="empty-icon"><i class="fas fa-users"></i></div>
-        <h3>No members yet</h3>
-        <p>Start building your congregation by inviting members and staff.</p>
+        <h3>No congregation records yet</h3>
+        <p>Start adding congregation members to build your church directory.</p>
         <a href="/members/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-user-plus"></i></span>
-            <span>Invite First Member</span>
+            <span>Add First Member</span>
         </a>
     </div>
     {{end}}
@@ -111,7 +98,6 @@
     border-radius: 12px;
     border: 1px solid var(--light-gray);
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
 }
 
 .search-box { position: relative; flex: 1; min-width: 200px; }
@@ -126,24 +112,6 @@
     transition: border 0.2s;
 }
 .search-input-field:focus { border-color: var(--primary); }
-
-.filter-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.filter-pill {
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    border: 1.5px solid var(--light-gray);
-    background: none;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text-dark);
-    font-weight: 500;
-}
-.filter-pill.active, .filter-pill:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-}
 
 /* Members Grid */
 .members-grid {
@@ -190,38 +158,18 @@
     text-transform: uppercase;
 }
 
-.member-status {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid white;
-}
-.member-status.active { background: #28A745; }
-.member-status.inactive { background: #DC3545; }
-
 .member-info { flex: 1; min-width: 0; }
 .member-name { font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
-.member-email { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 6px; }
-
-.member-role-badge {
+.member-sub { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 4px; }
+.member-badge {
     display: inline-block;
     font-size: 0.7rem;
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 12px;
-    text-transform: capitalize;
+    background: rgba(80,34,45,0.08);
+    color: var(--primary);
 }
-
-.role-super_admin { background: rgba(80,34,45,0.1); color: var(--primary); }
-.role-branch_admin { background: rgba(158,143,181,0.15); color: var(--support-purple); }
-.role-pastor { background: rgba(122,140,163,0.15); color: var(--support-blue); }
-.role-secretary { background: rgba(212,165,165,0.15); color: #8B4A4A; }
-.role-records_keeper { background: rgba(255,193,7,0.15); color: #856404; }
-.role-finance_officer { background: rgba(40,167,69,0.1); color: #28A745; }
-.role-member { background: rgba(108,117,125,0.1); color: #6C757D; }
 
 .member-arrow { color: var(--text-light); font-size: 0.8rem; }
 
@@ -249,36 +197,15 @@
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('memberSearch');
     const cards = document.querySelectorAll('.member-card');
-    const pills = document.querySelectorAll('.filter-pill');
-
-    let currentFilter = 'all';
-    let currentSearch = '';
-
-    function filterMembers() {
-        cards.forEach(function (card) {
-            const role = card.dataset.role || '';
-            const text = card.textContent.toLowerCase();
-            const matchesFilter = currentFilter === 'all' || role.includes(currentFilter);
-            const matchesSearch = currentSearch === '' || text.includes(currentSearch);
-            card.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
-        });
-    }
 
     if (searchInput) {
         searchInput.addEventListener('input', function () {
-            currentSearch = this.value.toLowerCase().trim();
-            filterMembers();
+            const q = this.value.toLowerCase().trim();
+            cards.forEach(function (card) {
+                card.style.display = q === '' || card.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
         });
     }
-
-    pills.forEach(function (pill) {
-        pill.addEventListener('click', function () {
-            pills.forEach(function (p) { p.classList.remove('active'); });
-            this.classList.add('active');
-            currentFilter = this.dataset.filter;
-            filterMembers();
-        });
-    });
 
     document.querySelectorAll('.notification .delete').forEach(function (btn) {
         btn.addEventListener('click', function () { this.closest('.notification').remove(); });
