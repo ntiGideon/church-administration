@@ -1,0 +1,369 @@
+{{define "title"}}Member Giving | FaithConnect{{end}}
+{{define "description"}}Giving history and pledges for a congregation member{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    {{$member  := index .Data "member"}}
+    {{$records := index .Data "givingRecords"}}
+    {{$pledges := index .Data "pledges"}}
+    {{$summary := index .Data "summary"}}
+
+    <!-- Header -->
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/members">Members</a> <i class="fas fa-chevron-right"></i>
+                <a href="/members/{{$member.ID}}">{{$member.FirstName}} {{$member.LastName}}</a> <i class="fas fa-chevron-right"></i>
+                <span>Giving</span>
+            </nav>
+            <h1 class="page-title-text">Giving Record</h1>
+            <p class="page-subtitle">{{$member.FirstName}} {{$member.LastName}}</p>
+        </div>
+        <div class="header-actions">
+            <a href="/giving/new?contact_id={{$member.ID}}" class="button is-primary">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                <span>Record Giving</span>
+            </a>
+            <a href="/members/{{$member.ID}}" class="button is-light">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Back to Profile</span>
+            </a>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button>{{.FlashError}}
+    </div>
+    {{end}}
+
+    <!-- Summary Cards -->
+    <div class="giving-stats">
+        <div class="gstat-card">
+            <div class="gstat-icon"><i class="fas fa-coins"></i></div>
+            <div class="gstat-body">
+                <div class="gstat-label">Total Given</div>
+                <div class="gstat-val">GH₵ {{formatMoney $summary.Total}}</div>
+            </div>
+        </div>
+        <div class="gstat-card">
+            <div class="gstat-icon year"><i class="fas fa-calendar-alt"></i></div>
+            <div class="gstat-body">
+                <div class="gstat-label">This Year</div>
+                <div class="gstat-val">GH₵ {{formatMoney $summary.ThisYear}}</div>
+            </div>
+        </div>
+        <div class="gstat-card">
+            <div class="gstat-icon month"><i class="fas fa-calendar-day"></i></div>
+            <div class="gstat-body">
+                <div class="gstat-label">This Month</div>
+                <div class="gstat-val">GH₵ {{formatMoney $summary.ThisMonth}}</div>
+            </div>
+        </div>
+        <div class="gstat-card">
+            <div class="gstat-icon pledge"><i class="fas fa-handshake"></i></div>
+            <div class="gstat-body">
+                <div class="gstat-label">Active Pledges</div>
+                <div class="gstat-val">{{len $pledges}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="giving-layout">
+        <!-- ── Left: Giving History + Pledges ──────────────── -->
+        <div class="giving-main">
+
+            <!-- Pledges Panel -->
+            <div class="giving-panel mb-4">
+                <div class="giving-panel-header">
+                    <div class="giving-panel-title">
+                        <i class="fas fa-handshake"></i> Pledges
+                        {{if $pledges}}<span class="count-badge">{{len $pledges}}</span>{{end}}
+                    </div>
+                </div>
+
+                {{if $pledges}}
+                <div class="pledge-list">
+                    {{range $pledges}}
+                    <div class="pledge-row">
+                        <div class="pledge-info">
+                            <div class="pledge-name">{{.Title}}</div>
+                            <div class="pledge-meta">
+                                <span><i class="fas fa-tag"></i> {{.Category}}</span>
+                                <span><i class="fas fa-sync-alt"></i> {{.Frequency}}</span>
+                                <span><i class="fas fa-calendar-check"></i> From {{.StartDate.Format "Jan 2, 2006"}}{{if .EndDate}} to {{.EndDate}}{{end}}</span>
+                            </div>
+                        </div>
+                        <div class="pledge-progress-wrap">
+                            <div class="pledge-amounts">
+                                <span class="pledge-fulfilled">GH₵ {{formatMoney .Fulfilled}}</span>
+                                <span class="pledge-target">/ GH₵ {{formatMoney .Amount}}</span>
+                            </div>
+                            <div class="pledge-bar-track">
+                                <div class="pledge-bar-fill {{if ge .Percent 100}}complete{{else if ge .Percent 50}}halfway{{end}}"
+                                     style="width: {{.Percent}}%"></div>
+                            </div>
+                            <div class="pledge-pct">{{.Percent}}% fulfilled</div>
+                        </div>
+                        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+                        {{$role := $.LoggedInUser.Role.String}}
+                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                        <form action="/members/{{$member.ID}}/pledges/{{.ID}}/delete" method="POST"
+                              onsubmit="return confirm('Delete this pledge?')">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <button type="submit" class="button is-light is-small pledge-del">
+                                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                            </button>
+                        </form>
+                        {{end}}{{end}}{{end}}
+                    </div>
+                    {{end}}
+                </div>
+                {{else}}
+                <div class="panel-empty">
+                    <i class="fas fa-handshake"></i>
+                    <p>No pledges recorded.</p>
+                </div>
+                {{end}}
+            </div>
+
+            <!-- Giving History -->
+            <div class="giving-panel">
+                <div class="giving-panel-header">
+                    <div class="giving-panel-title">
+                        <i class="fas fa-history"></i> Giving History
+                        {{if $records}}<span class="count-badge">{{len $records}}</span>{{end}}
+                    </div>
+                </div>
+
+                {{if $records}}
+                <div class="history-table-wrap">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $records}}
+                            <tr>
+                                <td class="date-cell">{{.TransactionDate.Format "Jan 2, 2006"}}</td>
+                                <td>{{.Description}}</td>
+                                <td><span class="tx-badge tx-{{.TransactionType}}">{{.TransactionType}}</span></td>
+                                <td class="cat-cell">{{.Category}}</td>
+                                <td class="amount-cell">GH₵ {{formatMoney .Amount}}</td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+                {{else}}
+                <div class="panel-empty">
+                    <i class="fas fa-receipt"></i>
+                    <p>No giving records found.</p>
+                    <p class="empty-hint">Record a transaction and link it to this member.</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <!-- ── Sidebar: Add Pledge ──────────────────────────── -->
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <div class="giving-sidebar">
+            <div class="pledge-form-card">
+                <h4><i class="fas fa-plus-circle"></i> Add Pledge</h4>
+                <form action="/members/{{$member.ID}}/pledges/new" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+
+                    <div class="field">
+                        <label class="label is-small">Title <span class="req">*</span></label>
+                        <div class="control">
+                            <input class="input is-small" type="text" name="title"
+                                   placeholder="e.g. Building Fund Pledge">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">Category</label>
+                        <div class="control">
+                            <div class="select is-fullwidth is-small">
+                                <select name="category">
+                                    <option value="General Fund">General Fund</option>
+                                    <option value="Building Fund">Building Fund</option>
+                                    <option value="Missions">Missions</option>
+                                    <option value="Youth Ministry">Youth Ministry</option>
+                                    <option value="Welfare">Welfare</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">Total Amount (GH₵) <span class="req">*</span></label>
+                        <div class="control">
+                            <input class="input is-small" type="number" name="amount"
+                                   step="0.01" min="1" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">Frequency</label>
+                        <div class="control">
+                            <div class="select is-fullwidth is-small">
+                                <select name="frequency">
+                                    <option value="one_time">One Time</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">Start Date <span class="req">*</span></label>
+                        <div class="control">
+                            <input class="input is-small" type="date" name="start_date">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">End Date <span class="has-text-grey">(optional)</span></label>
+                        <div class="control">
+                            <input class="input is-small" type="date" name="end_date">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">Notes</label>
+                        <div class="control">
+                            <textarea class="textarea is-small" name="notes" rows="2"
+                                      placeholder="Optional notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="button is-primary is-fullwidth is-small mt-3">
+                        <span class="icon is-small"><i class="fas fa-save"></i></span>
+                        <span>Save Pledge</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {{end}}{{end}}{{end}}
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+.header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.mb-4 { margin-bottom: 1.25rem; }
+.mt-3 { margin-top: 0.75rem; }
+.req { color: #e74c3c; }
+
+/* Summary cards */
+.giving-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.gstat-card { background: white; border-radius: 12px; border: 1px solid var(--light-gray); padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+.gstat-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(80,34,45,0.08); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.gstat-icon.year { background: rgba(52,152,219,0.1); color: #3498db; }
+.gstat-icon.month { background: rgba(40,167,69,0.1); color: #28a745; }
+.gstat-icon.pledge { background: rgba(241,196,15,0.15); color: #e67e22; }
+.gstat-label { font-size: 0.75rem; color: var(--text-light); font-weight: 500; }
+.gstat-val { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); }
+
+/* Layout */
+.giving-layout { display: flex; gap: 1.5rem; align-items: flex-start; }
+.giving-main { flex: 1; min-width: 0; }
+.giving-sidebar { width: 280px; flex-shrink: 0; }
+
+/* Panels */
+.giving-panel { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; }
+.giving-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--light-gray); background: #FAFAFA; }
+.giving-panel-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+.giving-panel-title i { color: var(--primary); }
+.count-badge { background: var(--primary); color: white; font-size: 0.7rem; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+
+/* Pledges */
+.pledge-list { }
+.pledge-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--light-gray); transition: background 0.15s; flex-wrap: wrap; }
+.pledge-row:last-child { border-bottom: none; }
+.pledge-row:hover { background: #FAFAFA; }
+.pledge-info { flex: 1; min-width: 180px; }
+.pledge-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+.pledge-meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 4px; }
+.pledge-meta span { font-size: 0.75rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+.pledge-progress-wrap { min-width: 160px; }
+.pledge-amounts { display: flex; align-items: baseline; gap: 4px; margin-bottom: 5px; }
+.pledge-fulfilled { font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
+.pledge-target { font-size: 0.78rem; color: var(--text-light); }
+.pledge-bar-track { height: 6px; background: #E9ECEF; border-radius: 3px; overflow: hidden; }
+.pledge-bar-fill { height: 100%; border-radius: 3px; background: var(--primary); transition: width 0.4s; }
+.pledge-bar-fill.halfway { background: #F39C12; }
+.pledge-bar-fill.complete { background: #28A745; }
+.pledge-pct { font-size: 0.72rem; color: var(--text-light); margin-top: 3px; }
+.pledge-del { border-radius: 8px !important; flex-shrink: 0; }
+
+/* History table */
+.history-table-wrap { overflow-x: auto; }
+.history-table { width: 100%; border-collapse: collapse; }
+.history-table thead tr { border-bottom: 2px solid var(--light-gray); }
+.history-table th { padding: 0.7rem 1.25rem; font-size: 0.75rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
+.history-table tbody tr { border-bottom: 1px solid var(--light-gray); transition: background 0.12s; }
+.history-table tbody tr:last-child { border-bottom: none; }
+.history-table tbody tr:hover { background: #FAFAFA; }
+.history-table td { padding: 0.8rem 1.25rem; font-size: 0.875rem; vertical-align: middle; }
+.date-cell { color: var(--text-light); white-space: nowrap; }
+.cat-cell { color: var(--text-medium); }
+.amount-cell { font-weight: 700; text-align: right; color: var(--text-dark); }
+.text-right { text-align: right; }
+.tx-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: capitalize; white-space: nowrap; }
+.tx-donation { background: rgba(40,167,69,0.1); color: #28A745; }
+.tx-tithe { background: rgba(80,34,45,0.1); color: var(--primary); }
+.tx-offering { background: rgba(122,140,163,0.15); color: var(--support-blue); }
+.tx-expense { background: rgba(220,53,69,0.1); color: #DC3545; }
+.tx-salary { background: rgba(255,193,7,0.15); color: #856404; }
+.tx-other { background: rgba(127,140,141,0.1); color: #636e72; }
+
+/* Sidebar form */
+.pledge-form-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); padding: 1.5rem; }
+.pledge-form-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 7px; }
+.pledge-form-card h4 i { color: var(--primary); }
+.pledge-form-card .field { margin-bottom: 0.75rem; }
+.pledge-form-card .label.is-small { font-size: 0.78rem; margin-bottom: 3px; }
+
+/* Empty states */
+.panel-empty { padding: 2.5rem; text-align: center; color: var(--text-light); }
+.panel-empty i { font-size: 1.8rem; display: block; margin-bottom: 0.6rem; opacity: 0.25; }
+.panel-empty p { font-size: 0.85rem; margin: 0; }
+.empty-hint { font-size: 0.78rem; margin-top: 4px !important; }
+
+@media (max-width: 1000px) { .giving-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) {
+    .giving-layout { flex-direction: column; }
+    .giving-sidebar { width: 100%; }
+    .page-wrapper { padding: 1rem; }
+}
+@media (max-width: 500px) { .giving-stats { grid-template-columns: 1fr 1fr; } }
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

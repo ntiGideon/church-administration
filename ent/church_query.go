@@ -16,31 +16,45 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
+	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/roster"
+	"github.com/ntiGideon/ent/sermon"
 	"github.com/ntiGideon/ent/user"
+	"github.com/ntiGideon/ent/visitor"
 )
 
 // ChurchQuery is the builder for querying Church entities.
 type ChurchQuery struct {
 	config
-	ctx               *QueryContext
-	order             []church.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Church
-	withParent        *ChurchQuery
-	withChildren      *ChurchQuery
-	withUsers         *UserQuery
-	withDepartments   *DepartmentQuery
-	withEvents        *EventQuery
-	withFinances      *FinanceQuery
-	withInvitations   *InvitationQuery
-	withAnnouncements *AnnouncementQuery
-	withContacts      *ContactQuery
-	withPrograms      *ProgramEntryQuery
+	ctx                *QueryContext
+	order              []church.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Church
+	withParent         *ChurchQuery
+	withChildren       *ChurchQuery
+	withUsers          *UserQuery
+	withDepartments    *DepartmentQuery
+	withEvents         *EventQuery
+	withFinances       *FinanceQuery
+	withInvitations    *InvitationQuery
+	withAnnouncements  *AnnouncementQuery
+	withContacts       *ContactQuery
+	withPrograms       *ProgramEntryQuery
+	withGroups         *GroupQuery
+	withPledges        *PledgeQuery
+	withRosters        *RosterQuery
+	withSermons        *SermonQuery
+	withVisitors       *VisitorQuery
+	withPrayerRequests *PrayerRequestQuery
+	withDocuments      *DocumentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -297,6 +311,160 @@ func (_q *ChurchQuery) QueryPrograms() *ProgramEntryQuery {
 	return query
 }
 
+// QueryGroups chains the current query on the "groups" edge.
+func (_q *ChurchQuery) QueryGroups() *GroupQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(group.Table, group.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.GroupsTable, church.GroupsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPledges chains the current query on the "pledges" edge.
+func (_q *ChurchQuery) QueryPledges() *PledgeQuery {
+	query := (&PledgeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(pledge.Table, pledge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.PledgesTable, church.PledgesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRosters chains the current query on the "rosters" edge.
+func (_q *ChurchQuery) QueryRosters() *RosterQuery {
+	query := (&RosterClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(roster.Table, roster.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.RostersTable, church.RostersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySermons chains the current query on the "sermons" edge.
+func (_q *ChurchQuery) QuerySermons() *SermonQuery {
+	query := (&SermonClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(sermon.Table, sermon.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.SermonsTable, church.SermonsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVisitors chains the current query on the "visitors" edge.
+func (_q *ChurchQuery) QueryVisitors() *VisitorQuery {
+	query := (&VisitorClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(visitor.Table, visitor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.VisitorsTable, church.VisitorsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPrayerRequests chains the current query on the "prayer_requests" edge.
+func (_q *ChurchQuery) QueryPrayerRequests() *PrayerRequestQuery {
+	query := (&PrayerRequestClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(prayerrequest.Table, prayerrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.PrayerRequestsTable, church.PrayerRequestsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDocuments chains the current query on the "documents" edge.
+func (_q *ChurchQuery) QueryDocuments() *DocumentQuery {
+	query := (&DocumentClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(document.Table, document.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.DocumentsTable, church.DocumentsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Church entity from the query.
 // Returns a *NotFoundError when no Church was found.
 func (_q *ChurchQuery) First(ctx context.Context) (*Church, error) {
@@ -484,21 +652,28 @@ func (_q *ChurchQuery) Clone() *ChurchQuery {
 		return nil
 	}
 	return &ChurchQuery{
-		config:            _q.config,
-		ctx:               _q.ctx.Clone(),
-		order:             append([]church.OrderOption{}, _q.order...),
-		inters:            append([]Interceptor{}, _q.inters...),
-		predicates:        append([]predicate.Church{}, _q.predicates...),
-		withParent:        _q.withParent.Clone(),
-		withChildren:      _q.withChildren.Clone(),
-		withUsers:         _q.withUsers.Clone(),
-		withDepartments:   _q.withDepartments.Clone(),
-		withEvents:        _q.withEvents.Clone(),
-		withFinances:      _q.withFinances.Clone(),
-		withInvitations:   _q.withInvitations.Clone(),
-		withAnnouncements: _q.withAnnouncements.Clone(),
-		withContacts:      _q.withContacts.Clone(),
-		withPrograms:      _q.withPrograms.Clone(),
+		config:             _q.config,
+		ctx:                _q.ctx.Clone(),
+		order:              append([]church.OrderOption{}, _q.order...),
+		inters:             append([]Interceptor{}, _q.inters...),
+		predicates:         append([]predicate.Church{}, _q.predicates...),
+		withParent:         _q.withParent.Clone(),
+		withChildren:       _q.withChildren.Clone(),
+		withUsers:          _q.withUsers.Clone(),
+		withDepartments:    _q.withDepartments.Clone(),
+		withEvents:         _q.withEvents.Clone(),
+		withFinances:       _q.withFinances.Clone(),
+		withInvitations:    _q.withInvitations.Clone(),
+		withAnnouncements:  _q.withAnnouncements.Clone(),
+		withContacts:       _q.withContacts.Clone(),
+		withPrograms:       _q.withPrograms.Clone(),
+		withGroups:         _q.withGroups.Clone(),
+		withPledges:        _q.withPledges.Clone(),
+		withRosters:        _q.withRosters.Clone(),
+		withSermons:        _q.withSermons.Clone(),
+		withVisitors:       _q.withVisitors.Clone(),
+		withPrayerRequests: _q.withPrayerRequests.Clone(),
+		withDocuments:      _q.withDocuments.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -615,6 +790,83 @@ func (_q *ChurchQuery) WithPrograms(opts ...func(*ProgramEntryQuery)) *ChurchQue
 	return _q
 }
 
+// WithGroups tells the query-builder to eager-load the nodes that are connected to
+// the "groups" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithGroups(opts ...func(*GroupQuery)) *ChurchQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGroups = query
+	return _q
+}
+
+// WithPledges tells the query-builder to eager-load the nodes that are connected to
+// the "pledges" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithPledges(opts ...func(*PledgeQuery)) *ChurchQuery {
+	query := (&PledgeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPledges = query
+	return _q
+}
+
+// WithRosters tells the query-builder to eager-load the nodes that are connected to
+// the "rosters" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithRosters(opts ...func(*RosterQuery)) *ChurchQuery {
+	query := (&RosterClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRosters = query
+	return _q
+}
+
+// WithSermons tells the query-builder to eager-load the nodes that are connected to
+// the "sermons" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithSermons(opts ...func(*SermonQuery)) *ChurchQuery {
+	query := (&SermonClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSermons = query
+	return _q
+}
+
+// WithVisitors tells the query-builder to eager-load the nodes that are connected to
+// the "visitors" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithVisitors(opts ...func(*VisitorQuery)) *ChurchQuery {
+	query := (&VisitorClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withVisitors = query
+	return _q
+}
+
+// WithPrayerRequests tells the query-builder to eager-load the nodes that are connected to
+// the "prayer_requests" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithPrayerRequests(opts ...func(*PrayerRequestQuery)) *ChurchQuery {
+	query := (&PrayerRequestClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPrayerRequests = query
+	return _q
+}
+
+// WithDocuments tells the query-builder to eager-load the nodes that are connected to
+// the "documents" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithDocuments(opts ...func(*DocumentQuery)) *ChurchQuery {
+	query := (&DocumentClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDocuments = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -693,7 +945,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 	var (
 		nodes       = []*Church{}
 		_spec       = _q.querySpec()
-		loadedTypes = [10]bool{
+		loadedTypes = [17]bool{
 			_q.withParent != nil,
 			_q.withChildren != nil,
 			_q.withUsers != nil,
@@ -704,6 +956,13 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 			_q.withAnnouncements != nil,
 			_q.withContacts != nil,
 			_q.withPrograms != nil,
+			_q.withGroups != nil,
+			_q.withPledges != nil,
+			_q.withRosters != nil,
+			_q.withSermons != nil,
+			_q.withVisitors != nil,
+			_q.withPrayerRequests != nil,
+			_q.withDocuments != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -790,6 +1049,55 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 		if err := _q.loadPrograms(ctx, query, nodes,
 			func(n *Church) { n.Edges.Programs = []*ProgramEntry{} },
 			func(n *Church, e *ProgramEntry) { n.Edges.Programs = append(n.Edges.Programs, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withGroups; query != nil {
+		if err := _q.loadGroups(ctx, query, nodes,
+			func(n *Church) { n.Edges.Groups = []*Group{} },
+			func(n *Church, e *Group) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPledges; query != nil {
+		if err := _q.loadPledges(ctx, query, nodes,
+			func(n *Church) { n.Edges.Pledges = []*Pledge{} },
+			func(n *Church, e *Pledge) { n.Edges.Pledges = append(n.Edges.Pledges, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRosters; query != nil {
+		if err := _q.loadRosters(ctx, query, nodes,
+			func(n *Church) { n.Edges.Rosters = []*Roster{} },
+			func(n *Church, e *Roster) { n.Edges.Rosters = append(n.Edges.Rosters, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSermons; query != nil {
+		if err := _q.loadSermons(ctx, query, nodes,
+			func(n *Church) { n.Edges.Sermons = []*Sermon{} },
+			func(n *Church, e *Sermon) { n.Edges.Sermons = append(n.Edges.Sermons, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withVisitors; query != nil {
+		if err := _q.loadVisitors(ctx, query, nodes,
+			func(n *Church) { n.Edges.Visitors = []*Visitor{} },
+			func(n *Church, e *Visitor) { n.Edges.Visitors = append(n.Edges.Visitors, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPrayerRequests; query != nil {
+		if err := _q.loadPrayerRequests(ctx, query, nodes,
+			func(n *Church) { n.Edges.PrayerRequests = []*PrayerRequest{} },
+			func(n *Church, e *PrayerRequest) { n.Edges.PrayerRequests = append(n.Edges.PrayerRequests, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDocuments; query != nil {
+		if err := _q.loadDocuments(ctx, query, nodes,
+			func(n *Church) { n.Edges.Documents = []*Document{} },
+			func(n *Church, e *Document) { n.Edges.Documents = append(n.Edges.Documents, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1097,6 +1405,216 @@ func (_q *ChurchQuery) loadPrograms(ctx context.Context, query *ProgramEntryQuer
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "church_programs" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadGroups(ctx context.Context, query *GroupQuery, nodes []*Church, init func(*Church), assign func(*Church, *Group)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(group.FieldChurchID)
+	}
+	query.Where(predicate.Group(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.GroupsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadPledges(ctx context.Context, query *PledgeQuery, nodes []*Church, init func(*Church), assign func(*Church, *Pledge)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(pledge.FieldChurchID)
+	}
+	query.Where(predicate.Pledge(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.PledgesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadRosters(ctx context.Context, query *RosterQuery, nodes []*Church, init func(*Church), assign func(*Church, *Roster)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(roster.FieldChurchID)
+	}
+	query.Where(predicate.Roster(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.RostersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadSermons(ctx context.Context, query *SermonQuery, nodes []*Church, init func(*Church), assign func(*Church, *Sermon)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(sermon.FieldChurchID)
+	}
+	query.Where(predicate.Sermon(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.SermonsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadVisitors(ctx context.Context, query *VisitorQuery, nodes []*Church, init func(*Church), assign func(*Church, *Visitor)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(visitor.FieldChurchID)
+	}
+	query.Where(predicate.Visitor(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.VisitorsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadPrayerRequests(ctx context.Context, query *PrayerRequestQuery, nodes []*Church, init func(*Church), assign func(*Church, *PrayerRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(prayerrequest.FieldChurchID)
+	}
+	query.Where(predicate.PrayerRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.PrayerRequestsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadDocuments(ctx context.Context, query *DocumentQuery, nodes []*Church, init func(*Church), assign func(*Church, *Document)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(document.FieldChurchID)
+	}
+	query.Where(predicate.Document(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.DocumentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

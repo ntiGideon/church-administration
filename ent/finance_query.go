@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -26,6 +27,7 @@ type FinanceQuery struct {
 	predicates     []predicate.Finance
 	withRecordedBy *UserQuery
 	withChurch     *ChurchQuery
+	withDonor      *ContactQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -100,6 +102,28 @@ func (_q *FinanceQuery) QueryChurch() *ChurchQuery {
 			sqlgraph.From(finance.Table, finance.FieldID, selector),
 			sqlgraph.To(church.Table, church.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, finance.ChurchTable, finance.ChurchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDonor chains the current query on the "donor" edge.
+func (_q *FinanceQuery) QueryDonor() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(finance.Table, finance.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, finance.DonorTable, finance.DonorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -301,6 +325,7 @@ func (_q *FinanceQuery) Clone() *FinanceQuery {
 		predicates:     append([]predicate.Finance{}, _q.predicates...),
 		withRecordedBy: _q.withRecordedBy.Clone(),
 		withChurch:     _q.withChurch.Clone(),
+		withDonor:      _q.withDonor.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -326,6 +351,17 @@ func (_q *FinanceQuery) WithChurch(opts ...func(*ChurchQuery)) *FinanceQuery {
 		opt(query)
 	}
 	_q.withChurch = query
+	return _q
+}
+
+// WithDonor tells the query-builder to eager-load the nodes that are connected to
+// the "donor" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *FinanceQuery) WithDonor(opts ...func(*ContactQuery)) *FinanceQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDonor = query
 	return _q
 }
 
@@ -408,9 +444,10 @@ func (_q *FinanceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Fina
 		nodes       = []*Finance{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withRecordedBy != nil,
 			_q.withChurch != nil,
+			_q.withDonor != nil,
 		}
 	)
 	if _q.withRecordedBy != nil || _q.withChurch != nil {
@@ -446,6 +483,12 @@ func (_q *FinanceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Fina
 	if query := _q.withChurch; query != nil {
 		if err := _q.loadChurch(ctx, query, nodes, nil,
 			func(n *Finance, e *Church) { n.Edges.Church = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withDonor; query != nil {
+		if err := _q.loadDonor(ctx, query, nodes, nil,
+			func(n *Finance, e *Contact) { n.Edges.Donor = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -516,6 +559,35 @@ func (_q *FinanceQuery) loadChurch(ctx context.Context, query *ChurchQuery, node
 	}
 	return nil
 }
+func (_q *FinanceQuery) loadDonor(ctx context.Context, query *ContactQuery, nodes []*Finance, init func(*Finance), assign func(*Finance, *Contact)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Finance)
+	for i := range nodes {
+		fk := nodes[i].ContactID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(contact.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "contact_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *FinanceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -541,6 +613,9 @@ func (_q *FinanceQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != finance.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withDonor != nil {
+			_spec.Node.AddColumnOnce(finance.FieldContactID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

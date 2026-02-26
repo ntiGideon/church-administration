@@ -97,5 +97,15 @@ func (Contact) Edges() []ent.Edge {
 		edge.From("spouse_of_contact", Contact.Type).
 			Ref("spouse_contact").
 			Unique(),
+		edge.To("attendances", Attendance.Type),
+		edge.From("groups", Group.Type).
+			Ref("members"),
+		edge.From("leading_groups", Group.Type).
+			Ref("leader"),
+		edge.From("giving_records", Finance.Type).
+			Ref("donor"),
+		edge.To("pledges", Pledge.Type),
+		edge.To("roster_entries", RosterEntry.Type),
+		edge.To("prayer_requests", PrayerRequest.Type),
 	}
 }

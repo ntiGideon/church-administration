@@ -1,0 +1,294 @@
+{{define "title"}}Upload Document | FaithConnect{{end}}
+{{define "description"}}Upload a document to the church library{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <a href="/documents" class="back-link"><i class="fas fa-arrow-left"></i> Document Library</a>
+            <h1 class="page-title-text">Upload Document</h1>
+            <p class="page-subtitle">Add a file to the church document library</p>
+        </div>
+    </div>
+
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{$form := index .Data "form"}}
+
+    <div class="form-card">
+        <form action="/documents/upload" method="POST" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+
+            <!-- Title -->
+            <div class="field-group">
+                <label class="field-label" for="title">Document Title <span class="req">*</span></label>
+                {{if $form}}{{with $form.FieldErrors.title}}
+                <p class="field-error">{{.}}</p>
+                {{end}}{{end}}
+                <input
+                    class="field-input {{if $form}}{{with $form.FieldErrors.title}}is-danger{{end}}{{end}}"
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="e.g. January 2025 Meeting Minutes"
+                    value="{{if $form}}{{$form.Title}}{{end}}"
+                    autofocus
+                >
+            </div>
+
+            <!-- Description -->
+            <div class="field-group">
+                <label class="field-label" for="description">Description <span class="opt">(optional)</span></label>
+                <textarea
+                    class="field-input field-textarea"
+                    id="description"
+                    name="description"
+                    rows="3"
+                    placeholder="Brief description of the document…"
+                >{{if $form}}{{$form.Description}}{{end}}</textarea>
+            </div>
+
+            <!-- Category -->
+            <div class="field-group">
+                <label class="field-label">Category <span class="req">*</span></label>
+                {{if $form}}{{with $form.FieldErrors.category}}
+                <p class="field-error">{{.}}</p>
+                {{end}}{{end}}
+                <div class="cat-picker">
+                    {{$cur := ""}}{{if $form}}{{$cur = $form.Category}}{{end}}
+                    <label class="cat-opt {{if eq $cur "minutes"}}selected{{end}}">
+                        <input type="radio" name="category" value="minutes" {{if eq $cur "minutes"}}checked{{end}}>
+                        <i class="fas fa-file-alt"></i> Minutes
+                    </label>
+                    <label class="cat-opt {{if eq $cur "bulletin"}}selected{{end}}">
+                        <input type="radio" name="category" value="bulletin" {{if eq $cur "bulletin"}}checked{{end}}>
+                        <i class="fas fa-newspaper"></i> Bulletin
+                    </label>
+                    <label class="cat-opt {{if eq $cur "constitution"}}selected{{end}}">
+                        <input type="radio" name="category" value="constitution" {{if eq $cur "constitution"}}checked{{end}}>
+                        <i class="fas fa-scroll"></i> Constitution
+                    </label>
+                    <label class="cat-opt {{if eq $cur "form"}}selected{{end}}">
+                        <input type="radio" name="category" value="form" {{if eq $cur "form"}}checked{{end}}>
+                        <i class="fas fa-file-signature"></i> Form
+                    </label>
+                    <label class="cat-opt {{if eq $cur "report"}}selected{{end}}">
+                        <input type="radio" name="category" value="report" {{if eq $cur "report"}}checked{{end}}>
+                        <i class="fas fa-chart-bar"></i> Report
+                    </label>
+                    <label class="cat-opt {{if eq $cur "financial"}}selected{{end}}">
+                        <input type="radio" name="category" value="financial" {{if eq $cur "financial"}}checked{{end}}>
+                        <i class="fas fa-file-invoice-dollar"></i> Financial
+                    </label>
+                    <label class="cat-opt {{if eq $cur "other"}}selected{{end}}">
+                        <input type="radio" name="category" value="other" {{if eq $cur "other"}}checked{{end}}>
+                        <i class="fas fa-file"></i> Other
+                    </label>
+                </div>
+            </div>
+
+            <!-- File -->
+            <div class="field-group">
+                <label class="field-label">File <span class="req">*</span></label>
+                {{if $form}}{{with $form.FieldErrors.file}}
+                <p class="field-error">{{.}}</p>
+                {{end}}{{end}}
+                <label class="file-drop" id="fileDrop">
+                    <input type="file" id="documentFile" name="document_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.odt,.ods">
+                    <div class="fd-inner" id="fdInner">
+                        <i class="fas fa-cloud-upload-alt fd-icon"></i>
+                        <p class="fd-main">Click to choose a file <span class="fd-or">or drag &amp; drop</span></p>
+                        <p class="fd-hint">PDF, Word, Excel, PowerPoint, text — up to 20 MB</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Visibility -->
+            <div class="field-group">
+                <label class="field-label">Visibility</label>
+                <div class="toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="is_public" id="isPublic" value="true"
+                            {{if $form}}{{if $form.IsPublic}}checked{{end}}{{else}}checked{{end}}>
+                        <span class="toggle-track"></span>
+                    </label>
+                    <div class="toggle-info">
+                        <span class="toggle-label" id="visLabel">Public — visible to all staff</span>
+                        <span class="toggle-sub">Private documents are only visible to admins</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <a href="/documents" class="button is-light">Cancel</a>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-upload"></i></span>
+                    <span>Upload Document</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { margin-bottom: 1.75rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-light); text-decoration: none; margin-bottom: 6px; }
+.back-link:hover { color: var(--primary); }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.form-card {
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.field-group { margin-bottom: 1.5rem; }
+.field-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+.req { color: #EF4444; }
+.opt { font-weight: 400; color: var(--text-light); font-size: 0.8rem; }
+.field-error { font-size: 0.78rem; color: #EF4444; margin-bottom: 5px; }
+
+.field-input {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid var(--light-gray);
+    border-radius: 9px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.field-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(80,34,45,0.1); }
+.field-input.is-danger { border-color: #EF4444; }
+.field-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+/* Category picker */
+.cat-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-opt {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 20px;
+    border: 1px solid var(--light-gray);
+    font-size: 0.82rem; font-weight: 500;
+    color: var(--text-medium); cursor: pointer;
+    transition: all 0.15s;
+}
+.cat-opt input[type="radio"] { display: none; }
+.cat-opt:hover { border-color: var(--primary); color: var(--primary); }
+.cat-opt.selected, .cat-opt:has(input:checked) {
+    background: var(--primary); color: white; border-color: var(--primary);
+}
+.cat-opt i { font-size: 0.78rem; }
+
+/* File drop zone */
+.file-drop {
+    display: block;
+    border: 2px dashed var(--light-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.file-drop:hover, .file-drop.dragover { border-color: var(--primary); background: rgba(80,34,45,0.03); }
+.file-drop input[type="file"] { display: none; }
+.fd-inner { pointer-events: none; }
+.fd-icon { font-size: 2rem; color: var(--text-light); display: block; margin-bottom: 0.75rem; }
+.fd-main { font-size: 0.9rem; color: var(--text-dark); font-weight: 500; margin-bottom: 4px; }
+.fd-or { color: var(--text-light); font-weight: 400; }
+.fd-hint { font-size: 0.78rem; color: var(--text-light); }
+.fd-chosen { font-size: 0.88rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+
+/* Toggle */
+.toggle-row { display: flex; align-items: flex-start; gap: 12px; }
+.toggle-switch { position: relative; flex-shrink: 0; margin-top: 2px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+    display: block; width: 42px; height: 24px; border-radius: 12px;
+    background: #D1D5DB; cursor: pointer; transition: background 0.2s;
+    position: relative;
+}
+.toggle-track::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%; background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--primary); }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
+.toggle-info { display: flex; flex-direction: column; gap: 2px; }
+.toggle-label { font-size: 0.875rem; font-weight: 600; color: var(--text-dark); }
+.toggle-sub { font-size: 0.78rem; color: var(--text-light); }
+
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 1rem; border-top: 1px solid var(--light-gray); margin-top: 0.5rem; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .form-card { padding: 1.25rem; }
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions .button { width: 100%; justify-content: center; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+
+// Category pill selection highlight
+document.querySelectorAll('.cat-opt input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.cat-opt').forEach(l => l.classList.remove('selected'));
+        if (this.checked) this.closest('.cat-opt').classList.add('selected');
+    });
+});
+
+// File drop zone
+const fileDrop = document.getElementById('fileDrop');
+const fileInput = document.getElementById('documentFile');
+const fdInner  = document.getElementById('fdInner');
+
+fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        fdInner.innerHTML =
+            '<i class="fas fa-file-check fd-icon" style="color:var(--primary)"></i>' +
+            '<p class="fd-chosen">' + this.files[0].name + '</p>' +
+            '<p class="fd-hint">' + (this.files[0].size / 1048576).toFixed(2) + ' MB</p>';
+    }
+});
+
+fileDrop.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    fileDrop.classList.add('dragover');
+});
+fileDrop.addEventListener('dragleave', function() {
+    fileDrop.classList.remove('dragover');
+});
+fileDrop.addEventListener('drop', function(e) {
+    e.preventDefault();
+    fileDrop.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
+
+// Visibility toggle label
+const isPublic = document.getElementById('isPublic');
+const visLabel = document.getElementById('visLabel');
+function updateVisLabel() {
+    visLabel.textContent = isPublic.checked
+        ? 'Public \u2014 visible to all staff'
+        : 'Private \u2014 admins only';
+}
+isPublic.addEventListener('change', updateVisLabel);
+updateVisLabel();
+</script>
+{{end}}

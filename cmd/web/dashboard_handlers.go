@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"html/template"
 	"net/http"
 
 	"github.com/ntiGideon/ent"
@@ -67,6 +69,15 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 		}
 		stats["recentAnnouncements"] = recentAnnounce
 
+		// Chart data
+		trend, _ := app.financeModel.MonthlyTrend(r.Context(), 0, 6)
+		trendJSON, _ := json.Marshal(trend)
+		stats["monthlyTrend"] = template.JS(trendJSON)
+
+		breakdown, _ := app.financeModel.IncomeCategoryBreakdown(r.Context(), 0)
+		breakdownJSON, _ := json.Marshal(breakdown)
+		stats["categoryBreakdown"] = template.JS(breakdownJSON)
+
 	} else {
 		churchID := 0
 		if u.Edges.Church != nil {
@@ -105,6 +116,15 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 				recentAnnounce = recentAnnounce[:4]
 			}
 			stats["recentAnnouncements"] = recentAnnounce
+
+			// Chart data
+			trend, _ := app.financeModel.MonthlyTrend(r.Context(), churchID, 6)
+			trendJSON, _ := json.Marshal(trend)
+			stats["monthlyTrend"] = template.JS(trendJSON)
+
+			breakdown, _ := app.financeModel.IncomeCategoryBreakdown(r.Context(), churchID)
+			breakdownJSON, _ := json.Marshal(breakdown)
+			stats["categoryBreakdown"] = template.JS(breakdownJSON)
 		}
 	}
 

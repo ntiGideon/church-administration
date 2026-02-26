@@ -9,6 +9,9 @@ import (
 // Announcement is the predicate function for announcement builders.
 type Announcement func(*sql.Selector)
 
+// Attendance is the predicate function for attendance builders.
+type Attendance func(*sql.Selector)
+
 // Church is the predicate function for church builders.
 type Church func(*sql.Selector)
 
@@ -18,20 +21,44 @@ type Contact func(*sql.Selector)
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
 
+// Document is the predicate function for document builders.
+type Document func(*sql.Selector)
+
 // Event is the predicate function for event builders.
 type Event func(*sql.Selector)
 
 // Finance is the predicate function for finance builders.
 type Finance func(*sql.Selector)
 
+// Group is the predicate function for group builders.
+type Group func(*sql.Selector)
+
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 
+// Pledge is the predicate function for pledge builders.
+type Pledge func(*sql.Selector)
+
+// PrayerRequest is the predicate function for prayerrequest builders.
+type PrayerRequest func(*sql.Selector)
+
 // ProgramEntry is the predicate function for programentry builders.
 type ProgramEntry func(*sql.Selector)
+
+// Roster is the predicate function for roster builders.
+type Roster func(*sql.Selector)
+
+// RosterEntry is the predicate function for rosterentry builders.
+type RosterEntry func(*sql.Selector)
+
+// Sermon is the predicate function for sermon builders.
+type Sermon func(*sql.Selector)
 
 // Session is the predicate function for session builders.
 type Session func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// Visitor is the predicate function for visitor builders.
+type Visitor func(*sql.Selector)

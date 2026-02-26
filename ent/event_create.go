@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/event"
 )
@@ -108,6 +109,21 @@ func (_c *EventCreate) SetChurchID(id int) *EventCreate {
 // SetChurch sets the "church" edge to the Church entity.
 func (_c *EventCreate) SetChurch(v *Church) *EventCreate {
 	return _c.SetChurchID(v.ID)
+}
+
+// AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
+func (_c *EventCreate) AddAttendanceIDs(ids ...int) *EventCreate {
+	_c.mutation.AddAttendanceIDs(ids...)
+	return _c
+}
+
+// AddAttendances adds the "attendances" edges to the Attendance entity.
+func (_c *EventCreate) AddAttendances(v ...*Attendance) *EventCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddAttendanceIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -266,6 +282,22 @@ func (_c *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.church_events = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.AttendancesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.AttendancesTable,
+			Columns: []string{event.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

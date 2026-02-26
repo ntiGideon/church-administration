@@ -13,15 +13,24 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ntiGideon/ent/announcement"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
+	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/roster"
+	"github.com/ntiGideon/ent/rosterentry"
+	"github.com/ntiGideon/ent/sermon"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
+	"github.com/ntiGideon/ent/visitor"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -82,16 +91,25 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			announcement.Table: announcement.ValidColumn,
-			church.Table:       church.ValidColumn,
-			contact.Table:      contact.ValidColumn,
-			department.Table:   department.ValidColumn,
-			event.Table:        event.ValidColumn,
-			finance.Table:      finance.ValidColumn,
-			invitation.Table:   invitation.ValidColumn,
-			programentry.Table: programentry.ValidColumn,
-			session.Table:      session.ValidColumn,
-			user.Table:         user.ValidColumn,
+			announcement.Table:  announcement.ValidColumn,
+			attendance.Table:    attendance.ValidColumn,
+			church.Table:        church.ValidColumn,
+			contact.Table:       contact.ValidColumn,
+			department.Table:    department.ValidColumn,
+			document.Table:      document.ValidColumn,
+			event.Table:         event.ValidColumn,
+			finance.Table:       finance.ValidColumn,
+			group.Table:         group.ValidColumn,
+			invitation.Table:    invitation.ValidColumn,
+			pledge.Table:        pledge.ValidColumn,
+			prayerrequest.Table: prayerrequest.ValidColumn,
+			programentry.Table:  programentry.ValidColumn,
+			roster.Table:        roster.ValidColumn,
+			rosterentry.Table:   rosterentry.ValidColumn,
+			sermon.Table:        sermon.ValidColumn,
+			session.Table:       session.ValidColumn,
+			user.Table:          user.ValidColumn,
+			visitor.Table:       visitor.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

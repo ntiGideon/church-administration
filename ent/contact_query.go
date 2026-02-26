@@ -12,9 +12,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -29,6 +35,13 @@ type ContactQuery struct {
 	withChurch          *ChurchQuery
 	withSpouseContact   *ContactQuery
 	withSpouseOfContact *ContactQuery
+	withAttendances     *AttendanceQuery
+	withGroups          *GroupQuery
+	withLeadingGroups   *GroupQuery
+	withGivingRecords   *FinanceQuery
+	withPledges         *PledgeQuery
+	withRosterEntries   *RosterEntryQuery
+	withPrayerRequests  *PrayerRequestQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -146,6 +159,160 @@ func (_q *ContactQuery) QuerySpouseOfContact() *ContactQuery {
 			sqlgraph.From(contact.Table, contact.FieldID, selector),
 			sqlgraph.To(contact.Table, contact.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, contact.SpouseOfContactTable, contact.SpouseOfContactColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAttendances chains the current query on the "attendances" edge.
+func (_q *ContactQuery) QueryAttendances() *AttendanceQuery {
+	query := (&AttendanceClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(attendance.Table, attendance.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contact.AttendancesTable, contact.AttendancesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGroups chains the current query on the "groups" edge.
+func (_q *ContactQuery) QueryGroups() *GroupQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(group.Table, group.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, contact.GroupsTable, contact.GroupsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryLeadingGroups chains the current query on the "leading_groups" edge.
+func (_q *ContactQuery) QueryLeadingGroups() *GroupQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(group.Table, group.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, contact.LeadingGroupsTable, contact.LeadingGroupsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGivingRecords chains the current query on the "giving_records" edge.
+func (_q *ContactQuery) QueryGivingRecords() *FinanceQuery {
+	query := (&FinanceClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(finance.Table, finance.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, contact.GivingRecordsTable, contact.GivingRecordsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPledges chains the current query on the "pledges" edge.
+func (_q *ContactQuery) QueryPledges() *PledgeQuery {
+	query := (&PledgeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(pledge.Table, pledge.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contact.PledgesTable, contact.PledgesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRosterEntries chains the current query on the "roster_entries" edge.
+func (_q *ContactQuery) QueryRosterEntries() *RosterEntryQuery {
+	query := (&RosterEntryClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(rosterentry.Table, rosterentry.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contact.RosterEntriesTable, contact.RosterEntriesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPrayerRequests chains the current query on the "prayer_requests" edge.
+func (_q *ContactQuery) QueryPrayerRequests() *PrayerRequestQuery {
+	query := (&PrayerRequestClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, selector),
+			sqlgraph.To(prayerrequest.Table, prayerrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contact.PrayerRequestsTable, contact.PrayerRequestsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -349,6 +516,13 @@ func (_q *ContactQuery) Clone() *ContactQuery {
 		withChurch:          _q.withChurch.Clone(),
 		withSpouseContact:   _q.withSpouseContact.Clone(),
 		withSpouseOfContact: _q.withSpouseOfContact.Clone(),
+		withAttendances:     _q.withAttendances.Clone(),
+		withGroups:          _q.withGroups.Clone(),
+		withLeadingGroups:   _q.withLeadingGroups.Clone(),
+		withGivingRecords:   _q.withGivingRecords.Clone(),
+		withPledges:         _q.withPledges.Clone(),
+		withRosterEntries:   _q.withRosterEntries.Clone(),
+		withPrayerRequests:  _q.withPrayerRequests.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -396,6 +570,83 @@ func (_q *ContactQuery) WithSpouseOfContact(opts ...func(*ContactQuery)) *Contac
 		opt(query)
 	}
 	_q.withSpouseOfContact = query
+	return _q
+}
+
+// WithAttendances tells the query-builder to eager-load the nodes that are connected to
+// the "attendances" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithAttendances(opts ...func(*AttendanceQuery)) *ContactQuery {
+	query := (&AttendanceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withAttendances = query
+	return _q
+}
+
+// WithGroups tells the query-builder to eager-load the nodes that are connected to
+// the "groups" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithGroups(opts ...func(*GroupQuery)) *ContactQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGroups = query
+	return _q
+}
+
+// WithLeadingGroups tells the query-builder to eager-load the nodes that are connected to
+// the "leading_groups" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithLeadingGroups(opts ...func(*GroupQuery)) *ContactQuery {
+	query := (&GroupClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withLeadingGroups = query
+	return _q
+}
+
+// WithGivingRecords tells the query-builder to eager-load the nodes that are connected to
+// the "giving_records" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithGivingRecords(opts ...func(*FinanceQuery)) *ContactQuery {
+	query := (&FinanceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withGivingRecords = query
+	return _q
+}
+
+// WithPledges tells the query-builder to eager-load the nodes that are connected to
+// the "pledges" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithPledges(opts ...func(*PledgeQuery)) *ContactQuery {
+	query := (&PledgeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPledges = query
+	return _q
+}
+
+// WithRosterEntries tells the query-builder to eager-load the nodes that are connected to
+// the "roster_entries" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithRosterEntries(opts ...func(*RosterEntryQuery)) *ContactQuery {
+	query := (&RosterEntryClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRosterEntries = query
+	return _q
+}
+
+// WithPrayerRequests tells the query-builder to eager-load the nodes that are connected to
+// the "prayer_requests" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ContactQuery) WithPrayerRequests(opts ...func(*PrayerRequestQuery)) *ContactQuery {
+	query := (&PrayerRequestClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPrayerRequests = query
 	return _q
 }
 
@@ -477,11 +728,18 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	var (
 		nodes       = []*Contact{}
 		_spec       = _q.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [11]bool{
 			_q.withUser != nil,
 			_q.withChurch != nil,
 			_q.withSpouseContact != nil,
 			_q.withSpouseOfContact != nil,
+			_q.withAttendances != nil,
+			_q.withGroups != nil,
+			_q.withLeadingGroups != nil,
+			_q.withGivingRecords != nil,
+			_q.withPledges != nil,
+			_q.withRosterEntries != nil,
+			_q.withPrayerRequests != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -523,6 +781,55 @@ func (_q *ContactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 	if query := _q.withSpouseOfContact; query != nil {
 		if err := _q.loadSpouseOfContact(ctx, query, nodes, nil,
 			func(n *Contact, e *Contact) { n.Edges.SpouseOfContact = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withAttendances; query != nil {
+		if err := _q.loadAttendances(ctx, query, nodes,
+			func(n *Contact) { n.Edges.Attendances = []*Attendance{} },
+			func(n *Contact, e *Attendance) { n.Edges.Attendances = append(n.Edges.Attendances, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withGroups; query != nil {
+		if err := _q.loadGroups(ctx, query, nodes,
+			func(n *Contact) { n.Edges.Groups = []*Group{} },
+			func(n *Contact, e *Group) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withLeadingGroups; query != nil {
+		if err := _q.loadLeadingGroups(ctx, query, nodes,
+			func(n *Contact) { n.Edges.LeadingGroups = []*Group{} },
+			func(n *Contact, e *Group) { n.Edges.LeadingGroups = append(n.Edges.LeadingGroups, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withGivingRecords; query != nil {
+		if err := _q.loadGivingRecords(ctx, query, nodes,
+			func(n *Contact) { n.Edges.GivingRecords = []*Finance{} },
+			func(n *Contact, e *Finance) { n.Edges.GivingRecords = append(n.Edges.GivingRecords, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPledges; query != nil {
+		if err := _q.loadPledges(ctx, query, nodes,
+			func(n *Contact) { n.Edges.Pledges = []*Pledge{} },
+			func(n *Contact, e *Pledge) { n.Edges.Pledges = append(n.Edges.Pledges, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRosterEntries; query != nil {
+		if err := _q.loadRosterEntries(ctx, query, nodes,
+			func(n *Contact) { n.Edges.RosterEntries = []*RosterEntry{} },
+			func(n *Contact, e *RosterEntry) { n.Edges.RosterEntries = append(n.Edges.RosterEntries, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPrayerRequests; query != nil {
+		if err := _q.loadPrayerRequests(ctx, query, nodes,
+			func(n *Contact) { n.Edges.PrayerRequests = []*PrayerRequest{} },
+			func(n *Contact, e *PrayerRequest) { n.Edges.PrayerRequests = append(n.Edges.PrayerRequests, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -641,6 +948,248 @@ func (_q *ContactQuery) loadSpouseOfContact(ctx context.Context, query *ContactQ
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *ContactQuery) loadAttendances(ctx context.Context, query *AttendanceQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Attendance)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(attendance.FieldContactID)
+	}
+	query.Where(predicate.Attendance(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.AttendancesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContactID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contact_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadGroups(ctx context.Context, query *GroupQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Group)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Contact)
+	nids := make(map[int]map[*Contact]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(contact.GroupsTable)
+		s.Join(joinT).On(s.C(group.FieldID), joinT.C(contact.GroupsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(contact.GroupsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(contact.GroupsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Contact]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Group](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "groups" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *ContactQuery) loadLeadingGroups(ctx context.Context, query *GroupQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Group)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(group.FieldLeaderID)
+	}
+	query.Where(predicate.Group(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.LeadingGroupsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.LeaderID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "leader_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadGivingRecords(ctx context.Context, query *FinanceQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Finance)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(finance.FieldContactID)
+	}
+	query.Where(predicate.Finance(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.GivingRecordsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContactID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contact_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadPledges(ctx context.Context, query *PledgeQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *Pledge)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(pledge.FieldContactID)
+	}
+	query.Where(predicate.Pledge(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.PledgesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContactID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contact_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadRosterEntries(ctx context.Context, query *RosterEntryQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *RosterEntry)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(rosterentry.FieldContactID)
+	}
+	query.Where(predicate.RosterEntry(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.RosterEntriesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContactID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contact_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ContactQuery) loadPrayerRequests(ctx context.Context, query *PrayerRequestQuery, nodes []*Contact, init func(*Contact), assign func(*Contact, *PrayerRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Contact)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(prayerrequest.FieldContactID)
+	}
+	query.Where(predicate.PrayerRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(contact.PrayerRequestsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ContactID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "contact_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -30,6 +30,7 @@ func (Finance) Fields() []ent.Field {
 		field.String("payment_method").Optional(),
 		field.String("reference_number").Optional(),
 		field.String("notes").Optional(),
+		field.Int("contact_id").Optional(),
 	}
 }
 
@@ -42,6 +43,10 @@ func (Finance) Edges() []ent.Edge {
 
 		edge.From("church", Church.Type).
 			Ref("finances").
+			Unique(),
+
+		edge.To("donor", Contact.Type).
+			Field("contact_id").
 			Unique(),
 	}
 }

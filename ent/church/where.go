@@ -1565,6 +1565,167 @@ func HasProgramsWith(preds ...predicate.ProgramEntry) predicate.Church {
 	})
 }
 
+// HasGroups applies the HasEdge predicate on the "groups" edge.
+func HasGroups() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, GroupsTable, GroupsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGroupsWith applies the HasEdge predicate on the "groups" edge with a given conditions (other predicates).
+func HasGroupsWith(preds ...predicate.Group) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newGroupsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPledges applies the HasEdge predicate on the "pledges" edge.
+func HasPledges() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PledgesTable, PledgesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPledgesWith applies the HasEdge predicate on the "pledges" edge with a given conditions (other predicates).
+func HasPledgesWith(preds ...predicate.Pledge) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newPledgesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRosters applies the HasEdge predicate on the "rosters" edge.
+func HasRosters() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RostersTable, RostersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRostersWith applies the HasEdge predicate on the "rosters" edge with a given conditions (other predicates).
+func HasRostersWith(preds ...predicate.Roster) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newRostersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSermons applies the HasEdge predicate on the "sermons" edge.
+func HasSermons() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SermonsTable, SermonsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSermonsWith applies the HasEdge predicate on the "sermons" edge with a given conditions (other predicates).
+func HasSermonsWith(preds ...predicate.Sermon) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newSermonsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVisitors applies the HasEdge predicate on the "visitors" edge.
+func HasVisitors() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VisitorsTable, VisitorsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVisitorsWith applies the HasEdge predicate on the "visitors" edge with a given conditions (other predicates).
+func HasVisitorsWith(preds ...predicate.Visitor) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newVisitorsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPrayerRequests applies the HasEdge predicate on the "prayer_requests" edge.
+func HasPrayerRequests() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PrayerRequestsTable, PrayerRequestsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPrayerRequestsWith applies the HasEdge predicate on the "prayer_requests" edge with a given conditions (other predicates).
+func HasPrayerRequestsWith(preds ...predicate.PrayerRequest) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newPrayerRequestsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDocuments applies the HasEdge predicate on the "documents" edge.
+func HasDocuments() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DocumentsTable, DocumentsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDocumentsWith applies the HasEdge predicate on the "documents" edge with a given conditions (other predicates).
+func HasDocumentsWith(preds ...predicate.Document) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newDocumentsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Church) predicate.Church {
 	return predicate.Church(sql.AndPredicates(predicates...))

@@ -21,6 +21,18 @@ func (f AnnouncementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AnnouncementMutation", m)
 }
 
+// The AttendanceFunc type is an adapter to allow the use of ordinary
+// function as Attendance mutator.
+type AttendanceFunc func(context.Context, *ent.AttendanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AttendanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AttendanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AttendanceMutation", m)
+}
+
 // The ChurchFunc type is an adapter to allow the use of ordinary
 // function as Church mutator.
 type ChurchFunc func(context.Context, *ent.ChurchMutation) (ent.Value, error)
@@ -57,6 +69,18 @@ func (f DepartmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DepartmentMutation", m)
 }
 
+// The DocumentFunc type is an adapter to allow the use of ordinary
+// function as Document mutator.
+type DocumentFunc func(context.Context, *ent.DocumentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DocumentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DocumentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DocumentMutation", m)
+}
+
 // The EventFunc type is an adapter to allow the use of ordinary
 // function as Event mutator.
 type EventFunc func(context.Context, *ent.EventMutation) (ent.Value, error)
@@ -81,6 +105,18 @@ func (f FinanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FinanceMutation", m)
 }
 
+// The GroupFunc type is an adapter to allow the use of ordinary
+// function as Group mutator.
+type GroupFunc func(context.Context, *ent.GroupMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GroupMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
+}
+
 // The InvitationFunc type is an adapter to allow the use of ordinary
 // function as Invitation mutator.
 type InvitationFunc func(context.Context, *ent.InvitationMutation) (ent.Value, error)
@@ -93,6 +129,30 @@ func (f InvitationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvitationMutation", m)
 }
 
+// The PledgeFunc type is an adapter to allow the use of ordinary
+// function as Pledge mutator.
+type PledgeFunc func(context.Context, *ent.PledgeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PledgeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PledgeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PledgeMutation", m)
+}
+
+// The PrayerRequestFunc type is an adapter to allow the use of ordinary
+// function as PrayerRequest mutator.
+type PrayerRequestFunc func(context.Context, *ent.PrayerRequestMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PrayerRequestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PrayerRequestMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PrayerRequestMutation", m)
+}
+
 // The ProgramEntryFunc type is an adapter to allow the use of ordinary
 // function as ProgramEntry mutator.
 type ProgramEntryFunc func(context.Context, *ent.ProgramEntryMutation) (ent.Value, error)
@@ -103,6 +163,42 @@ func (f ProgramEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProgramEntryMutation", m)
+}
+
+// The RosterFunc type is an adapter to allow the use of ordinary
+// function as Roster mutator.
+type RosterFunc func(context.Context, *ent.RosterMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RosterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RosterMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RosterMutation", m)
+}
+
+// The RosterEntryFunc type is an adapter to allow the use of ordinary
+// function as RosterEntry mutator.
+type RosterEntryFunc func(context.Context, *ent.RosterEntryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RosterEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RosterEntryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RosterEntryMutation", m)
+}
+
+// The SermonFunc type is an adapter to allow the use of ordinary
+// function as Sermon mutator.
+type SermonFunc func(context.Context, *ent.SermonMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SermonFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SermonMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SermonMutation", m)
 }
 
 // The SessionFunc type is an adapter to allow the use of ordinary
@@ -127,6 +223,18 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The VisitorFunc type is an adapter to allow the use of ordinary
+// function as Visitor mutator.
+type VisitorFunc func(context.Context, *ent.VisitorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f VisitorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.VisitorMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VisitorMutation", m)
 }
 
 // Condition is a hook condition function.

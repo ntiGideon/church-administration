@@ -87,9 +87,23 @@ type ChurchEdges struct {
 	Contacts []*Contact `json:"contacts,omitempty"`
 	// Programs holds the value of the programs edge.
 	Programs []*ProgramEntry `json:"programs,omitempty"`
+	// Groups holds the value of the groups edge.
+	Groups []*Group `json:"groups,omitempty"`
+	// Pledges holds the value of the pledges edge.
+	Pledges []*Pledge `json:"pledges,omitempty"`
+	// Rosters holds the value of the rosters edge.
+	Rosters []*Roster `json:"rosters,omitempty"`
+	// Sermons holds the value of the sermons edge.
+	Sermons []*Sermon `json:"sermons,omitempty"`
+	// Visitors holds the value of the visitors edge.
+	Visitors []*Visitor `json:"visitors,omitempty"`
+	// PrayerRequests holds the value of the prayer_requests edge.
+	PrayerRequests []*PrayerRequest `json:"prayer_requests,omitempty"`
+	// Documents holds the value of the documents edge.
+	Documents []*Document `json:"documents,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [10]bool
+	loadedTypes [17]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -182,6 +196,69 @@ func (e ChurchEdges) ProgramsOrErr() ([]*ProgramEntry, error) {
 		return e.Programs, nil
 	}
 	return nil, &NotLoadedError{edge: "programs"}
+}
+
+// GroupsOrErr returns the Groups value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) GroupsOrErr() ([]*Group, error) {
+	if e.loadedTypes[10] {
+		return e.Groups, nil
+	}
+	return nil, &NotLoadedError{edge: "groups"}
+}
+
+// PledgesOrErr returns the Pledges value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) PledgesOrErr() ([]*Pledge, error) {
+	if e.loadedTypes[11] {
+		return e.Pledges, nil
+	}
+	return nil, &NotLoadedError{edge: "pledges"}
+}
+
+// RostersOrErr returns the Rosters value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) RostersOrErr() ([]*Roster, error) {
+	if e.loadedTypes[12] {
+		return e.Rosters, nil
+	}
+	return nil, &NotLoadedError{edge: "rosters"}
+}
+
+// SermonsOrErr returns the Sermons value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) SermonsOrErr() ([]*Sermon, error) {
+	if e.loadedTypes[13] {
+		return e.Sermons, nil
+	}
+	return nil, &NotLoadedError{edge: "sermons"}
+}
+
+// VisitorsOrErr returns the Visitors value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) VisitorsOrErr() ([]*Visitor, error) {
+	if e.loadedTypes[14] {
+		return e.Visitors, nil
+	}
+	return nil, &NotLoadedError{edge: "visitors"}
+}
+
+// PrayerRequestsOrErr returns the PrayerRequests value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) PrayerRequestsOrErr() ([]*PrayerRequest, error) {
+	if e.loadedTypes[15] {
+		return e.PrayerRequests, nil
+	}
+	return nil, &NotLoadedError{edge: "prayer_requests"}
+}
+
+// DocumentsOrErr returns the Documents value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) DocumentsOrErr() ([]*Document, error) {
+	if e.loadedTypes[16] {
+		return e.Documents, nil
+	}
+	return nil, &NotLoadedError{edge: "documents"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -408,6 +485,41 @@ func (_m *Church) QueryContacts() *ContactQuery {
 // QueryPrograms queries the "programs" edge of the Church entity.
 func (_m *Church) QueryPrograms() *ProgramEntryQuery {
 	return NewChurchClient(_m.config).QueryPrograms(_m)
+}
+
+// QueryGroups queries the "groups" edge of the Church entity.
+func (_m *Church) QueryGroups() *GroupQuery {
+	return NewChurchClient(_m.config).QueryGroups(_m)
+}
+
+// QueryPledges queries the "pledges" edge of the Church entity.
+func (_m *Church) QueryPledges() *PledgeQuery {
+	return NewChurchClient(_m.config).QueryPledges(_m)
+}
+
+// QueryRosters queries the "rosters" edge of the Church entity.
+func (_m *Church) QueryRosters() *RosterQuery {
+	return NewChurchClient(_m.config).QueryRosters(_m)
+}
+
+// QuerySermons queries the "sermons" edge of the Church entity.
+func (_m *Church) QuerySermons() *SermonQuery {
+	return NewChurchClient(_m.config).QuerySermons(_m)
+}
+
+// QueryVisitors queries the "visitors" edge of the Church entity.
+func (_m *Church) QueryVisitors() *VisitorQuery {
+	return NewChurchClient(_m.config).QueryVisitors(_m)
+}
+
+// QueryPrayerRequests queries the "prayer_requests" edge of the Church entity.
+func (_m *Church) QueryPrayerRequests() *PrayerRequestQuery {
+	return NewChurchClient(_m.config).QueryPrayerRequests(_m)
+}
+
+// QueryDocuments queries the "documents" edge of the Church entity.
+func (_m *Church) QueryDocuments() *DocumentQuery {
+	return NewChurchClient(_m.config).QueryDocuments(_m)
 }
 
 // Update returns a builder for updating this Church.

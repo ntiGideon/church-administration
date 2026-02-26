@@ -57,6 +57,9 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /members/{id}/edit", protected.ThenFunc(app.memberEditPost))
 	mux.Handle("POST /members/{id}/avatar", protected.ThenFunc(app.memberAvatarPost))
 	mux.Handle("POST /members/{id}/delete", protected.ThenFunc(app.memberDelete))
+	mux.Handle("GET /members/{id}/giving", protected.ThenFunc(app.memberGiving))
+	mux.Handle("POST /members/{id}/pledges/new", adminOnly.ThenFunc(app.memberPledgeNewPost))
+	mux.Handle("POST /members/{id}/pledges/{pid}/delete", adminOnly.ThenFunc(app.memberPledgeDelete))
 
 	// Workers (system users — invited by admin, can log in)
 	mux.Handle("GET /workers", protected.ThenFunc(app.workersGet))
@@ -69,7 +72,67 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /events/new", adminOnly.ThenFunc(app.eventNewPost))
 	mux.Handle("GET /events/{id}", protected.ThenFunc(app.eventDetail))
 	mux.Handle("POST /events/{id}/attendance", adminOnly.ThenFunc(app.eventUpdateAttendance))
+	mux.Handle("POST /events/{id}/checkin", adminOnly.ThenFunc(app.eventCheckIn))
+	mux.Handle("POST /events/{id}/attendance/{aid}/remove", adminOnly.ThenFunc(app.eventRemoveAttendee))
 	mux.Handle("POST /events/{id}/publish", adminOnly.ThenFunc(app.eventTogglePublish))
+
+	// Groups / Cell Groups
+	mux.Handle("GET /groups", protected.ThenFunc(app.groupsList))
+	mux.Handle("GET /groups/new", adminOnly.ThenFunc(app.groupNewGet))
+	mux.Handle("POST /groups/new", adminOnly.ThenFunc(app.groupNewPost))
+	mux.Handle("GET /groups/{id}", protected.ThenFunc(app.groupDetail))
+	mux.Handle("GET /groups/{id}/edit", adminOnly.ThenFunc(app.groupEditGet))
+	mux.Handle("POST /groups/{id}/edit", adminOnly.ThenFunc(app.groupEditPost))
+	mux.Handle("POST /groups/{id}/members/add", adminOnly.ThenFunc(app.groupAddMember))
+	mux.Handle("POST /groups/{id}/members/{cid}/remove", adminOnly.ThenFunc(app.groupRemoveMember))
+	mux.Handle("POST /groups/{id}/delete", adminOnly.ThenFunc(app.groupDelete))
+
+	// Volunteer Rosters
+	mux.Handle("GET /rosters", protected.ThenFunc(app.rostersList))
+	mux.Handle("GET /rosters/new", adminOnly.ThenFunc(app.rosterNewGet))
+	mux.Handle("POST /rosters/new", adminOnly.ThenFunc(app.rosterNewPost))
+	mux.Handle("GET /rosters/{id}", protected.ThenFunc(app.rosterDetail))
+	mux.Handle("GET /rosters/{id}/edit", adminOnly.ThenFunc(app.rosterEditGet))
+	mux.Handle("POST /rosters/{id}/edit", adminOnly.ThenFunc(app.rosterEditPost))
+	mux.Handle("POST /rosters/{id}/entries/add", adminOnly.ThenFunc(app.rosterAddEntry))
+	mux.Handle("POST /rosters/{id}/entries/{eid}/remove", adminOnly.ThenFunc(app.rosterRemoveEntry))
+	mux.Handle("POST /rosters/{id}/delete", adminOnly.ThenFunc(app.rosterDelete))
+
+	// Document Library
+	mux.Handle("GET /documents", protected.ThenFunc(app.documentsList))
+	mux.Handle("GET /documents/upload", adminOnly.ThenFunc(app.documentUploadGet))
+	mux.Handle("POST /documents/upload", adminOnly.ThenFunc(app.documentUploadPost))
+	mux.Handle("POST /documents/{id}/delete", adminOnly.ThenFunc(app.documentDelete))
+
+	// Prayer Request Board
+	mux.Handle("GET /prayer", protected.ThenFunc(app.prayerList))
+	mux.Handle("GET /prayer/new", protected.ThenFunc(app.prayerNewGet))
+	mux.Handle("POST /prayer/new", protected.ThenFunc(app.prayerNewPost))
+	mux.Handle("GET /prayer/{id}", protected.ThenFunc(app.prayerDetail))
+	mux.Handle("GET /prayer/{id}/edit", protected.ThenFunc(app.prayerEditGet))
+	mux.Handle("POST /prayer/{id}/edit", protected.ThenFunc(app.prayerEditPost))
+	mux.Handle("POST /prayer/{id}/status", protected.ThenFunc(app.prayerUpdateStatus))
+	mux.Handle("POST /prayer/{id}/delete", adminOnly.ThenFunc(app.prayerDelete))
+
+	// Visitor Management
+	mux.Handle("GET /visitors", protected.ThenFunc(app.visitorsList))
+	mux.Handle("GET /visitors/new", protected.ThenFunc(app.visitorNewGet))
+	mux.Handle("POST /visitors/new", protected.ThenFunc(app.visitorNewPost))
+	mux.Handle("GET /visitors/{id}", protected.ThenFunc(app.visitorDetail))
+	mux.Handle("GET /visitors/{id}/edit", protected.ThenFunc(app.visitorEditGet))
+	mux.Handle("POST /visitors/{id}/edit", protected.ThenFunc(app.visitorEditPost))
+	mux.Handle("POST /visitors/{id}/status", protected.ThenFunc(app.visitorUpdateStatus))
+	mux.Handle("POST /visitors/{id}/delete", adminOnly.ThenFunc(app.visitorDelete))
+
+	// Sermon Library
+	mux.Handle("GET /sermons", protected.ThenFunc(app.sermonsList))
+	mux.Handle("GET /sermons/new", adminOnly.ThenFunc(app.sermonNewGet))
+	mux.Handle("POST /sermons/new", adminOnly.ThenFunc(app.sermonNewPost))
+	mux.Handle("GET /sermons/{id}", protected.ThenFunc(app.sermonDetail))
+	mux.Handle("GET /sermons/{id}/edit", adminOnly.ThenFunc(app.sermonEditGet))
+	mux.Handle("POST /sermons/{id}/edit", adminOnly.ThenFunc(app.sermonEditPost))
+	mux.Handle("POST /sermons/{id}/publish", adminOnly.ThenFunc(app.sermonTogglePublish))
+	mux.Handle("POST /sermons/{id}/delete", adminOnly.ThenFunc(app.sermonDelete))
 
 	// Finance / Giving
 	mux.Handle("GET /giving/donations", protected.ThenFunc(app.financeList))

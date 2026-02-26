@@ -6,16 +6,24 @@ import (
 	"time"
 
 	"github.com/ntiGideon/ent/announcement"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
+	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/roster"
 	"github.com/ntiGideon/ent/schema"
+	"github.com/ntiGideon/ent/sermon"
 	"github.com/ntiGideon/ent/session"
 	"github.com/ntiGideon/ent/user"
+	"github.com/ntiGideon/ent/visitor"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -38,6 +46,12 @@ func init() {
 	announcement.DefaultUpdatedAt = announcementDescUpdatedAt.Default.(func() time.Time)
 	// announcement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	announcement.UpdateDefaultUpdatedAt = announcementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	attendanceFields := schema.Attendance{}.Fields()
+	_ = attendanceFields
+	// attendanceDescCheckInTime is the schema descriptor for check_in_time field.
+	attendanceDescCheckInTime := attendanceFields[4].Descriptor()
+	// attendance.DefaultCheckInTime holds the default value on creation for the check_in_time field.
+	attendance.DefaultCheckInTime = attendanceDescCheckInTime.Default.(func() time.Time)
 	churchFields := schema.Church{}.Fields()
 	_ = churchFields
 	// churchDescCity is the schema descriptor for city field.
@@ -92,6 +106,16 @@ func init() {
 	departmentDescIsActive := departmentFields[3].Descriptor()
 	// department.DefaultIsActive holds the default value on creation for the is_active field.
 	department.DefaultIsActive = departmentDescIsActive.Default.(bool)
+	documentFields := schema.Document{}.Fields()
+	_ = documentFields
+	// documentDescIsPublic is the schema descriptor for is_public field.
+	documentDescIsPublic := documentFields[7].Descriptor()
+	// document.DefaultIsPublic holds the default value on creation for the is_public field.
+	document.DefaultIsPublic = documentDescIsPublic.Default.(bool)
+	// documentDescCreatedAt is the schema descriptor for created_at field.
+	documentDescCreatedAt := documentFields[9].Descriptor()
+	// document.DefaultCreatedAt holds the default value on creation for the created_at field.
+	document.DefaultCreatedAt = documentDescCreatedAt.Default.(func() time.Time)
 	eventFields := schema.Event{}.Fields()
 	_ = eventFields
 	// eventDescAttendanceCount is the schema descriptor for attendance_count field.
@@ -108,6 +132,22 @@ func init() {
 	financeDescCurrency := financeFields[3].Descriptor()
 	// finance.DefaultCurrency holds the default value on creation for the currency field.
 	finance.DefaultCurrency = financeDescCurrency.Default.(string)
+	groupFields := schema.Group{}.Fields()
+	_ = groupFields
+	// groupDescIsActive is the schema descriptor for is_active field.
+	groupDescIsActive := groupFields[6].Descriptor()
+	// group.DefaultIsActive holds the default value on creation for the is_active field.
+	group.DefaultIsActive = groupDescIsActive.Default.(bool)
+	// groupDescCreatedAt is the schema descriptor for created_at field.
+	groupDescCreatedAt := groupFields[9].Descriptor()
+	// group.DefaultCreatedAt holds the default value on creation for the created_at field.
+	group.DefaultCreatedAt = groupDescCreatedAt.Default.(func() time.Time)
+	// groupDescUpdatedAt is the schema descriptor for updated_at field.
+	groupDescUpdatedAt := groupFields[10].Descriptor()
+	// group.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
+	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
 	invitationFields := schema.Invitation{}.Fields()
 	_ = invitationFields
 	// invitationDescCreatedAt is the schema descriptor for created_at field.
@@ -120,6 +160,40 @@ func init() {
 	invitation.DefaultUpdatedAt = invitationDescUpdatedAt.Default.(func() time.Time)
 	// invitation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	invitation.UpdateDefaultUpdatedAt = invitationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	pledgeFields := schema.Pledge{}.Fields()
+	_ = pledgeFields
+	// pledgeDescCategory is the schema descriptor for category field.
+	pledgeDescCategory := pledgeFields[3].Descriptor()
+	// pledge.DefaultCategory holds the default value on creation for the category field.
+	pledge.DefaultCategory = pledgeDescCategory.Default.(string)
+	// pledgeDescCurrency is the schema descriptor for currency field.
+	pledgeDescCurrency := pledgeFields[5].Descriptor()
+	// pledge.DefaultCurrency holds the default value on creation for the currency field.
+	pledge.DefaultCurrency = pledgeDescCurrency.Default.(string)
+	// pledgeDescCreatedAt is the schema descriptor for created_at field.
+	pledgeDescCreatedAt := pledgeFields[10].Descriptor()
+	// pledge.DefaultCreatedAt holds the default value on creation for the created_at field.
+	pledge.DefaultCreatedAt = pledgeDescCreatedAt.Default.(func() time.Time)
+	prayerrequestFields := schema.PrayerRequest{}.Fields()
+	_ = prayerrequestFields
+	// prayerrequestDescIsAnonymous is the schema descriptor for is_anonymous field.
+	prayerrequestDescIsAnonymous := prayerrequestFields[3].Descriptor()
+	// prayerrequest.DefaultIsAnonymous holds the default value on creation for the is_anonymous field.
+	prayerrequest.DefaultIsAnonymous = prayerrequestDescIsAnonymous.Default.(bool)
+	// prayerrequestDescIsPrivate is the schema descriptor for is_private field.
+	prayerrequestDescIsPrivate := prayerrequestFields[4].Descriptor()
+	// prayerrequest.DefaultIsPrivate holds the default value on creation for the is_private field.
+	prayerrequest.DefaultIsPrivate = prayerrequestDescIsPrivate.Default.(bool)
+	// prayerrequestDescCreatedAt is the schema descriptor for created_at field.
+	prayerrequestDescCreatedAt := prayerrequestFields[8].Descriptor()
+	// prayerrequest.DefaultCreatedAt holds the default value on creation for the created_at field.
+	prayerrequest.DefaultCreatedAt = prayerrequestDescCreatedAt.Default.(func() time.Time)
+	// prayerrequestDescUpdatedAt is the schema descriptor for updated_at field.
+	prayerrequestDescUpdatedAt := prayerrequestFields[9].Descriptor()
+	// prayerrequest.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	prayerrequest.DefaultUpdatedAt = prayerrequestDescUpdatedAt.Default.(func() time.Time)
+	// prayerrequest.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	prayerrequest.UpdateDefaultUpdatedAt = prayerrequestDescUpdatedAt.UpdateDefault.(func() time.Time)
 	programentryFields := schema.ProgramEntry{}.Fields()
 	_ = programentryFields
 	// programentryDescIsPublished is the schema descriptor for is_published field.
@@ -130,6 +204,22 @@ func init() {
 	programentryDescCreatedAt := programentryFields[13].Descriptor()
 	// programentry.DefaultCreatedAt holds the default value on creation for the created_at field.
 	programentry.DefaultCreatedAt = programentryDescCreatedAt.Default.(func() time.Time)
+	rosterFields := schema.Roster{}.Fields()
+	_ = rosterFields
+	// rosterDescCreatedAt is the schema descriptor for created_at field.
+	rosterDescCreatedAt := rosterFields[5].Descriptor()
+	// roster.DefaultCreatedAt holds the default value on creation for the created_at field.
+	roster.DefaultCreatedAt = rosterDescCreatedAt.Default.(func() time.Time)
+	sermonFields := schema.Sermon{}.Fields()
+	_ = sermonFields
+	// sermonDescIsPublished is the schema descriptor for is_published field.
+	sermonDescIsPublished := sermonFields[7].Descriptor()
+	// sermon.DefaultIsPublished holds the default value on creation for the is_published field.
+	sermon.DefaultIsPublished = sermonDescIsPublished.Default.(bool)
+	// sermonDescCreatedAt is the schema descriptor for created_at field.
+	sermonDescCreatedAt := sermonFields[9].Descriptor()
+	// sermon.DefaultCreatedAt holds the default value on creation for the created_at field.
+	sermon.DefaultCreatedAt = sermonDescCreatedAt.Default.(func() time.Time)
 	sessionFields := schema.Session{}.Fields()
 	_ = sessionFields
 	// sessionDescToken is the schema descriptor for token field.
@@ -174,4 +264,10 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	visitorFields := schema.Visitor{}.Fields()
+	_ = visitorFields
+	// visitorDescCreatedAt is the schema descriptor for created_at field.
+	visitorDescCreatedAt := visitorFields[11].Descriptor()
+	// visitor.DefaultCreatedAt holds the default value on creation for the created_at field.
+	visitor.DefaultCreatedAt = visitorDescCreatedAt.Default.(func() time.Time)
 }

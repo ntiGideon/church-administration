@@ -14,11 +14,18 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
+	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/roster"
+	"github.com/ntiGideon/ent/sermon"
 	"github.com/ntiGideon/ent/user"
+	"github.com/ntiGideon/ent/visitor"
 )
 
 // ChurchCreate is the builder for creating a Church entity.
@@ -438,6 +445,111 @@ func (_c *ChurchCreate) AddPrograms(v ...*ProgramEntry) *ChurchCreate {
 	return _c.AddProgramIDs(ids...)
 }
 
+// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+func (_c *ChurchCreate) AddGroupIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddGroupIDs(ids...)
+	return _c
+}
+
+// AddGroups adds the "groups" edges to the Group entity.
+func (_c *ChurchCreate) AddGroups(v ...*Group) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGroupIDs(ids...)
+}
+
+// AddPledgeIDs adds the "pledges" edge to the Pledge entity by IDs.
+func (_c *ChurchCreate) AddPledgeIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddPledgeIDs(ids...)
+	return _c
+}
+
+// AddPledges adds the "pledges" edges to the Pledge entity.
+func (_c *ChurchCreate) AddPledges(v ...*Pledge) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPledgeIDs(ids...)
+}
+
+// AddRosterIDs adds the "rosters" edge to the Roster entity by IDs.
+func (_c *ChurchCreate) AddRosterIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddRosterIDs(ids...)
+	return _c
+}
+
+// AddRosters adds the "rosters" edges to the Roster entity.
+func (_c *ChurchCreate) AddRosters(v ...*Roster) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRosterIDs(ids...)
+}
+
+// AddSermonIDs adds the "sermons" edge to the Sermon entity by IDs.
+func (_c *ChurchCreate) AddSermonIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddSermonIDs(ids...)
+	return _c
+}
+
+// AddSermons adds the "sermons" edges to the Sermon entity.
+func (_c *ChurchCreate) AddSermons(v ...*Sermon) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddSermonIDs(ids...)
+}
+
+// AddVisitorIDs adds the "visitors" edge to the Visitor entity by IDs.
+func (_c *ChurchCreate) AddVisitorIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddVisitorIDs(ids...)
+	return _c
+}
+
+// AddVisitors adds the "visitors" edges to the Visitor entity.
+func (_c *ChurchCreate) AddVisitors(v ...*Visitor) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVisitorIDs(ids...)
+}
+
+// AddPrayerRequestIDs adds the "prayer_requests" edge to the PrayerRequest entity by IDs.
+func (_c *ChurchCreate) AddPrayerRequestIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddPrayerRequestIDs(ids...)
+	return _c
+}
+
+// AddPrayerRequests adds the "prayer_requests" edges to the PrayerRequest entity.
+func (_c *ChurchCreate) AddPrayerRequests(v ...*PrayerRequest) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPrayerRequestIDs(ids...)
+}
+
+// AddDocumentIDs adds the "documents" edge to the Document entity by IDs.
+func (_c *ChurchCreate) AddDocumentIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddDocumentIDs(ids...)
+	return _c
+}
+
+// AddDocuments adds the "documents" edges to the Document entity.
+func (_c *ChurchCreate) AddDocuments(v ...*Document) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDocumentIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_c *ChurchCreate) Mutation() *ChurchMutation {
 	return _c.mutation
@@ -800,6 +912,118 @@ func (_c *ChurchCreate) createSpec() (*Church, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(programentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.GroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.GroupsTable,
+			Columns: []string{church.GroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PledgesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PledgesTable,
+			Columns: []string{church.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RostersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.RostersTable,
+			Columns: []string{church.RostersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(roster.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SermonsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.SermonsTable,
+			Columns: []string{church.SermonsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sermon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.VisitorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.VisitorsTable,
+			Columns: []string{church.VisitorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(visitor.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PrayerRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PrayerRequestsTable,
+			Columns: []string{church.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DocumentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.DocumentsTable,
+			Columns: []string{church.DocumentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

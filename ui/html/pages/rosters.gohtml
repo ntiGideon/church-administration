@@ -1,0 +1,121 @@
+{{define "title"}}Duty Rosters | FaithConnect{{end}}
+{{define "description"}}Manage volunteer duty rosters for church services{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">Duty Rosters</h1>
+            <p class="page-subtitle">Volunteer schedules and service assignments</p>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <a href="/rosters/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Roster</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    {{$rosters := index .Data "rosters"}}
+    {{if $rosters}}
+    <div class="roster-list">
+        {{range $rosters}}
+        <a href="/rosters/{{.ID}}" class="roster-card">
+            <div class="rc-date-box">
+                <span class="rc-day">{{.ServiceDate.Day}}</span>
+                <span class="rc-month">{{.ServiceDate.Format "Jan"}}</span>
+                <span class="rc-year">{{.ServiceDate.Year}}</span>
+            </div>
+            <div class="rc-body">
+                <div class="rc-title">{{.Title}}</div>
+                {{if .Department}}<div class="rc-dept"><i class="fas fa-layer-group"></i> {{.Department}}</div>{{end}}
+                {{if .Notes}}<div class="rc-notes">{{.Notes}}</div>{{end}}
+            </div>
+            <div class="rc-meta">
+                <span class="rc-count">
+                    <i class="fas fa-users"></i>
+                    {{len .Edges.Entries}} volunteer{{if ne (len .Edges.Entries) 1}}s{{end}}
+                </span>
+                <span class="rc-day-label">{{.ServiceDate.Format "Monday"}}</span>
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <i class="fas fa-clipboard-list empty-icon"></i>
+        <h3>No rosters yet</h3>
+        <p>Create a duty roster to start assigning volunteers to service roles.</p>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <a href="/rosters/new" class="button is-primary mt-4">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Create Roster</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+
+.roster-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.roster-card {
+    background: white; border: 1px solid var(--light-gray); border-radius: 14px;
+    padding: 1.25rem 1.5rem; text-decoration: none; color: inherit;
+    display: flex; align-items: center; gap: 1.5rem;
+    transition: box-shadow 0.18s, transform 0.15s;
+}
+.roster-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateX(3px); }
+
+.rc-date-box {
+    width: 60px; min-width: 60px; height: 68px; border-radius: 12px;
+    background: var(--primary); color: white;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.rc-day { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.rc-month { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+.rc-year { font-size: 0.6rem; opacity: 0.65; }
+
+.rc-body { flex: 1; min-width: 0; }
+.rc-title { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
+.rc-dept { font-size: 0.8rem; color: var(--primary); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+.rc-notes { font-size: 0.78rem; color: var(--text-light); margin-top: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.rc-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.rc-count { font-size: 0.8rem; color: var(--text-medium); display: flex; align-items: center; gap: 5px; }
+.rc-day-label { font-size: 0.72rem; color: var(--text-light); background: #F1F3F5; padding: 2px 8px; border-radius: 10px; }
+
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); }
+.empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.25; }
+.empty-state h3 { font-size: 1.15rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.9rem; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .roster-card { flex-wrap: wrap; }
+    .rc-meta { flex-direction: row; width: 100%; justify-content: space-between; }
+}
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

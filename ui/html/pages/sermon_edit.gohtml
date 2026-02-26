@@ -1,0 +1,152 @@
+{{define "title"}}Edit Sermon | FaithConnect{{end}}
+{{define "description"}}Edit sermon details{{end}}
+
+{{define "main"}}
+{{$form := .Form}}
+{{$s := index .Data "sermon"}}
+<div class="form-page-wrapper">
+
+    <div class="form-header">
+        <a href="/sermons/{{$s.ID}}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Sermon</a>
+        <h1 class="form-title">Edit Sermon</h1>
+        <p class="form-subtitle">{{$s.Title}}</p>
+    </div>
+
+    <div class="form-card">
+        <form action="/sermons/{{$s.ID}}/edit" method="POST">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div class="form-section-label">Basic Info</div>
+
+            <!-- Title -->
+            <div class="field {{if $form.FieldErrors.title}}has-error{{end}}">
+                <label class="field-label" for="title">Sermon Title <span class="req">*</span></label>
+                <div class="control">
+                    <input class="input {{if $form.FieldErrors.title}}is-danger{{end}}"
+                           type="text" id="title" name="title" value="{{$form.Title}}">
+                </div>
+                {{if $form.FieldErrors.title}}<p class="help is-danger">{{$form.FieldErrors.title}}</p>{{end}}
+            </div>
+
+            <!-- Speaker -->
+            <div class="field {{if $form.FieldErrors.speaker}}has-error{{end}}">
+                <label class="field-label" for="speaker">Speaker <span class="req">*</span></label>
+                <div class="control">
+                    <input class="input {{if $form.FieldErrors.speaker}}is-danger{{end}}"
+                           type="text" id="speaker" name="speaker" value="{{$form.Speaker}}">
+                </div>
+                {{if $form.FieldErrors.speaker}}<p class="help is-danger">{{$form.FieldErrors.speaker}}</p>{{end}}
+            </div>
+
+            <!-- Service Date -->
+            <div class="field {{if $form.FieldErrors.service_date}}has-error{{end}}">
+                <label class="field-label" for="service_date">Service Date <span class="req">*</span></label>
+                <div class="control">
+                    <input class="input {{if $form.FieldErrors.service_date}}is-danger{{end}}"
+                           type="date" id="service_date" name="service_date" value="{{$form.ServiceDate}}">
+                </div>
+                {{if $form.FieldErrors.service_date}}<p class="help is-danger">{{$form.FieldErrors.service_date}}</p>{{end}}
+            </div>
+
+            <div class="form-section-label mt-section">References</div>
+
+            <!-- Series -->
+            <div class="field">
+                <label class="field-label" for="series">Series <span class="opt">(optional)</span></label>
+                <div class="control">
+                    <input class="input" type="text" id="series" name="series" value="{{$form.Series}}">
+                </div>
+            </div>
+
+            <!-- Scripture -->
+            <div class="field">
+                <label class="field-label" for="scripture">Scripture Reference <span class="opt">(optional)</span></label>
+                <div class="control">
+                    <input class="input" type="text" id="scripture" name="scripture" value="{{$form.Scripture}}">
+                </div>
+            </div>
+
+            <div class="form-section-label mt-section">Content & Media</div>
+
+            <!-- Description -->
+            <div class="field">
+                <label class="field-label" for="description">Message Notes <span class="opt">(optional)</span></label>
+                <div class="control">
+                    <textarea class="textarea" id="description" name="description" rows="5">{{$form.Description}}</textarea>
+                </div>
+            </div>
+
+            <!-- Media URL -->
+            <div class="field">
+                <label class="field-label" for="media_url">Media Link <span class="opt">(optional)</span></label>
+                <div class="control has-icons-left">
+                    <input class="input" type="url" id="media_url" name="media_url" value="{{$form.MediaURL}}"
+                           placeholder="https://…">
+                    <span class="icon is-left"><i class="fas fa-link"></i></span>
+                </div>
+            </div>
+
+            <!-- Published -->
+            <div class="publish-toggle">
+                <label class="toggle-label">
+                    <input type="checkbox" name="is_published" value="true" {{if $form.IsPublished}}checked{{end}}>
+                    <span class="toggle-text">
+                        <strong>Published</strong>
+                        <small>Visible to all staff members</small>
+                    </span>
+                </label>
+            </div>
+
+            <div class="form-footer">
+                <a href="/sermons/{{$s.ID}}" class="button is-light">Cancel</a>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-save"></i></span>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-page-wrapper { max-width: 660px; margin: 0 auto; padding: 2rem; }
+.form-header { margin-bottom: 1.75rem; }
+.back-link { font-size: 0.82rem; color: var(--text-light); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 0.75rem; }
+.back-link:hover { color: var(--primary); }
+.form-title { font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin: 0 0 4px; }
+.form-subtitle { font-size: 0.88rem; color: var(--text-light); margin: 0; }
+
+.form-card { background: white; border: 1px solid var(--light-gray); border-radius: 16px; padding: 2rem; }
+
+.form-section-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-light); margin-bottom: 1rem; padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+.mt-section { margin-top: 1.5rem; }
+
+.field { margin-bottom: 1rem; }
+.field-label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 6px; }
+.req { color: var(--primary); }
+.opt { font-weight: 400; color: var(--text-light); }
+.help { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; }
+
+.publish-toggle {
+    background: #F9FAFB; border: 1px solid var(--light-gray); border-radius: 10px;
+    padding: 1rem 1.25rem; margin-top: 1.25rem;
+}
+.toggle-label { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.toggle-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; }
+.toggle-text { display: flex; flex-direction: column; gap: 1px; }
+.toggle-text strong { font-size: 0.88rem; color: var(--text-dark); }
+.toggle-text small { font-size: 0.78rem; color: var(--text-light); }
+
+.form-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--light-gray); }
+
+@media (max-width: 600px) {
+    .form-page-wrapper { padding: 1rem; }
+    .form-footer { flex-direction: column-reverse; }
+    .form-footer .button { width: 100%; justify-content: center; }
+}
+</style>
+{{end}}

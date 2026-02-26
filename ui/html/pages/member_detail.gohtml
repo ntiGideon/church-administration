@@ -12,10 +12,16 @@
             </nav>
             <h1 class="page-title-text">Member Profile</h1>
         </div>
-        <a href="/members" class="button is-outlined">
-            <span class="icon"><i class="fas fa-arrow-left"></i></span>
-            <span>Back to Members</span>
-        </a>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/members/{{$member.ID}}/giving" class="button is-outlined">
+                <span class="icon"><i class="fas fa-hand-holding-heart"></i></span>
+                <span>Giving</span>
+            </a>
+            <a href="/members" class="button is-light">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
     </div>
 
     {{if .Flash}}

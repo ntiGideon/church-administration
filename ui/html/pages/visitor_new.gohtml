@@ -1,0 +1,153 @@
+{{define "title"}}Record Visitor | FaithConnect{{end}}
+{{define "description"}}Record a first-time visitor{{end}}
+
+{{define "main"}}
+{{$form := .Form}}
+<div class="form-page-wrapper">
+
+    <div class="form-header">
+        <a href="/visitors" class="back-link"><i class="fas fa-arrow-left"></i> Back to Visitors</a>
+        <h1 class="form-title">Record Visitor</h1>
+        <p class="form-subtitle">Log a first-time guest and begin follow-up tracking.</p>
+    </div>
+
+    <div class="form-card">
+        <form action="/visitors/new" method="POST">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div class="form-section-label">Name</div>
+            <div class="field-row">
+                <div class="field {{if $form.FieldErrors.first_name}}has-error{{end}}">
+                    <label class="field-label" for="first_name">First Name <span class="req">*</span></label>
+                    <div class="control">
+                        <input class="input {{if $form.FieldErrors.first_name}}is-danger{{end}}"
+                               type="text" id="first_name" name="first_name"
+                               value="{{$form.FirstName}}" placeholder="First name">
+                    </div>
+                    {{if $form.FieldErrors.first_name}}<p class="help is-danger">{{$form.FieldErrors.first_name}}</p>{{end}}
+                </div>
+                <div class="field {{if $form.FieldErrors.last_name}}has-error{{end}}">
+                    <label class="field-label" for="last_name">Last Name <span class="req">*</span></label>
+                    <div class="control">
+                        <input class="input {{if $form.FieldErrors.last_name}}is-danger{{end}}"
+                               type="text" id="last_name" name="last_name"
+                               value="{{$form.LastName}}" placeholder="Last name">
+                    </div>
+                    {{if $form.FieldErrors.last_name}}<p class="help is-danger">{{$form.FieldErrors.last_name}}</p>{{end}}
+                </div>
+            </div>
+
+            <div class="form-section-label mt-section">Contact Info</div>
+            <div class="field-row">
+                <div class="field">
+                    <label class="field-label" for="phone">Phone <span class="opt">(optional)</span></label>
+                    <div class="control">
+                        <input class="input" type="tel" id="phone" name="phone"
+                               value="{{$form.Phone}}" placeholder="+233 …">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="email">Email <span class="opt">(optional)</span></label>
+                    <div class="control">
+                        <input class="input" type="email" id="email" name="email"
+                               value="{{$form.Email}}" placeholder="email@example.com">
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label" for="address">Address <span class="opt">(optional)</span></label>
+                <div class="control">
+                    <input class="input" type="text" id="address" name="address"
+                           value="{{$form.Address}}" placeholder="Area / neighbourhood">
+                </div>
+            </div>
+
+            <div class="form-section-label mt-section">Visit Details</div>
+            <div class="field-row">
+                <div class="field {{if $form.FieldErrors.visit_date}}has-error{{end}}">
+                    <label class="field-label" for="visit_date">Visit Date <span class="req">*</span></label>
+                    <div class="control">
+                        <input class="input {{if $form.FieldErrors.visit_date}}is-danger{{end}}"
+                               type="date" id="visit_date" name="visit_date"
+                               value="{{$form.VisitDate}}">
+                    </div>
+                    {{if $form.FieldErrors.visit_date}}<p class="help is-danger">{{$form.FieldErrors.visit_date}}</p>{{end}}
+                </div>
+                <div class="field">
+                    <label class="field-label" for="how_heard">How did they hear? <span class="opt">(optional)</span></label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select id="how_heard" name="how_heard">
+                                <option value="">— Select —</option>
+                                <option value="walk_in"          {{if eq $form.HowHeard "walk_in"}}selected{{end}}>Walk-in</option>
+                                <option value="invited_by_member"{{if eq $form.HowHeard "invited_by_member"}}selected{{end}}>Invited by member</option>
+                                <option value="social_media"     {{if eq $form.HowHeard "social_media"}}selected{{end}}>Social media</option>
+                                <option value="website"          {{if eq $form.HowHeard "website"}}selected{{end}}>Website</option>
+                                <option value="flyer"            {{if eq $form.HowHeard "flyer"}}selected{{end}}>Flyer / poster</option>
+                                <option value="other"            {{if eq $form.HowHeard "other"}}selected{{end}}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label" for="invited_by">Invited by (member name) <span class="opt">(optional)</span></label>
+                <div class="control">
+                    <input class="input" type="text" id="invited_by" name="invited_by"
+                           value="{{$form.InvitedBy}}" placeholder="Name of the member who brought them">
+                </div>
+            </div>
+
+            <div class="form-section-label mt-section">Notes</div>
+            <div class="field">
+                <div class="control">
+                    <textarea class="textarea" id="notes" name="notes" rows="3"
+                              placeholder="Any observations, prayer requests, or special notes…">{{$form.Notes}}</textarea>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <a href="/visitors" class="button is-light">Cancel</a>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-check"></i></span>
+                    <span>Save Visitor</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-page-wrapper { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.form-header { margin-bottom: 1.75rem; }
+.back-link { font-size: 0.82rem; color: var(--text-light); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 0.75rem; }
+.back-link:hover { color: var(--primary); }
+.form-title { font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin: 0 0 4px; }
+.form-subtitle { font-size: 0.88rem; color: var(--text-light); margin: 0; }
+
+.form-card { background: white; border: 1px solid var(--light-gray); border-radius: 16px; padding: 2rem; }
+
+.form-section-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-light); margin-bottom: 1rem; padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+.mt-section { margin-top: 1.5rem; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.field { margin-bottom: 1rem; }
+.field-label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 6px; }
+.req { color: var(--primary); }
+.opt { font-weight: 400; color: var(--text-light); }
+.help { font-size: 0.78rem; margin-top: 4px; }
+
+.form-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--light-gray); }
+
+@media (max-width: 600px) {
+    .form-page-wrapper { padding: 1rem; }
+    .field-row { grid-template-columns: 1fr; }
+    .form-footer { flex-direction: column-reverse; }
+    .form-footer .button { width: 100%; justify-content: center; }
+}
+</style>
+{{end}}

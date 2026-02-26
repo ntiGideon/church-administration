@@ -1,0 +1,173 @@
+{{define "title"}}Edit Group | FaithConnect{{end}}
+{{define "description"}}Edit group details{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    {{$g := index .Data "group"}}
+    {{$members := index .Data "members"}}
+    {{$form := .Form}}
+
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/groups">Groups</a> <i class="fas fa-chevron-right"></i>
+                <a href="/groups/{{$g.ID}}">{{$g.Name}}</a> <i class="fas fa-chevron-right"></i>
+                <span>Edit</span>
+            </nav>
+            <h1 class="page-title-text">Edit Group</h1>
+        </div>
+        <a href="/groups/{{$g.ID}}" class="button is-light">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Back</span>
+        </a>
+    </div>
+
+    <div class="form-card">
+        <form action="/groups/{{$g.ID}}/edit" method="POST">
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+
+            <div class="form-section">
+                <h3 class="form-section-title">Basic Information</h3>
+                <div class="form-grid-2">
+                    <div class="field">
+                        <label class="label">Group Name <span class="required">*</span></label>
+                        <div class="control">
+                            <input class="input {{if $form}}{{if (index $form.FieldErrors "name")}}is-danger{{end}}{{end}}"
+                                   type="text" name="name" value="{{if $form}}{{$form.Name}}{{end}}">
+                        </div>
+                        {{if $form}}{{with index $form.FieldErrors "name"}}
+                        <p class="help is-danger">{{.}}</p>
+                        {{end}}{{end}}
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Group Type <span class="required">*</span></label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="group_type">
+                                    {{$cur := ""}}{{if $form}}{{$cur = $form.GroupType}}{{end}}
+                                    <option value="cell_group"   {{if eq $cur "cell_group"}}selected{{end}}>Cell Group</option>
+                                    <option value="bible_study"  {{if eq $cur "bible_study"}}selected{{end}}>Bible Study</option>
+                                    <option value="youth"        {{if eq $cur "youth"}}selected{{end}}>Youth</option>
+                                    <option value="women"        {{if eq $cur "women"}}selected{{end}}>Women</option>
+                                    <option value="men"          {{if eq $cur "men"}}selected{{end}}>Men</option>
+                                    <option value="choir"        {{if eq $cur "choir"}}selected{{end}}>Choir</option>
+                                    <option value="committee"    {{if eq $cur "committee"}}selected{{end}}>Committee</option>
+                                    <option value="prayer_team"  {{if eq $cur "prayer_team"}}selected{{end}}>Prayer Team</option>
+                                    <option value="other"        {{if eq $cur "other"}}selected{{end}}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" name="description" rows="3">{{if $form}}{{$form.Description}}{{end}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">
+                        <input type="checkbox" name="is_active" value="true" {{if $form}}{{if $form.IsActive}}checked{{end}}{{end}}>
+                        &nbsp;Active group
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="form-section-title">Meeting Details</h3>
+                <div class="form-grid-3">
+                    <div class="field">
+                        <label class="label">Meeting Day</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="meeting_day">
+                                    <option value="">— Not set —</option>
+                                    {{$day := ""}}{{if $form}}{{$day = $form.MeetingDay}}{{end}}
+                                    <option value="monday"    {{if eq $day "monday"}}selected{{end}}>Monday</option>
+                                    <option value="tuesday"   {{if eq $day "tuesday"}}selected{{end}}>Tuesday</option>
+                                    <option value="wednesday" {{if eq $day "wednesday"}}selected{{end}}>Wednesday</option>
+                                    <option value="thursday"  {{if eq $day "thursday"}}selected{{end}}>Thursday</option>
+                                    <option value="friday"    {{if eq $day "friday"}}selected{{end}}>Friday</option>
+                                    <option value="saturday"  {{if eq $day "saturday"}}selected{{end}}>Saturday</option>
+                                    <option value="sunday"    {{if eq $day "sunday"}}selected{{end}}>Sunday</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Meeting Time</label>
+                        <div class="control">
+                            <input class="input" type="text" name="meeting_time"
+                                   value="{{if $form}}{{$form.MeetingTime}}{{end}}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Location</label>
+                        <div class="control">
+                            <input class="input" type="text" name="location"
+                                   value="{{if $form}}{{$form.Location}}{{end}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{if $members}}
+            <div class="form-section">
+                <h3 class="form-section-title">Leadership</h3>
+                <div class="field" style="max-width: 420px">
+                    <label class="label">Group Leader</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="leader_id">
+                                <option value="0">— No leader assigned —</option>
+                                {{$lid := 0}}{{if $form}}{{$lid = $form.LeaderID}}{{end}}
+                                {{range $members}}
+                                <option value="{{.ID}}" {{if eq $lid .ID}}selected{{end}}>
+                                    {{.FirstName}} {{.LastName}}{{if .Phone}} · {{.Phone}}{{end}}
+                                </option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+
+            <div class="form-actions">
+                <a href="/groups/{{$g.ID}}" class="button is-light">Cancel</a>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-save"></i></span>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 800px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+.required { color: #e74c3c; }
+.form-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); padding: 2rem; }
+.form-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--light-gray); }
+.form-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.form-section-title { font-size: 0.9rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1.25rem; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--light-gray); }
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .form-card { padding: 1.25rem; }
+    .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+}
+</style>
+{{end}}

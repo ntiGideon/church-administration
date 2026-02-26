@@ -39,5 +39,6 @@ func (Event) Edges() []ent.Edge {
 			Ref("events").
 			Required().
 			Unique(),
+		edge.To("attendances", Attendance.Type),
 	}
 }

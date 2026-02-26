@@ -66,6 +66,13 @@ func (Church) Edges() []ent.Edge {
 		edge.To("announcements", Announcement.Type),
 		edge.To("contacts", Contact.Type),
 		edge.To("programs", ProgramEntry.Type),
+		edge.To("groups", Group.Type),
+		edge.To("pledges", Pledge.Type),
+		edge.To("rosters", Roster.Type),
+		edge.To("sermons", Sermon.Type),
+		edge.To("visitors", Visitor.Type),
+		edge.To("prayer_requests", PrayerRequest.Type),
+		edge.To("documents", Document.Type),
 	}
 }
 

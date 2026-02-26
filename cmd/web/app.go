@@ -27,4 +27,12 @@ type application struct {
 	invitationModel   *models.InvitationModel
 	announcementModel *models.AnnouncementModel
 	programModel      *models.ProgramModel
+	attendanceModel   *models.AttendanceModel
+	groupModel        *models.GroupModel
+	pledgeModel       *models.PledgeModel
+	rosterModel       *models.RosterModel
+	sermonModel       *models.SermonModel
+	visitorModel      *models.VisitorModel
+	prayerModel       *models.PrayerRequestModel
+	documentModel     *models.DocumentModel
 }

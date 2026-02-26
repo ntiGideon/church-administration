@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -181,6 +182,26 @@ func (_u *FinanceUpdate) ClearNotes() *FinanceUpdate {
 	return _u
 }
 
+// SetContactID sets the "contact_id" field.
+func (_u *FinanceUpdate) SetContactID(v int) *FinanceUpdate {
+	_u.mutation.SetContactID(v)
+	return _u
+}
+
+// SetNillableContactID sets the "contact_id" field if the given value is not nil.
+func (_u *FinanceUpdate) SetNillableContactID(v *int) *FinanceUpdate {
+	if v != nil {
+		_u.SetContactID(*v)
+	}
+	return _u
+}
+
+// ClearContactID clears the value of the "contact_id" field.
+func (_u *FinanceUpdate) ClearContactID() *FinanceUpdate {
+	_u.mutation.ClearContactID()
+	return _u
+}
+
 // SetRecordedByID sets the "recorded_by" edge to the User entity by ID.
 func (_u *FinanceUpdate) SetRecordedByID(id int) *FinanceUpdate {
 	_u.mutation.SetRecordedByID(id)
@@ -219,6 +240,25 @@ func (_u *FinanceUpdate) SetChurch(v *Church) *FinanceUpdate {
 	return _u.SetChurchID(v.ID)
 }
 
+// SetDonorID sets the "donor" edge to the Contact entity by ID.
+func (_u *FinanceUpdate) SetDonorID(id int) *FinanceUpdate {
+	_u.mutation.SetDonorID(id)
+	return _u
+}
+
+// SetNillableDonorID sets the "donor" edge to the Contact entity by ID if the given value is not nil.
+func (_u *FinanceUpdate) SetNillableDonorID(id *int) *FinanceUpdate {
+	if id != nil {
+		_u = _u.SetDonorID(*id)
+	}
+	return _u
+}
+
+// SetDonor sets the "donor" edge to the Contact entity.
+func (_u *FinanceUpdate) SetDonor(v *Contact) *FinanceUpdate {
+	return _u.SetDonorID(v.ID)
+}
+
 // Mutation returns the FinanceMutation object of the builder.
 func (_u *FinanceUpdate) Mutation() *FinanceMutation {
 	return _u.mutation
@@ -233,6 +273,12 @@ func (_u *FinanceUpdate) ClearRecordedBy() *FinanceUpdate {
 // ClearChurch clears the "church" edge to the Church entity.
 func (_u *FinanceUpdate) ClearChurch() *FinanceUpdate {
 	_u.mutation.ClearChurch()
+	return _u
+}
+
+// ClearDonor clears the "donor" edge to the Contact entity.
+func (_u *FinanceUpdate) ClearDonor() *FinanceUpdate {
+	_u.mutation.ClearDonor()
 	return _u
 }
 
@@ -375,6 +421,35 @@ func (_u *FinanceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DonorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   finance.DonorTable,
+			Columns: []string{finance.DonorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DonorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   finance.DonorTable,
+			Columns: []string{finance.DonorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -553,6 +628,26 @@ func (_u *FinanceUpdateOne) ClearNotes() *FinanceUpdateOne {
 	return _u
 }
 
+// SetContactID sets the "contact_id" field.
+func (_u *FinanceUpdateOne) SetContactID(v int) *FinanceUpdateOne {
+	_u.mutation.SetContactID(v)
+	return _u
+}
+
+// SetNillableContactID sets the "contact_id" field if the given value is not nil.
+func (_u *FinanceUpdateOne) SetNillableContactID(v *int) *FinanceUpdateOne {
+	if v != nil {
+		_u.SetContactID(*v)
+	}
+	return _u
+}
+
+// ClearContactID clears the value of the "contact_id" field.
+func (_u *FinanceUpdateOne) ClearContactID() *FinanceUpdateOne {
+	_u.mutation.ClearContactID()
+	return _u
+}
+
 // SetRecordedByID sets the "recorded_by" edge to the User entity by ID.
 func (_u *FinanceUpdateOne) SetRecordedByID(id int) *FinanceUpdateOne {
 	_u.mutation.SetRecordedByID(id)
@@ -591,6 +686,25 @@ func (_u *FinanceUpdateOne) SetChurch(v *Church) *FinanceUpdateOne {
 	return _u.SetChurchID(v.ID)
 }
 
+// SetDonorID sets the "donor" edge to the Contact entity by ID.
+func (_u *FinanceUpdateOne) SetDonorID(id int) *FinanceUpdateOne {
+	_u.mutation.SetDonorID(id)
+	return _u
+}
+
+// SetNillableDonorID sets the "donor" edge to the Contact entity by ID if the given value is not nil.
+func (_u *FinanceUpdateOne) SetNillableDonorID(id *int) *FinanceUpdateOne {
+	if id != nil {
+		_u = _u.SetDonorID(*id)
+	}
+	return _u
+}
+
+// SetDonor sets the "donor" edge to the Contact entity.
+func (_u *FinanceUpdateOne) SetDonor(v *Contact) *FinanceUpdateOne {
+	return _u.SetDonorID(v.ID)
+}
+
 // Mutation returns the FinanceMutation object of the builder.
 func (_u *FinanceUpdateOne) Mutation() *FinanceMutation {
 	return _u.mutation
@@ -605,6 +719,12 @@ func (_u *FinanceUpdateOne) ClearRecordedBy() *FinanceUpdateOne {
 // ClearChurch clears the "church" edge to the Church entity.
 func (_u *FinanceUpdateOne) ClearChurch() *FinanceUpdateOne {
 	_u.mutation.ClearChurch()
+	return _u
+}
+
+// ClearDonor clears the "donor" edge to the Contact entity.
+func (_u *FinanceUpdateOne) ClearDonor() *FinanceUpdateOne {
+	_u.mutation.ClearDonor()
 	return _u
 }
 
@@ -777,6 +897,35 @@ func (_u *FinanceUpdateOne) sqlSave(ctx context.Context) (_node *Finance, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DonorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   finance.DonorTable,
+			Columns: []string{finance.DonorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DonorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   finance.DonorTable,
+			Columns: []string{finance.DonorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

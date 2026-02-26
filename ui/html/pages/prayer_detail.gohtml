@@ -1,0 +1,200 @@
+{{define "title"}}{{(index .Data "request").Title}} | Prayer Board | FaithConnect{{end}}
+{{define "description"}}Prayer request detail{{end}}
+
+{{define "main"}}
+{{$pr := index .Data "request"}}
+<div class="page-wrapper">
+
+    <!-- Header -->
+    <div class="page-header-bar">
+        <div class="ph-left">
+            <a href="/prayer" class="back-link"><i class="fas fa-arrow-left"></i> Prayer Board</a>
+            <div class="status-row">
+                <span class="status-badge-{{enumStr $pr.Status}}">{{prayerStatusLabel (enumStr $pr.Status)}}</span>
+                {{if $pr.IsPrivate}}<span class="private-badge"><i class="fas fa-lock"></i> Private</span>{{end}}
+            </div>
+            <h1 class="page-title-text">{{$pr.Title}}</h1>
+            <div class="header-meta">
+                <span class="hm-item"><i class="fas fa-clock"></i> {{$pr.CreatedAt.Format "2 January 2006"}}</span>
+                {{if $pr.IsAnonymous}}
+                <span class="hm-item"><i class="fas fa-user-secret"></i> Anonymous</span>
+                {{else if $pr.RequesterName}}
+                <span class="hm-item"><i class="fas fa-user"></i> {{$pr.RequesterName}}</span>
+                {{else if $pr.Edges.Contact}}
+                <span class="hm-item"><i class="fas fa-user"></i> {{$pr.Edges.Contact.FirstName}} {{$pr.Edges.Contact.LastName}}</span>
+                {{end}}
+            </div>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <div class="ph-actions">
+            <a href="/prayer/{{$pr.ID}}/edit" class="button is-light">
+                <span class="icon"><i class="fas fa-edit"></i></span>
+                <span>Edit</span>
+            </a>
+            <form action="/prayer/{{$pr.ID}}/delete" method="POST"
+                  onsubmit="return confirm('Delete this prayer request?')">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button type="submit" class="button is-danger is-light">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Delete</span>
+                </button>
+            </form>
+        </div>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    <div class="detail-layout">
+
+        <!-- Request body -->
+        <div class="detail-main">
+            <div class="request-body-card">
+                <div class="rb-label"><i class="fas fa-hands-praying"></i> Prayer Request</div>
+                <div class="rb-text">{{$pr.Body}}</div>
+            </div>
+        </div>
+
+        <!-- Sidebar: status + info -->
+        <div class="detail-sidebar">
+
+            <!-- Status update -->
+            <div class="sidebar-card">
+                <div class="sc-title">Status</div>
+                <div class="current-status cs-{{enumStr $pr.Status}}">
+                    <i class="fas {{if eq (enumStr $pr.Status) "answered"}}fa-check-circle{{else if eq (enumStr $pr.Status) "closed"}}fa-times-circle{{else}}fa-circle{{end}}"></i>
+                    {{prayerStatusLabel (enumStr $pr.Status)}}
+                </div>
+
+                <div class="sc-subtitle">Update Status</div>
+                <div class="prayer-status-btns">
+                    <form action="/prayer/{{$pr.ID}}/status" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <input type="hidden" name="status" value="active">
+                        <button type="submit" class="psb psb-active {{if eq (enumStr $pr.Status) "active"}}is-active{{end}}">
+                            <i class="fas fa-circle"></i> Active
+                        </button>
+                    </form>
+                    <form action="/prayer/{{$pr.ID}}/status" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <input type="hidden" name="status" value="answered">
+                        <button type="submit" class="psb psb-answered {{if eq (enumStr $pr.Status) "answered"}}is-active{{end}}">
+                            <i class="fas fa-check-circle"></i> Answered
+                        </button>
+                    </form>
+                    <form action="/prayer/{{$pr.ID}}/status" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <input type="hidden" name="status" value="closed">
+                        <button type="submit" class="psb psb-closed {{if eq (enumStr $pr.Status) "closed"}}is-active{{end}}">
+                            <i class="fas fa-times-circle"></i> Closed
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="sidebar-card">
+                <div class="sc-title">Details</div>
+                <div class="stat-row">
+                    <span class="sr-label">Submitted</span>
+                    <span class="sr-val">{{$pr.CreatedAt.Format "2 Jan 2006"}}</span>
+                </div>
+                {{if and (not $pr.IsAnonymous) (ne $pr.RequesterName "")}}
+                <div class="stat-row">
+                    <span class="sr-label">By</span>
+                    <span class="sr-val">{{$pr.RequesterName}}</span>
+                </div>
+                {{else if $pr.IsAnonymous}}
+                <div class="stat-row">
+                    <span class="sr-label">By</span>
+                    <span class="sr-val anon">Anonymous</span>
+                </div>
+                {{else if $pr.Edges.Contact}}
+                <div class="stat-row">
+                    <span class="sr-label">By</span>
+                    <span class="sr-val">{{$pr.Edges.Contact.FirstName}} {{$pr.Edges.Contact.LastName}}</span>
+                </div>
+                {{end}}
+                <div class="stat-row">
+                    <span class="sr-label">Visibility</span>
+                    <span class="sr-val">{{if $pr.IsPrivate}}<i class="fas fa-lock"></i> Private{{else}}<i class="fas fa-users"></i> Shared{{end}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="sr-label">Last updated</span>
+                    <span class="sr-val">{{$pr.UpdatedAt.Format "2 Jan 2006"}}</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 960px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.ph-left { display: flex; flex-direction: column; gap: 5px; max-width: 650px; }
+.back-link { font-size: 0.82rem; color: var(--text-light); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.back-link:hover { color: var(--primary); }
+.status-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.status-badge-active   { font-size: 0.72rem; font-weight: 700; background: #EFF6FF; color: #2563EB; border-radius: 20px; padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-badge-answered { font-size: 0.72rem; font-weight: 700; background: #F0FDF4; color: #15803D; border-radius: 20px; padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-badge-closed   { font-size: 0.72rem; font-weight: 700; background: #F9FAFB; color: #6B7280;  border-radius: 20px; padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.private-badge { font-size: 0.72rem; color: #9CA3AF; display: inline-flex; align-items: center; gap: 4px; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1.25; }
+.header-meta { display: flex; gap: 1rem; flex-wrap: wrap; }
+.hm-item { font-size: 0.83rem; color: var(--text-light); display: inline-flex; align-items: center; gap: 5px; }
+.ph-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-start; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 270px; gap: 1.5rem; align-items: start; }
+
+.request-body-card {
+    background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.5rem;
+}
+.rb-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 7px; }
+.rb-text { font-size: 0.95rem; color: var(--text-medium); line-height: 1.75; white-space: pre-wrap; }
+
+/* Sidebar */
+.sidebar-card { background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+.sc-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+.sc-subtitle { font-size: 0.75rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin: 1rem 0 0.6rem; }
+
+.current-status { font-size: 1rem; font-weight: 700; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.cs-active   { background: #EFF6FF; color: #2563EB; }
+.cs-answered { background: #F0FDF4; color: #15803D; }
+.cs-closed   { background: #F9FAFB; color: #6B7280; }
+
+.prayer-status-btns { display: flex; flex-direction: column; gap: 5px; }
+.psb {
+    width: 100%; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--light-gray);
+    background: #F9FAFB; font-size: 0.83rem; color: var(--text-medium);
+    cursor: pointer; text-align: left; font-family: inherit;
+    display: flex; align-items: center; gap: 8px; transition: all 0.12s;
+}
+.psb:hover { border-color: var(--primary); color: var(--primary); background: rgba(80,34,45,0.04); }
+.psb.is-active { font-weight: 700; }
+.psb-active.is-active   { background: #EFF6FF; color: #2563EB; border-color: #93C5FD; }
+.psb-answered.is-active { background: #F0FDF4; color: #15803D; border-color: #86EFAC; }
+.psb-closed.is-active   { background: #F9FAFB; color: #6B7280; border-color: #D1D5DB; }
+
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #F5F5F5; font-size: 0.83rem; }
+.stat-row:last-child { border-bottom: none; }
+.sr-label { color: var(--text-light); }
+.sr-val { color: var(--text-dark); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+.sr-val.anon { color: var(--text-light); font-style: italic; }
+
+@media (max-width: 768px) {
+    .detail-layout { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

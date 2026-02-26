@@ -82,6 +82,21 @@ type FinanceDto struct {
 	Category        string  `form:"category"`
 	PaymentMethod   string  `form:"payment_method"`
 	Notes           string  `form:"notes"`
+	ContactID       int     `form:"contact_id"`
+
+	validator.Validator `form:"-"`
+}
+
+// PledgeDto is used to create a pledge for a member.
+type PledgeDto struct {
+	Title     string  `form:"title"`
+	Category  string  `form:"category"`
+	Amount    float64 `form:"amount"`
+	Currency  string  `form:"currency"`
+	StartDate string  `form:"start_date"`
+	EndDate   string  `form:"end_date"`
+	Frequency string  `form:"frequency"`
+	Notes     string  `form:"notes"`
 
 	validator.Validator `form:"-"`
 }
@@ -143,6 +158,91 @@ type ChurchSettingsDto struct {
 	Phone            string `form:"phone"`
 	Website          string `form:"website"`
 	CongregationSize int    `form:"congregation_size"`
+
+	validator.Validator `form:"-"`
+}
+
+// RosterDto is used to create or update a duty roster.
+type RosterDto struct {
+	Title       string `form:"title"`
+	ServiceDate string `form:"service_date"`
+	Department  string `form:"department"`
+	Notes       string `form:"notes"`
+
+	validator.Validator `form:"-"`
+}
+
+// RosterEntryDto is used to assign a volunteer to a roster.
+type RosterEntryDto struct {
+	ContactID int    `form:"contact_id"`
+	Role      string `form:"role"`
+	Notes     string `form:"notes"`
+
+	validator.Validator `form:"-"`
+}
+
+// DocumentDto is used when uploading a document.
+type DocumentDto struct {
+	Title       string `form:"title"`
+	Description string `form:"description"`
+	Category    string `form:"category"`
+	IsPublic    bool   `form:"is_public"`
+
+	validator.Validator `form:"-"`
+}
+
+// PrayerRequestDto is used to create or update a prayer request.
+type PrayerRequestDto struct {
+	Title         string `form:"title"`
+	Body          string `form:"body"`
+	RequesterName string `form:"requester_name"`
+	IsAnonymous   bool   `form:"is_anonymous"`
+	IsPrivate     bool   `form:"is_private"`
+	ContactID     int    `form:"contact_id"`
+
+	validator.Validator `form:"-"`
+}
+
+// VisitorDto is used to create or update a visitor record.
+type VisitorDto struct {
+	FirstName      string `form:"first_name"`
+	LastName       string `form:"last_name"`
+	Email          string `form:"email"`
+	Phone          string `form:"phone"`
+	Address        string `form:"address"`
+	VisitDate      string `form:"visit_date"`
+	HowHeard       string `form:"how_heard"`
+	InvitedBy      string `form:"invited_by"`
+	Notes          string `form:"notes"`
+	FollowUpStatus string `form:"follow_up_status"`
+
+	validator.Validator `form:"-"`
+}
+
+// SermonDto is used to create or update a sermon record.
+type SermonDto struct {
+	Title       string `form:"title"`
+	Speaker     string `form:"speaker"`
+	Series      string `form:"series"`
+	Scripture   string `form:"scripture"`
+	Description string `form:"description"`
+	MediaURL    string `form:"media_url"`
+	ServiceDate string `form:"service_date"`
+	IsPublished bool   `form:"is_published"`
+
+	validator.Validator `form:"-"`
+}
+
+// GroupDto is used to create or update a small group
+type GroupDto struct {
+	Name        string `form:"name"`
+	Description string `form:"description"`
+	GroupType   string `form:"group_type"`
+	MeetingDay  string `form:"meeting_day"`
+	MeetingTime string `form:"meeting_time"`
+	Location    string `form:"location"`
+	LeaderID    int    `form:"leader_id"`
+	IsActive    bool   `form:"is_active"`
 
 	validator.Validator `form:"-"`
 }

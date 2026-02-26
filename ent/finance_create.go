@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/user"
 )
@@ -108,6 +109,20 @@ func (_c *FinanceCreate) SetNillableNotes(v *string) *FinanceCreate {
 	return _c
 }
 
+// SetContactID sets the "contact_id" field.
+func (_c *FinanceCreate) SetContactID(v int) *FinanceCreate {
+	_c.mutation.SetContactID(v)
+	return _c
+}
+
+// SetNillableContactID sets the "contact_id" field if the given value is not nil.
+func (_c *FinanceCreate) SetNillableContactID(v *int) *FinanceCreate {
+	if v != nil {
+		_c.SetContactID(*v)
+	}
+	return _c
+}
+
 // SetRecordedByID sets the "recorded_by" edge to the User entity by ID.
 func (_c *FinanceCreate) SetRecordedByID(id int) *FinanceCreate {
 	_c.mutation.SetRecordedByID(id)
@@ -144,6 +159,25 @@ func (_c *FinanceCreate) SetNillableChurchID(id *int) *FinanceCreate {
 // SetChurch sets the "church" edge to the Church entity.
 func (_c *FinanceCreate) SetChurch(v *Church) *FinanceCreate {
 	return _c.SetChurchID(v.ID)
+}
+
+// SetDonorID sets the "donor" edge to the Contact entity by ID.
+func (_c *FinanceCreate) SetDonorID(id int) *FinanceCreate {
+	_c.mutation.SetDonorID(id)
+	return _c
+}
+
+// SetNillableDonorID sets the "donor" edge to the Contact entity by ID if the given value is not nil.
+func (_c *FinanceCreate) SetNillableDonorID(id *int) *FinanceCreate {
+	if id != nil {
+		_c = _c.SetDonorID(*id)
+	}
+	return _c
+}
+
+// SetDonor sets the "donor" edge to the Contact entity.
+func (_c *FinanceCreate) SetDonor(v *Contact) *FinanceCreate {
+	return _c.SetDonorID(v.ID)
 }
 
 // Mutation returns the FinanceMutation object of the builder.
@@ -306,6 +340,23 @@ func (_c *FinanceCreate) createSpec() (*Finance, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.church_finances = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DonorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   finance.DonorTable,
+			Columns: []string{finance.DonorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ContactID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

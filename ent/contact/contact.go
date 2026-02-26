@@ -95,6 +95,20 @@ const (
 	EdgeSpouseContact = "spouse_contact"
 	// EdgeSpouseOfContact holds the string denoting the spouse_of_contact edge name in mutations.
 	EdgeSpouseOfContact = "spouse_of_contact"
+	// EdgeAttendances holds the string denoting the attendances edge name in mutations.
+	EdgeAttendances = "attendances"
+	// EdgeGroups holds the string denoting the groups edge name in mutations.
+	EdgeGroups = "groups"
+	// EdgeLeadingGroups holds the string denoting the leading_groups edge name in mutations.
+	EdgeLeadingGroups = "leading_groups"
+	// EdgeGivingRecords holds the string denoting the giving_records edge name in mutations.
+	EdgeGivingRecords = "giving_records"
+	// EdgePledges holds the string denoting the pledges edge name in mutations.
+	EdgePledges = "pledges"
+	// EdgeRosterEntries holds the string denoting the roster_entries edge name in mutations.
+	EdgeRosterEntries = "roster_entries"
+	// EdgePrayerRequests holds the string denoting the prayer_requests edge name in mutations.
+	EdgePrayerRequests = "prayer_requests"
 	// Table holds the table name of the contact in the database.
 	Table = "contacts"
 	// UserTable is the table that holds the user relation/edge.
@@ -119,6 +133,53 @@ const (
 	SpouseOfContactTable = "contacts"
 	// SpouseOfContactColumn is the table column denoting the spouse_of_contact relation/edge.
 	SpouseOfContactColumn = "spouse_id"
+	// AttendancesTable is the table that holds the attendances relation/edge.
+	AttendancesTable = "attendances"
+	// AttendancesInverseTable is the table name for the Attendance entity.
+	// It exists in this package in order to avoid circular dependency with the "attendance" package.
+	AttendancesInverseTable = "attendances"
+	// AttendancesColumn is the table column denoting the attendances relation/edge.
+	AttendancesColumn = "contact_id"
+	// GroupsTable is the table that holds the groups relation/edge. The primary key declared below.
+	GroupsTable = "group_members"
+	// GroupsInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	GroupsInverseTable = "groups"
+	// LeadingGroupsTable is the table that holds the leading_groups relation/edge.
+	LeadingGroupsTable = "groups"
+	// LeadingGroupsInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	LeadingGroupsInverseTable = "groups"
+	// LeadingGroupsColumn is the table column denoting the leading_groups relation/edge.
+	LeadingGroupsColumn = "leader_id"
+	// GivingRecordsTable is the table that holds the giving_records relation/edge.
+	GivingRecordsTable = "finances"
+	// GivingRecordsInverseTable is the table name for the Finance entity.
+	// It exists in this package in order to avoid circular dependency with the "finance" package.
+	GivingRecordsInverseTable = "finances"
+	// GivingRecordsColumn is the table column denoting the giving_records relation/edge.
+	GivingRecordsColumn = "contact_id"
+	// PledgesTable is the table that holds the pledges relation/edge.
+	PledgesTable = "pledges"
+	// PledgesInverseTable is the table name for the Pledge entity.
+	// It exists in this package in order to avoid circular dependency with the "pledge" package.
+	PledgesInverseTable = "pledges"
+	// PledgesColumn is the table column denoting the pledges relation/edge.
+	PledgesColumn = "contact_id"
+	// RosterEntriesTable is the table that holds the roster_entries relation/edge.
+	RosterEntriesTable = "roster_entries"
+	// RosterEntriesInverseTable is the table name for the RosterEntry entity.
+	// It exists in this package in order to avoid circular dependency with the "rosterentry" package.
+	RosterEntriesInverseTable = "roster_entries"
+	// RosterEntriesColumn is the table column denoting the roster_entries relation/edge.
+	RosterEntriesColumn = "contact_id"
+	// PrayerRequestsTable is the table that holds the prayer_requests relation/edge.
+	PrayerRequestsTable = "prayer_requests"
+	// PrayerRequestsInverseTable is the table name for the PrayerRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "prayerrequest" package.
+	PrayerRequestsInverseTable = "prayer_requests"
+	// PrayerRequestsColumn is the table column denoting the prayer_requests relation/edge.
+	PrayerRequestsColumn = "contact_id"
 )
 
 // Columns holds all SQL columns for contact fields.
@@ -161,6 +222,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// GroupsPrimaryKey and GroupsColumn2 are the table columns denoting the
+	// primary key for the groups relation (M2M).
+	GroupsPrimaryKey = []string{"group_id", "contact_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -477,6 +544,104 @@ func BySpouseOfContactField(field string, opts ...sql.OrderTermOption) OrderOpti
 		sqlgraph.OrderByNeighborTerms(s, newSpouseOfContactStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAttendancesCount orders the results by attendances count.
+func ByAttendancesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAttendancesStep(), opts...)
+	}
+}
+
+// ByAttendances orders the results by attendances terms.
+func ByAttendances(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAttendancesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByGroupsCount orders the results by groups count.
+func ByGroupsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGroupsStep(), opts...)
+	}
+}
+
+// ByGroups orders the results by groups terms.
+func ByGroups(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByLeadingGroupsCount orders the results by leading_groups count.
+func ByLeadingGroupsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLeadingGroupsStep(), opts...)
+	}
+}
+
+// ByLeadingGroups orders the results by leading_groups terms.
+func ByLeadingGroups(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLeadingGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByGivingRecordsCount orders the results by giving_records count.
+func ByGivingRecordsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGivingRecordsStep(), opts...)
+	}
+}
+
+// ByGivingRecords orders the results by giving_records terms.
+func ByGivingRecords(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGivingRecordsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPledgesCount orders the results by pledges count.
+func ByPledgesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPledgesStep(), opts...)
+	}
+}
+
+// ByPledges orders the results by pledges terms.
+func ByPledges(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPledgesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRosterEntriesCount orders the results by roster_entries count.
+func ByRosterEntriesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRosterEntriesStep(), opts...)
+	}
+}
+
+// ByRosterEntries orders the results by roster_entries terms.
+func ByRosterEntries(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRosterEntriesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPrayerRequestsCount orders the results by prayer_requests count.
+func ByPrayerRequestsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPrayerRequestsStep(), opts...)
+	}
+}
+
+// ByPrayerRequests orders the results by prayer_requests terms.
+func ByPrayerRequests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPrayerRequestsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -503,5 +668,54 @@ func newSpouseOfContactStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, true, SpouseOfContactTable, SpouseOfContactColumn),
+	)
+}
+func newAttendancesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AttendancesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AttendancesTable, AttendancesColumn),
+	)
+}
+func newGroupsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, GroupsTable, GroupsPrimaryKey...),
+	)
+}
+func newLeadingGroupsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LeadingGroupsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, LeadingGroupsTable, LeadingGroupsColumn),
+	)
+}
+func newGivingRecordsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GivingRecordsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, GivingRecordsTable, GivingRecordsColumn),
+	)
+}
+func newPledgesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PledgesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PledgesTable, PledgesColumn),
+	)
+}
+func newRosterEntriesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RosterEntriesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RosterEntriesTable, RosterEntriesColumn),
+	)
+}
+func newPrayerRequestsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PrayerRequestsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PrayerRequestsTable, PrayerRequestsColumn),
 	)
 }

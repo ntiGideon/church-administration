@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/user"
 )
@@ -37,6 +38,8 @@ type Finance struct {
 	ReferenceNumber string `json:"reference_number,omitempty"`
 	// Notes holds the value of the "notes" field.
 	Notes string `json:"notes,omitempty"`
+	// ContactID holds the value of the "contact_id" field.
+	ContactID int `json:"contact_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FinanceQuery when eager-loading is set.
 	Edges                FinanceEdges `json:"edges"`
@@ -51,9 +54,11 @@ type FinanceEdges struct {
 	RecordedBy *User `json:"recorded_by,omitempty"`
 	// Church holds the value of the church edge.
 	Church *Church `json:"church,omitempty"`
+	// Donor holds the value of the donor edge.
+	Donor *Contact `json:"donor,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // RecordedByOrErr returns the RecordedBy value or an error if the edge
@@ -78,6 +83,17 @@ func (e FinanceEdges) ChurchOrErr() (*Church, error) {
 	return nil, &NotLoadedError{edge: "church"}
 }
 
+// DonorOrErr returns the Donor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e FinanceEdges) DonorOrErr() (*Contact, error) {
+	if e.Donor != nil {
+		return e.Donor, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: contact.Label}
+	}
+	return nil, &NotLoadedError{edge: "donor"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Finance) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -85,7 +101,7 @@ func (*Finance) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case finance.FieldAmount:
 			values[i] = new(sql.NullFloat64)
-		case finance.FieldID:
+		case finance.FieldID, finance.FieldContactID:
 			values[i] = new(sql.NullInt64)
 		case finance.FieldDescription, finance.FieldTransactionType, finance.FieldCurrency, finance.FieldCategory, finance.FieldPaymentMethod, finance.FieldReferenceNumber, finance.FieldNotes:
 			values[i] = new(sql.NullString)
@@ -170,6 +186,12 @@ func (_m *Finance) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Notes = value.String
 			}
+		case finance.FieldContactID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field contact_id", values[i])
+			} else if value.Valid {
+				_m.ContactID = int(value.Int64)
+			}
 		case finance.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field church_finances", value)
@@ -205,6 +227,11 @@ func (_m *Finance) QueryRecordedBy() *UserQuery {
 // QueryChurch queries the "church" edge of the Finance entity.
 func (_m *Finance) QueryChurch() *ChurchQuery {
 	return NewFinanceClient(_m.config).QueryChurch(_m)
+}
+
+// QueryDonor queries the "donor" edge of the Finance entity.
+func (_m *Finance) QueryDonor() *ContactQuery {
+	return NewFinanceClient(_m.config).QueryDonor(_m)
 }
 
 // Update returns a builder for updating this Finance.
@@ -256,6 +283,9 @@ func (_m *Finance) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("notes=")
 	builder.WriteString(_m.Notes)
+	builder.WriteString(", ")
+	builder.WriteString("contact_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ContactID))
 	builder.WriteByte(')')
 	return builder.String()
 }

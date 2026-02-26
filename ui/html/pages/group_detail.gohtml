@@ -1,0 +1,270 @@
+{{define "title"}}Group Detail | FaithConnect{{end}}
+{{define "description"}}View and manage group members{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    {{$g := index .Data "group"}}
+    {{$available := index .Data "availableMembers"}}
+
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/groups">Groups</a> <i class="fas fa-chevron-right"></i>
+                <span>{{if $g}}{{$g.Name}}{{else}}Group{{end}}</span>
+            </nav>
+            <h1 class="page-title-text">{{if $g}}{{$g.Name}}{{end}}</h1>
+        </div>
+        <div class="header-actions">
+            {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+            {{$role := $.LoggedInUser.Role.String}}
+            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+            <a href="/groups/{{$g.ID}}/edit" class="button is-outlined">
+                <span class="icon"><i class="fas fa-edit"></i></span>
+                <span>Edit</span>
+            </a>
+            <form action="/groups/{{$g.ID}}/delete" method="POST" style="display:inline"
+                  onsubmit="return confirm('Delete this group? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button type="submit" class="button is-danger is-outlined">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Delete</span>
+                </button>
+            </form>
+            {{end}}{{end}}{{end}}
+            <a href="/groups" class="button is-light">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{if $g}}
+    <div class="gd-layout">
+        <!-- ── Main ─────────────────────────────── -->
+        <div class="gd-main">
+            <!-- Members Panel -->
+            <div class="gd-panel">
+                <div class="gd-panel-header">
+                    <div class="gd-panel-title">
+                        <i class="fas fa-users"></i>
+                        Members
+                        <span class="member-count-badge">{{len $g.Edges.Members}}</span>
+                    </div>
+                </div>
+
+                <!-- Add member form (admin only) -->
+                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+                {{$role := $.LoggedInUser.Role.String}}
+                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                {{if $available}}
+                <div class="add-member-bar">
+                    <form action="/groups/{{$g.ID}}/members/add" method="POST" class="add-member-form">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <div class="select add-member-select">
+                            <select name="contact_id" required>
+                                <option value="">— Add a member —</option>
+                                {{range $available}}
+                                <option value="{{.ID}}">{{.Name}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <button type="submit" class="button is-primary">
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                            <span>Add</span>
+                        </button>
+                    </form>
+                </div>
+                {{end}}
+                {{end}}{{end}}{{end}}
+
+                <!-- Member list -->
+                {{if $g.Edges.Members}}
+                <div class="member-list">
+                    {{range $g.Edges.Members}}
+                    <div class="member-row">
+                        <div class="member-avatar">
+                            {{if .ProfilePictureURL}}
+                            <img src="{{.ProfilePictureURL}}" alt="">
+                            {{else}}
+                            <span class="avatar-init">{{slice .FirstName 0 1}}</span>
+                            {{end}}
+                        </div>
+                        <div class="member-info">
+                            <span class="member-name">{{.FirstName}} {{.LastName}}</span>
+                            {{if .Phone}}<span class="member-meta"><i class="fas fa-phone"></i> {{.Phone}}</span>{{end}}
+                        </div>
+                        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+                        {{$role := $.LoggedInUser.Role.String}}
+                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                        <form action="/groups/{{$g.ID}}/members/{{.ID}}/remove" method="POST" class="remove-form">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <button type="submit" class="button is-light is-small remove-btn"
+                                    onclick="return confirm('Remove {{.FirstName}} from this group?')">
+                                <span class="icon is-small"><i class="fas fa-times"></i></span>
+                            </button>
+                        </form>
+                        {{end}}{{end}}{{end}}
+                    </div>
+                    {{end}}
+                </div>
+                {{else}}
+                <div class="no-members">
+                    <i class="fas fa-user-plus"></i>
+                    <p>No members yet. Add members using the form above.</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <!-- ── Sidebar ────────────────────────────── -->
+        <div class="gd-sidebar">
+            <div class="info-card">
+                <h4>Group Info</h4>
+
+                <div class="info-row">
+                    <span class="info-label">Type</span>
+                    <span class="gt-badge-{{$g.GroupType}} type-badge-sm">{{$g.GroupType}}</span>
+                </div>
+
+                {{if $g.Edges.Leader}}
+                <div class="info-row">
+                    <span class="info-label">Leader</span>
+                    <span class="info-val">{{$g.Edges.Leader.FirstName}} {{$g.Edges.Leader.LastName}}</span>
+                </div>
+                {{end}}
+
+                {{if $g.MeetingDay}}
+                <div class="info-row">
+                    <span class="info-label">Meeting Day</span>
+                    <span class="info-val">{{$g.MeetingDay}}</span>
+                </div>
+                {{end}}
+
+                {{if $g.MeetingTime}}
+                <div class="info-row">
+                    <span class="info-label">Time</span>
+                    <span class="info-val">{{$g.MeetingTime}}</span>
+                </div>
+                {{end}}
+
+                {{if $g.Location}}
+                <div class="info-row">
+                    <span class="info-label">Location</span>
+                    <span class="info-val">{{$g.Location}}</span>
+                </div>
+                {{end}}
+
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    {{if $g.IsActive}}
+                    <span class="status-pill active">Active</span>
+                    {{else}}
+                    <span class="status-pill inactive">Inactive</span>
+                    {{end}}
+                </div>
+
+                {{if $g.Description}}
+                <div class="info-desc">
+                    <span class="info-label">Description</span>
+                    <p>{{$g.Description}}</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+.header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+/* Layout */
+.gd-layout { display: flex; gap: 1.5rem; align-items: flex-start; }
+.gd-main { flex: 1; min-width: 0; }
+.gd-sidebar { width: 260px; flex-shrink: 0; }
+
+/* Panel */
+.gd-panel { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; }
+.gd-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--light-gray); background: #FAFAFA; }
+.gd-panel-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1rem; color: var(--text-dark); }
+.gd-panel-title i { color: var(--primary); }
+.member-count-badge { background: var(--primary); color: white; font-size: 0.72rem; font-weight: 700; padding: 1px 8px; border-radius: 12px; }
+
+/* Add member bar */
+.add-member-bar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--light-gray); background: #F8F9FA; }
+.add-member-form { display: flex; gap: 0.75rem; align-items: center; }
+.add-member-select { flex: 1; }
+.add-member-select select { width: 100%; }
+
+/* Member list */
+.member-list { }
+.member-row { display: flex; align-items: center; gap: 12px; padding: 0.85rem 1.5rem; border-bottom: 1px solid var(--light-gray); transition: background 0.15s; }
+.member-row:last-child { border-bottom: none; }
+.member-row:hover { background: #FAFAFA; }
+.member-avatar { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-init { color: white; font-size: 0.88rem; font-weight: 700; text-transform: uppercase; }
+.member-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.member-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+.member-meta { font-size: 0.78rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+.remove-form { flex-shrink: 0; }
+.remove-btn { border-radius: 8px !important; }
+
+.no-members { padding: 2.5rem; text-align: center; color: var(--text-light); }
+.no-members i { font-size: 2rem; display: block; margin-bottom: 0.75rem; opacity: 0.3; }
+.no-members p { font-size: 0.88rem; }
+
+/* Sidebar info card */
+.info-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); padding: 1.5rem; }
+.info-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1.25rem; }
+.info-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; gap: 8px; }
+.info-label { font-size: 0.78rem; color: var(--text-light); font-weight: 500; white-space: nowrap; }
+.info-val { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); text-align: right; text-transform: capitalize; }
+.info-desc { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--light-gray); }
+.info-desc p { font-size: 0.85rem; color: var(--text-medium); line-height: 1.5; margin-top: 4px; }
+.type-badge-sm { font-size: 0.72rem; font-weight: 700; padding: 2px 9px; border-radius: 12px; text-transform: capitalize; }
+.status-pill { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.status-pill.active { background: rgba(40,167,69,0.1); color: #28a745; }
+.status-pill.inactive { background: rgba(108,117,125,0.1); color: #6c757d; }
+
+/* Type badge colours (reused from groups list) */
+.gt-badge-cell_group  { background: rgba(80,34,45,0.08);   color: var(--primary); }
+.gt-badge-bible_study { background: rgba(52,152,219,0.1);  color: #2980b9; }
+.gt-badge-youth       { background: rgba(255,193,7,0.15);  color: #d4a100; }
+.gt-badge-women       { background: rgba(231,76,60,0.1);   color: #c0392b; }
+.gt-badge-men         { background: rgba(52,73,94,0.1);    color: #2c3e50; }
+.gt-badge-choir       { background: rgba(155,89,182,0.1);  color: #8e44ad; }
+.gt-badge-committee   { background: rgba(26,188,156,0.1);  color: #16a085; }
+.gt-badge-prayer_team { background: rgba(241,196,15,0.12); color: #e67e22; }
+.gt-badge-other       { background: rgba(127,140,141,0.1); color: #636e72; }
+
+@media (max-width: 900px) {
+    .gd-layout { flex-direction: column; }
+    .gd-sidebar { width: 100%; }
+    .page-wrapper { padding: 1rem; }
+    .add-member-form { flex-wrap: wrap; }
+    .add-member-select { width: 100%; }
+}
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

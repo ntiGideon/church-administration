@@ -32,10 +32,14 @@ const (
 	FieldReferenceNumber = "reference_number"
 	// FieldNotes holds the string denoting the notes field in the database.
 	FieldNotes = "notes"
+	// FieldContactID holds the string denoting the contact_id field in the database.
+	FieldContactID = "contact_id"
 	// EdgeRecordedBy holds the string denoting the recorded_by edge name in mutations.
 	EdgeRecordedBy = "recorded_by"
 	// EdgeChurch holds the string denoting the church edge name in mutations.
 	EdgeChurch = "church"
+	// EdgeDonor holds the string denoting the donor edge name in mutations.
+	EdgeDonor = "donor"
 	// Table holds the table name of the finance in the database.
 	Table = "finances"
 	// RecordedByTable is the table that holds the recorded_by relation/edge.
@@ -52,6 +56,13 @@ const (
 	ChurchInverseTable = "churches"
 	// ChurchColumn is the table column denoting the church relation/edge.
 	ChurchColumn = "church_finances"
+	// DonorTable is the table that holds the donor relation/edge.
+	DonorTable = "finances"
+	// DonorInverseTable is the table name for the Contact entity.
+	// It exists in this package in order to avoid circular dependency with the "contact" package.
+	DonorInverseTable = "contacts"
+	// DonorColumn is the table column denoting the donor relation/edge.
+	DonorColumn = "contact_id"
 )
 
 // Columns holds all SQL columns for finance fields.
@@ -66,6 +77,7 @@ var Columns = []string{
 	FieldPaymentMethod,
 	FieldReferenceNumber,
 	FieldNotes,
+	FieldContactID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "finances"
@@ -175,6 +187,11 @@ func ByNotes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNotes, opts...).ToFunc()
 }
 
+// ByContactID orders the results by the contact_id field.
+func ByContactID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContactID, opts...).ToFunc()
+}
+
 // ByRecordedByField orders the results by recorded_by field.
 func ByRecordedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -186,6 +203,13 @@ func ByRecordedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 func ByChurchField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newChurchStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByDonorField orders the results by donor field.
+func ByDonorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDonorStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newRecordedByStep() *sqlgraph.Step {
@@ -200,5 +224,12 @@ func newChurchStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ChurchInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ChurchTable, ChurchColumn),
+	)
+}
+func newDonorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DonorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, DonorTable, DonorColumn),
 	)
 }

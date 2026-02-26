@@ -107,9 +107,23 @@ type ContactEdges struct {
 	SpouseContact *Contact `json:"spouse_contact,omitempty"`
 	// SpouseOfContact holds the value of the spouse_of_contact edge.
 	SpouseOfContact *Contact `json:"spouse_of_contact,omitempty"`
+	// Attendances holds the value of the attendances edge.
+	Attendances []*Attendance `json:"attendances,omitempty"`
+	// Groups holds the value of the groups edge.
+	Groups []*Group `json:"groups,omitempty"`
+	// LeadingGroups holds the value of the leading_groups edge.
+	LeadingGroups []*Group `json:"leading_groups,omitempty"`
+	// GivingRecords holds the value of the giving_records edge.
+	GivingRecords []*Finance `json:"giving_records,omitempty"`
+	// Pledges holds the value of the pledges edge.
+	Pledges []*Pledge `json:"pledges,omitempty"`
+	// RosterEntries holds the value of the roster_entries edge.
+	RosterEntries []*RosterEntry `json:"roster_entries,omitempty"`
+	// PrayerRequests holds the value of the prayer_requests edge.
+	PrayerRequests []*PrayerRequest `json:"prayer_requests,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [11]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -154,6 +168,69 @@ func (e ContactEdges) SpouseOfContactOrErr() (*Contact, error) {
 		return nil, &NotFoundError{label: contact.Label}
 	}
 	return nil, &NotLoadedError{edge: "spouse_of_contact"}
+}
+
+// AttendancesOrErr returns the Attendances value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) AttendancesOrErr() ([]*Attendance, error) {
+	if e.loadedTypes[4] {
+		return e.Attendances, nil
+	}
+	return nil, &NotLoadedError{edge: "attendances"}
+}
+
+// GroupsOrErr returns the Groups value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) GroupsOrErr() ([]*Group, error) {
+	if e.loadedTypes[5] {
+		return e.Groups, nil
+	}
+	return nil, &NotLoadedError{edge: "groups"}
+}
+
+// LeadingGroupsOrErr returns the LeadingGroups value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) LeadingGroupsOrErr() ([]*Group, error) {
+	if e.loadedTypes[6] {
+		return e.LeadingGroups, nil
+	}
+	return nil, &NotLoadedError{edge: "leading_groups"}
+}
+
+// GivingRecordsOrErr returns the GivingRecords value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) GivingRecordsOrErr() ([]*Finance, error) {
+	if e.loadedTypes[7] {
+		return e.GivingRecords, nil
+	}
+	return nil, &NotLoadedError{edge: "giving_records"}
+}
+
+// PledgesOrErr returns the Pledges value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) PledgesOrErr() ([]*Pledge, error) {
+	if e.loadedTypes[8] {
+		return e.Pledges, nil
+	}
+	return nil, &NotLoadedError{edge: "pledges"}
+}
+
+// RosterEntriesOrErr returns the RosterEntries value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) RosterEntriesOrErr() ([]*RosterEntry, error) {
+	if e.loadedTypes[9] {
+		return e.RosterEntries, nil
+	}
+	return nil, &NotLoadedError{edge: "roster_entries"}
+}
+
+// PrayerRequestsOrErr returns the PrayerRequests value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) PrayerRequestsOrErr() ([]*PrayerRequest, error) {
+	if e.loadedTypes[10] {
+		return e.PrayerRequests, nil
+	}
+	return nil, &NotLoadedError{edge: "prayer_requests"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -437,6 +514,41 @@ func (_m *Contact) QuerySpouseContact() *ContactQuery {
 // QuerySpouseOfContact queries the "spouse_of_contact" edge of the Contact entity.
 func (_m *Contact) QuerySpouseOfContact() *ContactQuery {
 	return NewContactClient(_m.config).QuerySpouseOfContact(_m)
+}
+
+// QueryAttendances queries the "attendances" edge of the Contact entity.
+func (_m *Contact) QueryAttendances() *AttendanceQuery {
+	return NewContactClient(_m.config).QueryAttendances(_m)
+}
+
+// QueryGroups queries the "groups" edge of the Contact entity.
+func (_m *Contact) QueryGroups() *GroupQuery {
+	return NewContactClient(_m.config).QueryGroups(_m)
+}
+
+// QueryLeadingGroups queries the "leading_groups" edge of the Contact entity.
+func (_m *Contact) QueryLeadingGroups() *GroupQuery {
+	return NewContactClient(_m.config).QueryLeadingGroups(_m)
+}
+
+// QueryGivingRecords queries the "giving_records" edge of the Contact entity.
+func (_m *Contact) QueryGivingRecords() *FinanceQuery {
+	return NewContactClient(_m.config).QueryGivingRecords(_m)
+}
+
+// QueryPledges queries the "pledges" edge of the Contact entity.
+func (_m *Contact) QueryPledges() *PledgeQuery {
+	return NewContactClient(_m.config).QueryPledges(_m)
+}
+
+// QueryRosterEntries queries the "roster_entries" edge of the Contact entity.
+func (_m *Contact) QueryRosterEntries() *RosterEntryQuery {
+	return NewContactClient(_m.config).QueryRosterEntries(_m)
+}
+
+// QueryPrayerRequests queries the "prayer_requests" edge of the Contact entity.
+func (_m *Contact) QueryPrayerRequests() *PrayerRequestQuery {
+	return NewContactClient(_m.config).QueryPrayerRequests(_m)
 }
 
 // Update returns a builder for updating this Contact.

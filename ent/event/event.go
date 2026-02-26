@@ -34,6 +34,8 @@ const (
 	FieldIsPublished = "is_published"
 	// EdgeChurch holds the string denoting the church edge name in mutations.
 	EdgeChurch = "church"
+	// EdgeAttendances holds the string denoting the attendances edge name in mutations.
+	EdgeAttendances = "attendances"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -43,6 +45,13 @@ const (
 	ChurchInverseTable = "churches"
 	// ChurchColumn is the table column denoting the church relation/edge.
 	ChurchColumn = "church_events"
+	// AttendancesTable is the table that holds the attendances relation/edge.
+	AttendancesTable = "attendances"
+	// AttendancesInverseTable is the table name for the Attendance entity.
+	// It exists in this package in order to avoid circular dependency with the "attendance" package.
+	AttendancesInverseTable = "attendances"
+	// AttendancesColumn is the table column denoting the attendances relation/edge.
+	AttendancesColumn = "event_id"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -172,10 +181,31 @@ func ByChurchField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newChurchStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAttendancesCount orders the results by attendances count.
+func ByAttendancesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAttendancesStep(), opts...)
+	}
+}
+
+// ByAttendances orders the results by attendances terms.
+func ByAttendances(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAttendancesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newChurchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ChurchInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ChurchTable, ChurchColumn),
+	)
+}
+func newAttendancesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AttendancesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AttendancesTable, AttendancesColumn),
 	)
 }

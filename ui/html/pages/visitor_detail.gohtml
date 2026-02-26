@@ -1,0 +1,214 @@
+{{define "title"}}{{(index .Data "visitor").FirstName}} {{(index .Data "visitor").LastName}} | Visitors | FaithConnect{{end}}
+{{define "description"}}Visitor detail and follow-up tracking{{end}}
+
+{{define "main"}}
+{{$v := index .Data "visitor"}}
+<div class="page-wrapper">
+
+    <!-- Header -->
+    <div class="page-header-bar">
+        <div class="ph-left">
+            <a href="/visitors" class="back-link"><i class="fas fa-arrow-left"></i> Visitors</a>
+            <h1 class="page-title-text">{{$v.FirstName}} {{$v.LastName}}</h1>
+            <div class="header-meta">
+                <span class="hm-item"><i class="fas fa-calendar-day"></i> Visited {{$v.VisitDate.Format "2 January 2006"}}</span>
+                {{if $v.HowHeard}}<span class="hm-item"><i class="fas fa-map-signs"></i> {{howHeardLabel (enumStr $v.HowHeard)}}</span>{{end}}
+            </div>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <div class="ph-actions">
+            <a href="/visitors/{{$v.ID}}/edit" class="button is-light">
+                <span class="icon"><i class="fas fa-edit"></i></span>
+                <span>Edit</span>
+            </a>
+            <form action="/visitors/{{$v.ID}}/delete" method="POST"
+                  onsubmit="return confirm('Delete this visitor record?')">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button type="submit" class="button is-danger is-light">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Delete</span>
+                </button>
+            </form>
+        </div>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    <div class="detail-layout">
+
+        <!-- Left: Contact info + notes -->
+        <div class="detail-main">
+
+            <!-- Contact Info -->
+            <div class="info-card">
+                <div class="ic-title">Contact Information</div>
+                <div class="info-grid">
+                    {{if $v.Phone}}
+                    <div class="info-row">
+                        <span class="ir-icon"><i class="fas fa-phone"></i></span>
+                        <div class="ir-body">
+                            <span class="ir-label">Phone</span>
+                            <a href="tel:{{$v.Phone}}" class="ir-val link">{{$v.Phone}}</a>
+                        </div>
+                    </div>
+                    {{end}}
+                    {{if $v.Email}}
+                    <div class="info-row">
+                        <span class="ir-icon"><i class="fas fa-envelope"></i></span>
+                        <div class="ir-body">
+                            <span class="ir-label">Email</span>
+                            <a href="mailto:{{$v.Email}}" class="ir-val link">{{$v.Email}}</a>
+                        </div>
+                    </div>
+                    {{end}}
+                    {{if $v.Address}}
+                    <div class="info-row">
+                        <span class="ir-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        <div class="ir-body">
+                            <span class="ir-label">Address</span>
+                            <span class="ir-val">{{$v.Address}}</span>
+                        </div>
+                    </div>
+                    {{end}}
+                    {{if $v.InvitedBy}}
+                    <div class="info-row">
+                        <span class="ir-icon"><i class="fas fa-user-plus"></i></span>
+                        <div class="ir-body">
+                            <span class="ir-label">Invited by</span>
+                            <span class="ir-val">{{$v.InvitedBy}}</span>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+
+            {{if $v.Notes}}
+            <div class="info-card mt-1">
+                <div class="ic-title">Notes</div>
+                <div class="notes-text">{{$v.Notes}}</div>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Right: Status + Follow-up -->
+        <div class="detail-sidebar">
+
+            <!-- Current Status -->
+            <div class="sidebar-card">
+                <div class="sc-title">Follow-up Status</div>
+                <div class="current-status status-{{$v.FollowUpStatus}}">
+                    {{statusLabel (enumStr $v.FollowUpStatus)}}
+                </div>
+
+                <!-- Quick status update -->
+                <div class="sc-subtitle">Update Status</div>
+                {{$cur := enumStr $v.FollowUpStatus}}
+                <div class="status-buttons">
+                    {{range $info := statusOptions}}
+                    <form action="/visitors/{{$v.ID}}/status" method="POST" style="margin:0">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <input type="hidden" name="status" value="{{index $info 0}}">
+                        <button type="submit"
+                                class="status-btn status-btn-{{index $info 0}} {{if eq $cur (index $info 0)}}is-active{{end}}">
+                            {{index $info 1}}
+                        </button>
+                    </form>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Visit Summary -->
+            <div class="sidebar-card">
+                <div class="sc-title">Visit Details</div>
+                <div class="stat-row"><span class="sr-label">Date</span><span class="sr-val">{{$v.VisitDate.Format "2 Jan 2006"}}</span></div>
+                <div class="stat-row"><span class="sr-label">Day</span><span class="sr-val">{{$v.VisitDate.Format "Monday"}}</span></div>
+                {{if $v.HowHeard}}
+                <div class="stat-row"><span class="sr-label">How heard</span><span class="sr-val">{{howHeardLabel (enumStr $v.HowHeard)}}</span></div>
+                {{end}}
+                <div class="stat-row"><span class="sr-label">Recorded</span><span class="sr-val">{{$v.CreatedAt.Format "2 Jan 2006"}}</span></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.ph-left { display: flex; flex-direction: column; gap: 4px; }
+.back-link { font-size: 0.82rem; color: var(--text-light); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.back-link:hover { color: var(--primary); }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.header-meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 4px; }
+.hm-item { font-size: 0.83rem; color: var(--text-light); display: inline-flex; align-items: center; gap: 5px; }
+.ph-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-start; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-1 { margin-top: 1rem; }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 290px; gap: 1.5rem; align-items: start; }
+
+/* Info card */
+.info-card { background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.25rem; }
+.ic-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem; }
+.info-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.info-row { display: flex; align-items: flex-start; gap: 12px; }
+.ir-icon { width: 32px; height: 32px; border-radius: 8px; background: #F1F3F5; display: flex; align-items: center; justify-content: center; color: var(--text-medium); font-size: 0.8rem; flex-shrink: 0; }
+.ir-body { display: flex; flex-direction: column; gap: 1px; }
+.ir-label { font-size: 0.72rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+.ir-val { font-size: 0.88rem; color: var(--text-dark); font-weight: 500; }
+.ir-val.link { color: var(--primary); text-decoration: none; }
+.ir-val.link:hover { text-decoration: underline; }
+.notes-text { font-size: 0.88rem; color: var(--text-medium); line-height: 1.65; white-space: pre-wrap; }
+
+/* Sidebar */
+.sidebar-card { background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+.sc-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+.sc-subtitle { font-size: 0.75rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin: 1rem 0 0.6rem; }
+
+.current-status {
+    font-size: 0.9rem; font-weight: 700; border-radius: 10px; padding: 8px 14px;
+    text-align: center; margin-bottom: 0.5rem;
+}
+.status-new              { background: #EFF6FF; color: #2563EB; }
+.status-contacted        { background: #FFFBEB; color: #D97706; }
+.status-follow_up_scheduled { background: #F5F3FF; color: #7C3AED; }
+.status-follow_up_done   { background: #F0FDFA; color: #0F766E; }
+.status-converted        { background: #F0FDF4; color: #15803D; }
+.status-no_response      { background: #F9FAFB; color: #6B7280; }
+
+.status-buttons { display: flex; flex-direction: column; gap: 5px; }
+.status-btn {
+    width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--light-gray);
+    background: #F9FAFB; font-size: 0.82rem; color: var(--text-medium);
+    cursor: pointer; text-align: left; font-family: inherit; transition: all 0.12s;
+}
+.status-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(80,34,45,0.04); }
+.status-btn.is-active { font-weight: 700; border-color: currentColor; }
+.status-btn-new.is-active              { background: #EFF6FF; color: #2563EB; border-color: #93C5FD; }
+.status-btn-contacted.is-active        { background: #FFFBEB; color: #D97706; border-color: #FCD34D; }
+.status-btn-follow_up_scheduled.is-active { background: #F5F3FF; color: #7C3AED; border-color: #C4B5FD; }
+.status-btn-follow_up_done.is-active   { background: #F0FDFA; color: #0F766E; border-color: #6EE7B7; }
+.status-btn-converted.is-active        { background: #F0FDF4; color: #15803D; border-color: #86EFAC; }
+.status-btn-no_response.is-active      { background: #F9FAFB; color: #6B7280; border-color: #D1D5DB; }
+
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #F5F5F5; font-size: 0.83rem; }
+.stat-row:last-child { border-bottom: none; }
+.sr-label { color: var(--text-light); }
+.sr-val { color: var(--text-dark); font-weight: 500; }
+
+@media (max-width: 768px) {
+    .detail-layout { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

@@ -95,6 +95,11 @@ func Notes(v string) predicate.Finance {
 	return predicate.Finance(sql.FieldEQ(FieldNotes, v))
 }
 
+// ContactID applies equality check predicate on the "contact_id" field. It's identical to ContactIDEQ.
+func ContactID(v int) predicate.Finance {
+	return predicate.Finance(sql.FieldEQ(FieldContactID, v))
+}
+
 // DescriptionEQ applies the EQ predicate on the "description" field.
 func DescriptionEQ(v string) predicate.Finance {
 	return predicate.Finance(sql.FieldEQ(FieldDescription, v))
@@ -615,6 +620,36 @@ func NotesContainsFold(v string) predicate.Finance {
 	return predicate.Finance(sql.FieldContainsFold(FieldNotes, v))
 }
 
+// ContactIDEQ applies the EQ predicate on the "contact_id" field.
+func ContactIDEQ(v int) predicate.Finance {
+	return predicate.Finance(sql.FieldEQ(FieldContactID, v))
+}
+
+// ContactIDNEQ applies the NEQ predicate on the "contact_id" field.
+func ContactIDNEQ(v int) predicate.Finance {
+	return predicate.Finance(sql.FieldNEQ(FieldContactID, v))
+}
+
+// ContactIDIn applies the In predicate on the "contact_id" field.
+func ContactIDIn(vs ...int) predicate.Finance {
+	return predicate.Finance(sql.FieldIn(FieldContactID, vs...))
+}
+
+// ContactIDNotIn applies the NotIn predicate on the "contact_id" field.
+func ContactIDNotIn(vs ...int) predicate.Finance {
+	return predicate.Finance(sql.FieldNotIn(FieldContactID, vs...))
+}
+
+// ContactIDIsNil applies the IsNil predicate on the "contact_id" field.
+func ContactIDIsNil() predicate.Finance {
+	return predicate.Finance(sql.FieldIsNull(FieldContactID))
+}
+
+// ContactIDNotNil applies the NotNil predicate on the "contact_id" field.
+func ContactIDNotNil() predicate.Finance {
+	return predicate.Finance(sql.FieldNotNull(FieldContactID))
+}
+
 // HasRecordedBy applies the HasEdge predicate on the "recorded_by" edge.
 func HasRecordedBy() predicate.Finance {
 	return predicate.Finance(func(s *sql.Selector) {
@@ -653,6 +688,29 @@ func HasChurch() predicate.Finance {
 func HasChurchWith(preds ...predicate.Church) predicate.Finance {
 	return predicate.Finance(func(s *sql.Selector) {
 		step := newChurchStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDonor applies the HasEdge predicate on the "donor" edge.
+func HasDonor() predicate.Finance {
+	return predicate.Finance(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, DonorTable, DonorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDonorWith applies the HasEdge predicate on the "donor" edge with a given conditions (other predicates).
+func HasDonorWith(preds ...predicate.Contact) predicate.Finance {
+	return predicate.Finance(func(s *sql.Selector) {
+		step := newDonorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -27,12 +27,35 @@
             <a href="/giving/donations" class="nav-link">
                 <i class="fas fa-hand-holding-heart"></i><span>Giving</span>
             </a>
-            <a href="/calendar" class="nav-link">
-                <i class="fas fa-calendar-days"></i><span>Calendar</span>
-            </a>
-            <a href="/announcements" class="nav-link">
-                <i class="fas fa-bullhorn"></i><span>Notices</span>
-            </a>
+
+            <!-- Ministry dropdown -->
+            <div class="nav-dropdown" id="ministryDropdown">
+                <button class="nav-link nav-dropdown-trigger" id="ministryTrigger" aria-expanded="false">
+                    <i class="fas fa-church"></i><span>Ministry</span>
+                    <i class="fas fa-chevron-down nd-caret"></i>
+                </button>
+                <div class="nd-menu" id="ministryMenu">
+                    <a href="/groups"  class="nd-item"><i class="fas fa-users-rectangle"></i> Groups</a>
+                    <a href="/rosters" class="nd-item"><i class="fas fa-clipboard-list"></i>  Rosters</a>
+                    <a href="/sermons" class="nd-item"><i class="fas fa-bible"></i>            Sermons</a>
+                    <a href="/prayer"  class="nd-item"><i class="fas fa-hands-praying"></i>   Prayer</a>
+                </div>
+            </div>
+
+            <!-- Community dropdown -->
+            <div class="nav-dropdown" id="communityDropdown">
+                <button class="nav-link nav-dropdown-trigger" id="communityTrigger" aria-expanded="false">
+                    <i class="fas fa-people-group"></i><span>Community</span>
+                    <i class="fas fa-chevron-down nd-caret"></i>
+                </button>
+                <div class="nd-menu" id="communityMenu">
+                    <a href="/calendar"      class="nd-item"><i class="fas fa-calendar-days"></i> Calendar</a>
+                    <a href="/announcements" class="nd-item"><i class="fas fa-bullhorn"></i>       Notices</a>
+                    <a href="/visitors"      class="nd-item"><i class="fas fa-user-friends"></i>   Visitors</a>
+                    <a href="/documents"     class="nd-item"><i class="fas fa-folder-open"></i>    Documents</a>
+                </div>
+            </div>
+
             <a href="/reports" class="nav-link">
                 <i class="fas fa-chart-bar"></i><span>Reports</span>
             </a>
@@ -353,6 +376,74 @@ body { padding-top: 64px; }
     transition: all 0.2s;
 }
 
+/* Nav Dropdowns */
+.nav-dropdown { position: relative; }
+.nav-dropdown-trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    color: var(--text-medium);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.nav-dropdown-trigger i:first-child { font-size: 0.85rem; color: var(--text-light); transition: color 0.15s; }
+.nav-dropdown-trigger:hover,
+.nav-dropdown.open .nav-dropdown-trigger { background: rgba(80,34,45,0.06); color: var(--primary); }
+.nav-dropdown-trigger:hover i:first-child,
+.nav-dropdown.open .nav-dropdown-trigger i:first-child { color: var(--primary); }
+.nav-dropdown.active .nav-dropdown-trigger { background: rgba(80,34,45,0.08); color: var(--primary); font-weight: 600; }
+.nav-dropdown.active .nav-dropdown-trigger i:first-child { color: var(--primary); }
+
+.nd-caret { font-size: 0.6rem !important; color: var(--text-light) !important; transition: transform 0.2s; margin-left: 2px; }
+.nav-dropdown.open .nd-caret { transform: rotate(180deg); }
+
+.nd-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.11);
+    min-width: 190px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+    z-index: 200;
+}
+.nav-dropdown.open .nd-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.nd-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: background 0.12s;
+    white-space: nowrap;
+}
+.nd-item i { width: 16px; text-align: center; font-size: 0.82rem; color: var(--text-light); }
+.nd-item:hover { background: rgba(80,34,45,0.06); color: var(--primary); }
+.nd-item:hover i { color: var(--primary); }
+.nd-item.active { background: rgba(80,34,45,0.07); color: var(--primary); font-weight: 600; }
+.nd-item.active i { color: var(--primary); }
+
 @media (max-width: 900px) {
     .navbar-links {
         display: none;
@@ -365,25 +456,71 @@ body { padding-top: 64px; }
         border-bottom: 1px solid var(--light-gray);
         box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         z-index: 999;
+        overflow-y: auto;
+        max-height: calc(100vh - 64px);
     }
     .navbar-links.open { display: flex; }
-    .nav-link { padding: 10px 14px; }
+    .nav-link, .nav-dropdown-trigger { padding: 10px 14px; width: 100%; }
     .mobile-toggle { display: flex; }
     .user-info { display: none; }
     .user-caret { display: none; }
     .user-trigger { padding: 4px; border: none; }
+
+    /* Mobile: dropdowns expand inline */
+    .nd-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-left: 2px solid var(--light-gray);
+        border-radius: 0;
+        padding: 0 0 0 1rem;
+        display: none;
+    }
+    .nav-dropdown.open .nd-menu { display: block; }
+    .nd-item { padding: 8px 12px; }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Highlight active nav link
     const path = window.location.pathname;
-    document.querySelectorAll('.nav-link').forEach(function (link) {
+
+    // Highlight active flat nav links
+    document.querySelectorAll('.nav-link:not(.nav-dropdown-trigger)').forEach(function (link) {
         const href = link.getAttribute('href');
         if (href && (path === href || (href !== '/' && path.startsWith(href)))) {
             link.classList.add('active');
         }
+    });
+
+    // Highlight active dropdown items + mark parent as active
+    document.querySelectorAll('.nd-item').forEach(function (item) {
+        const href = item.getAttribute('href');
+        if (href && (path === href || (href !== '/' && path.startsWith(href)))) {
+            item.classList.add('active');
+            item.closest('.nav-dropdown').classList.add('active');
+        }
+    });
+
+    // Nav dropdowns toggle (click; close others)
+    document.querySelectorAll('.nav-dropdown-trigger').forEach(function (trigger) {
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const parent = this.closest('.nav-dropdown');
+            const isOpen = parent.classList.contains('open');
+            // close all dropdowns
+            document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+            userMenu.classList.remove('open');
+            if (!isOpen) parent.classList.add('open');
+        });
+    });
+
+    // Close nav dropdowns on outside click
+    document.addEventListener('click', function () {
+        document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
     });
 
     // User dropdown toggle
@@ -392,7 +529,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (userTrigger) {
         userTrigger.addEventListener('click', function (e) {
             e.stopPropagation();
-            userMenu.classList.toggle('open');
+            const isOpen = userMenu.classList.contains('open');
+            document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+            userMenu.classList.toggle('open', !isOpen);
         });
         document.addEventListener('click', function () {
             userMenu.classList.remove('open');

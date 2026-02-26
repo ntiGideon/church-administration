@@ -14,24 +14,42 @@ type Tx struct {
 	config
 	// Announcement is the client for interacting with the Announcement builders.
 	Announcement *AnnouncementClient
+	// Attendance is the client for interacting with the Attendance builders.
+	Attendance *AttendanceClient
 	// Church is the client for interacting with the Church builders.
 	Church *ChurchClient
 	// Contact is the client for interacting with the Contact builders.
 	Contact *ContactClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// Document is the client for interacting with the Document builders.
+	Document *DocumentClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
 	// Finance is the client for interacting with the Finance builders.
 	Finance *FinanceClient
+	// Group is the client for interacting with the Group builders.
+	Group *GroupClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// Pledge is the client for interacting with the Pledge builders.
+	Pledge *PledgeClient
+	// PrayerRequest is the client for interacting with the PrayerRequest builders.
+	PrayerRequest *PrayerRequestClient
 	// ProgramEntry is the client for interacting with the ProgramEntry builders.
 	ProgramEntry *ProgramEntryClient
+	// Roster is the client for interacting with the Roster builders.
+	Roster *RosterClient
+	// RosterEntry is the client for interacting with the RosterEntry builders.
+	RosterEntry *RosterEntryClient
+	// Sermon is the client for interacting with the Sermon builders.
+	Sermon *SermonClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// Visitor is the client for interacting with the Visitor builders.
+	Visitor *VisitorClient
 
 	// lazily loaded.
 	client     *Client
@@ -164,15 +182,24 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Announcement = NewAnnouncementClient(tx.config)
+	tx.Attendance = NewAttendanceClient(tx.config)
 	tx.Church = NewChurchClient(tx.config)
 	tx.Contact = NewContactClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
+	tx.Document = NewDocumentClient(tx.config)
 	tx.Event = NewEventClient(tx.config)
 	tx.Finance = NewFinanceClient(tx.config)
+	tx.Group = NewGroupClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
+	tx.Pledge = NewPledgeClient(tx.config)
+	tx.PrayerRequest = NewPrayerRequestClient(tx.config)
 	tx.ProgramEntry = NewProgramEntryClient(tx.config)
+	tx.Roster = NewRosterClient(tx.config)
+	tx.RosterEntry = NewRosterEntryClient(tx.config)
+	tx.Sermon = NewSermonClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.Visitor = NewVisitorClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

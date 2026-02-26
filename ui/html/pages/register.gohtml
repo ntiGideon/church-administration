@@ -1,722 +1,698 @@
-{{define "title"}}Create Your Church Account | FaithConnect{{end}}
-
+{{define "title"}}Create Account | FaithConnect{{end}}
 {{define "description"}}Join FaithConnect to manage your church community. Register now to access powerful tools for administration, member management, and spiritual growth.{{end}}
 
 {{define "main"}}
-<div class="container">
-    <div class="columns is-centered is-vcentered min-vh-80">
-        <div class="column is-8-tablet is-6-desktop is-5-widescreen">
-            <!-- Registration Card -->
-            <div class="card has-gradient-border animate__animated animate__fadeInUp">
-                <div class="card-content p-6">
-                    <!-- Header Section -->
-                    <div class="has-text-centered mb-6">
-                        <div class="mb-4">
-                            <span class="icon is-large has-text-primary mb-3">
+<div class="fcr-wrap">
+    <!-- ── LEFT PANEL ─────────────────────── -->
+    <div class="fcr-left">
+        <div class="fcr-bg" aria-hidden="true">
+            <div class="fcr-orb fcr-orb--1"></div>
+            <div class="fcr-orb fcr-orb--2"></div>
+            <div class="fcr-orb fcr-orb--3"></div>
+            <span class="fcr-cross fcr-cross--1">✝</span>
+            <span class="fcr-cross fcr-cross--2">✝</span>
+            <div class="fcr-ring fcr-ring--1"></div>
+            <div class="fcr-ring fcr-ring--2"></div>
+        </div>
 
-                                <!-- Replace with your church logo -->
-                                <img src="/static/img/abc_filter.png" alt="Ascension Baptist Church Logo" class="church-logo">
-                                <!-- Fallback icon if logo not available -->
-{{/*                                <div class="logo-fallback">*/}}
-{{/*                                    <i class="fas fa-church"></i>*/}}
-{{/*                                </div>*/}}
+        <div class="fcr-left__body">
+            <div class="fcr-brand fcr-anim" style="--d:.05s">
+                <div class="fcr-brand__logo">
+                    <img src="/static/img/abc_filter.png" alt="FaithConnect Logo">
+                </div>
+                <h1>FaithConnect</h1>
+                <p>Empowering Church Administration</p>
+            </div>
 
-                            </span>
-                            <h1 class="title has-text-primary is-size-3">
-                                ASCENSION BAPTIST CHURCH - GHANA
-                            </h1>
-                            <p class="subtitle has-text-dark is-size-6 mt-2">
-                                Create your church administration account
-                            </p>
-                        </div>
-
-                        <!-- Progress Steps -->
-                        <div class="steps mb-5">
-                            <div class="steps-content">
-                                <div class="steps-item is-active is-primary">
-                                    <div class="steps-marker">
-                                        <span class="icon">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                    </div>
-                                    <div class="steps-details">
-                                        <p class="steps-title">Account</p>
-                                    </div>
-                                </div>
-                                <div class="steps-item">
-                                    <div class="steps-marker">
-                                        <span class="icon">
-                                            <i class="fas fa-church"></i>
-                                        </span>
-                                    </div>
-                                    <div class="steps-details">
-                                        <p class="steps-title">Church</p>
-                                    </div>
-                                </div>
-                                <div class="steps-item">
-                                    <div class="steps-marker">
-                                        <span class="icon">
-                                            <i class="fas fa-check"></i>
-                                        </span>
-                                    </div>
-                                    <div class="steps-details">
-                                        <p class="steps-title">Complete</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="fcr-highlights fcr-anim" style="--d:.18s">
+                <div class="fcr-hl">
+                    <div class="fcr-hl__ico"><i class="fas fa-church"></i></div>
+                    <div class="fcr-hl__txt">
+                        <strong>All-in-One Platform</strong>
+                        <span>Everything your church needs in one place</span>
                     </div>
-
-                    <!-- Registration Form -->
-                    <form id="registerForm" action="/register" method="POST">
-                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-                        <input type="hidden" name="registration_token" value="{{with .Form}}{{.RegistrationToken}}{{end}}">
-                        <!-- Personal Information -->
-                        <div class="mb-5">
-                            <h3 class="title is-size-4 has-text-primary mb-4">
-                                <span class="icon-text">
-                                    <span class="icon">
-                                        <i class="fas fa-user-circle"></i>
-                                    </span>
-                                    <span>Personal Information</span>
-                                </span>
-                            </h3>
-
-                            <div class="columns is-multiline">
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">First Name *</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="text" name="first_name" placeholder="John" required>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-user has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Last Name *</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="text" name="last_name" placeholder="Doe" required>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-user has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="column is-12">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Email Address *</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="email" name="email"
-                                                   value="{{with .Form}}{{.Email}}{{end}}"
-                                                   placeholder="pastor@yourchurch.org"
-                                                   readonly style="background:#f8f9fa;cursor:not-allowed" required>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-envelope has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <p class="help has-text-support-blue">
-                                            <i class="fas fa-lock" style="font-size:0.75rem"></i>
-                                            This email was set by the invitation — it will be your login username
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Phone Number</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="tel" name="phone" placeholder="+1 (555) 123-4567">
-                                            <span class="icon is-left">
-                                                <i class="fas fa-phone has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Security Section -->
-                        <div class="mb-5">
-                            <h3 class="title is-size-4 has-text-primary mb-4">
-                                <span class="icon-text">
-                                    <span class="icon">
-                                        <i class="fas fa-shield-alt"></i>
-                                    </span>
-                                    <span>Security</span>
-                                </span>
-                            </h3>
-
-                            <div class="columns is-multiline">
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Password *</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="password" name="password" id="password" placeholder="Create strong password" required>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-lock has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="password-strength mt-2">
-                                            <progress class="progress is-small" value="0" max="100"></progress>
-                                            <p class="help has-text-dark">Password strength: <span id="strength-text">Weak</span></p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="column is-6">
-                                    <div class="field">
-                                        <label class="label has-text-primary">Confirm Password *</label>
-                                        <div class="control has-icons-left">
-                                            <input class="input" type="password" name="confirm_password" id="confirm_password" placeholder="Repeat password" required>
-                                            <span class="icon is-left">
-                                                <i class="fas fa-lock has-text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <p class="help has-text-dark" id="password-match"></p>
-                                    </div>
-                                </div>
-
-                                <div class="column is-12">
-                                    <div class="box has-background-light-bg">
-                                        <div class="content is-small">
-                                            <h6 class="has-text-primary mb-2">Password Requirements:</h6>
-                                            <ul class="requirements-list">
-                                                <li class="requirement" data-requirement="length">
-                                                    <span class="icon-text">
-                                                        <span class="icon">
-                                                            <i class="fas fa-check-circle has-text-success"></i>
-                                                        </span>
-                                                        <span>At least 8 characters</span>
-                                                    </span>
-                                                </li>
-                                                <li class="requirement" data-requirement="uppercase">
-                                                    <span class="icon-text">
-                                                        <span class="icon">
-                                                            <i class="fas fa-check-circle has-text-success"></i>
-                                                        </span>
-                                                        <span>One uppercase letter</span>
-                                                    </span>
-                                                </li>
-                                                <li class="requirement" data-requirement="lowercase">
-                                                    <span class="icon-text">
-                                                        <span class="icon">
-                                                            <i class="fas fa-check-circle has-text-success"></i>
-                                                        </span>
-                                                        <span>One lowercase letter</span>
-                                                    </span>
-                                                </li>
-                                                <li class="requirement" data-requirement="number">
-                                                    <span class="icon-text">
-                                                        <span class="icon">
-                                                            <i class="fas fa-check-circle has-text-success"></i>
-                                                        </span>
-                                                        <span>One number</span>
-                                                    </span>
-                                                </li>
-                                                <li class="requirement" data-requirement="special">
-                                                    <span class="icon-text">
-                                                        <span class="icon">
-                                                            <i class="fas fa-check-circle has-text-success"></i>
-                                                        </span>
-                                                        <span>One special character</span>
-                                                    </span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Terms and Conditions -->
-                        <div class="field mb-6">
-                            <div class="control">
-                                <label class="checkbox">
-                                    <input type="checkbox" name="terms" required>
-                                    <span class="has-text-dark">
-                                        I agree to the
-                                        <a href="/terms" class="has-text-primary has-text-weight-semibold">Terms of Service</a>
-                                        and
-                                        <a href="/privacy" class="has-text-primary has-text-weight-semibold">Privacy Policy</a>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="field">
-                            <div class="control">
-                                <button type="submit" class="button is-primary is-fullwidth is-large has-gradient" id="submitBtn">
-                                    <span class="icon">
-                                        <i class="fas fa-user-plus"></i>
-                                    </span>
-                                    <span>Create Account</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Divider -->
-                        <div class="has-text-centered my-5">
-                            <span class="has-text-dark">or</span>
-                        </div>
-
-                        <!-- Alternative Options -->
-                        <div class="has-text-centered">
-                            <p class="has-text-dark mb-3">
-                                Already have an account?
-                                <a href="/login" class="has-text-primary has-text-weight-semibold">Sign In</a>
-                            </p>
-                            <p class="has-text-support-blue is-size-7">
-                                Received an invitation?
-                                <a href="/invite/accept" class="has-text-support-purple has-text-weight-semibold">Click here</a>
-                            </p>
-                        </div>
-                    </form>
+                </div>
+                <div class="fcr-hl">
+                    <div class="fcr-hl__ico"><i class="fas fa-shield-alt"></i></div>
+                    <div class="fcr-hl__txt">
+                        <strong>Secure &amp; Private</strong>
+                        <span>Your church data is safe and encrypted</span>
+                    </div>
+                </div>
+                <div class="fcr-hl">
+                    <div class="fcr-hl__ico"><i class="fas fa-users"></i></div>
+                    <div class="fcr-hl__txt">
+                        <strong>Team Collaboration</strong>
+                        <span>Invite workers and manage roles easily</span>
+                    </div>
+                </div>
+                <div class="fcr-hl">
+                    <div class="fcr-hl__ico"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="fcr-hl__txt">
+                        <strong>Access Anywhere</strong>
+                        <span>Responsive design for any device</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Features Grid -->
-            <div class="mt-6">
-                <h3 class="title is-size-4 has-text-centered has-text-primary mb-5">
-                    Why Join FaithConnect?
-                </h3>
-                <div class="columns is-multiline">
-                    <div class="column is-4">
-                        <div class="feature-card has-text-centered">
-                            <span class="icon is-large has-text-support-blue mb-3">
-                                <i class="fas fa-users fa-2x"></i>
-                            </span>
-                            <h4 class="title is-size-5 has-text-primary">Member Management</h4>
-                            <p class="has-text-dark">Organize your congregation efficiently</p>
+            <div class="fcr-verse fcr-anim" style="--d:.32s">
+                <p>"Not giving up meeting together, as some are in the habit of doing, but encouraging one another."</p>
+                <cite>— Hebrews 10:25</cite>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── RIGHT PANEL (scrollable) ──────── -->
+    <div class="fcr-right">
+        <div class="fcr-form-wrap">
+            <!-- Header -->
+            <div class="fcr-form-head fcr-anim" style="--d:.1s">
+                <div class="fcr-form-logo">
+                    <img src="/static/img/abc_filter.png" alt="Logo">
+                </div>
+                <h2>Create Your Account</h2>
+                <p>Fill in your details to get started</p>
+            </div>
+
+            <!-- Step indicator -->
+            <div class="fcr-steps fcr-anim" style="--d:.2s">
+                <div class="fcr-step fcr-step--active">
+                    <div class="fcr-step__dot"><i class="fas fa-user"></i></div>
+                    <span>Account</span>
+                </div>
+                <div class="fcr-step-line"></div>
+                <div class="fcr-step">
+                    <div class="fcr-step__dot"><i class="fas fa-church"></i></div>
+                    <span>Church</span>
+                </div>
+                <div class="fcr-step-line"></div>
+                <div class="fcr-step">
+                    <div class="fcr-step__dot"><i class="fas fa-check"></i></div>
+                    <span>Done</span>
+                </div>
+            </div>
+
+            <form id="registerForm" action="/register" method="POST" class="fcr-anim" style="--d:.28s">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                <input type="hidden" name="registration_token" value="{{with .Form}}{{.RegistrationToken}}{{end}}">
+
+                <!-- Personal Information -->
+                <div class="fcr-section">
+                    <div class="fcr-section__hd">
+                        <div class="fcr-section__ico"><i class="fas fa-user-circle"></i></div>
+                        <h3>Personal Information</h3>
+                    </div>
+
+                    <div class="fcr-row">
+                        <div class="fcr-fld">
+                            <label class="fcr-lbl" for="firstName">First Name *</label>
+                            <div class="fcr-ctrl">
+                                <span class="fcr-ctrl__ico"><i class="fas fa-user"></i></span>
+                                <input class="fcr-inp" id="firstName" type="text" name="first_name" placeholder="John" required autocomplete="given-name">
+                            </div>
+                        </div>
+                        <div class="fcr-fld">
+                            <label class="fcr-lbl" for="lastName">Last Name *</label>
+                            <div class="fcr-ctrl">
+                                <span class="fcr-ctrl__ico"><i class="fas fa-user"></i></span>
+                                <input class="fcr-inp" id="lastName" type="text" name="last_name" placeholder="Doe" required autocomplete="family-name">
+                            </div>
                         </div>
                     </div>
-                    <div class="column is-4">
-                        <div class="feature-card has-text-centered">
-                            <span class="icon is-large has-text-support-pink mb-3">
-                                <i class="fas fa-calendar-alt fa-2x"></i>
-                            </span>
-                            <h4 class="title is-size-5 has-text-primary">Event Planning</h4>
-                            <p class="has-text-dark">Schedule services and events</p>
+
+                    <div class="fcr-fld">
+                        <label class="fcr-lbl" for="regEmail">Email Address *</label>
+                        <div class="fcr-ctrl">
+                            <span class="fcr-ctrl__ico"><i class="fas fa-envelope"></i></span>
+                            <input class="fcr-inp fcr-inp--locked" id="regEmail" type="email" name="email"
+                                   value="{{with .Form}}{{.Email}}{{end}}"
+                                   placeholder="pastor@yourchurch.org"
+                                   readonly autocomplete="email">
+                            <span class="fcr-ctrl__lock"><i class="fas fa-lock"></i></span>
                         </div>
+                        <p class="fcr-help">This email was set by the invitation — it will be your login username</p>
                     </div>
-                    <div class="column is-4">
-                        <div class="feature-card has-text-centered">
-                            <span class="icon is-large has-text-support-purple mb-3">
-                                <i class="fas fa-chart-line fa-2x"></i>
-                            </span>
-                            <h4 class="title is-size-5 has-text-primary">Growth Analytics</h4>
-                            <p class="has-text-dark">Track your ministry's impact</p>
+
+                    <div class="fcr-fld fcr-fld--half">
+                        <label class="fcr-lbl" for="phone">Phone Number</label>
+                        <div class="fcr-ctrl">
+                            <span class="fcr-ctrl__ico"><i class="fas fa-phone"></i></span>
+                            <input class="fcr-inp" id="phone" type="tel" name="phone" placeholder="+1 (555) 123-4567" autocomplete="tel">
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Security -->
+                <div class="fcr-section">
+                    <div class="fcr-section__hd">
+                        <div class="fcr-section__ico"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Security</h3>
+                    </div>
+
+                    <div class="fcr-row">
+                        <div class="fcr-fld">
+                            <label class="fcr-lbl" for="password">Password *</label>
+                            <div class="fcr-ctrl">
+                                <span class="fcr-ctrl__ico"><i class="fas fa-lock"></i></span>
+                                <input class="fcr-inp" id="password" type="password" name="password" placeholder="Create strong password" required autocomplete="new-password">
+                            </div>
+                            <div class="fcr-strength">
+                                <div class="fcr-strength__bar">
+                                    <div class="fcr-strength__fill" id="strengthFill"></div>
+                                </div>
+                                <span class="fcr-strength__lbl" id="strengthText">Weak</span>
+                            </div>
+                        </div>
+                        <div class="fcr-fld">
+                            <label class="fcr-lbl" for="confirm_password">Confirm Password *</label>
+                            <div class="fcr-ctrl">
+                                <span class="fcr-ctrl__ico"><i class="fas fa-lock"></i></span>
+                                <input class="fcr-inp" id="confirm_password" type="password" name="confirm_password" placeholder="Repeat password" required autocomplete="new-password">
+                            </div>
+                            <p class="fcr-match-msg" id="passwordMatch"></p>
+                        </div>
+                    </div>
+
+                    <!-- Password requirements -->
+                    <div class="fcr-reqs">
+                        <p class="fcr-reqs__title">Password must include:</p>
+                        <ul class="fcr-reqs__list">
+                            <li class="fcr-req" data-req="length">
+                                <span class="fcr-req__ico"><i class="fas fa-circle"></i></span>
+                                At least 8 characters
+                            </li>
+                            <li class="fcr-req" data-req="uppercase">
+                                <span class="fcr-req__ico"><i class="fas fa-circle"></i></span>
+                                One uppercase letter
+                            </li>
+                            <li class="fcr-req" data-req="lowercase">
+                                <span class="fcr-req__ico"><i class="fas fa-circle"></i></span>
+                                One lowercase letter
+                            </li>
+                            <li class="fcr-req" data-req="number">
+                                <span class="fcr-req__ico"><i class="fas fa-circle"></i></span>
+                                One number
+                            </li>
+                            <li class="fcr-req" data-req="special">
+                                <span class="fcr-req__ico"><i class="fas fa-circle"></i></span>
+                                One special character
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Terms -->
+                <div class="fcr-terms">
+                    <label class="fcr-chk">
+                        <input type="checkbox" name="terms" class="fcr-chk__inp" required>
+                        <span class="fcr-chk__box"></span>
+                        <span class="fcr-chk__lbl">
+                            I agree to the
+                            <a href="/terms" class="fcr-link">Terms of Service</a>
+                            and
+                            <a href="/privacy" class="fcr-link">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="fcr-btn" id="submitBtn">
+                    <span class="fcr-btn__inner">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create Account</span>
+                    </span>
+                    <span class="fcr-btn__spin" aria-hidden="true"></span>
+                    <span class="fcr-btn__shine" aria-hidden="true"></span>
+                </button>
+
+                <div class="fcr-form-foot">
+                    <p>Already have an account? <a href="/login" class="fcr-link fcr-link--bold">Sign In</a></p>
+                    <p>Received an invitation? <a href="/invite/accept" class="fcr-link">Click here</a></p>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <style>
-    .min-vh-80 {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        padding: 3rem 0;
-    }
+/* ══════════════════════════════════════════════
+   REGISTER LAYOUT
+══════════════════════════════════════════════ */
+.fcr-wrap {
+    display: flex;
+    height: 100vh;
+    margin-top: -64px;
+    padding-top: 64px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
 
-    .p-6 {
-        padding: 3rem !important;
-    }
+/* ══════════════════════════════════════════════
+   LEFT PANEL
+══════════════════════════════════════════════ */
+.fcr-left {
+    width: 420px;
+    flex-shrink: 0;
+    position: relative;
+    background: linear-gradient(148deg, #1E0D13 0%, #3A1923 38%, #50222D 72%, #6B2F3D 100%);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+}
 
-    /* Radio Card Styling */
-    .radio-card {
-        display: block;
-        border: 2px solid var(--light-gray);
-        border-radius: 10px;
-        padding: 1.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        height: 100%;
-        background: var(--white);
-    }
+/* Background decorations — reuse same animation names as login */
+.fcr-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 
-    .radio-card:hover {
-        border-color: var(--primary);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(160, 90, 255, 0.1);
-    }
+@keyframes fcrFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-26px) scale(1.04); }
+}
+@keyframes fcrDrift {
+    0%,100% { transform: translateX(0) rotate(0deg); opacity: .08; }
+    40%      { transform: translateX(12px) rotate(5deg); opacity: .05; }
+    70%      { transform: translateX(-8px) rotate(-3deg); opacity: .12; }
+}
+@keyframes fcrRing {
+    0%,100% { transform: scale(1); opacity: .06; }
+    50%      { transform: scale(1.1); opacity: .03; }
+}
 
-    input[type="radio"]:checked + .radio-card {
-        border-color: var(--primary);
-        background: linear-gradient(135deg, rgba(160, 90, 255, 0.05) 0%, rgba(27, 207, 180, 0.05) 100%);
-        box-shadow: 0 5px 20px rgba(160, 90, 255, 0.15);
-    }
+.fcr-orb {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,195,208,.16) 0%, transparent 70%);
+    animation: fcrFloat linear infinite;
+}
+.fcr-orb--1 { width: 450px; height: 450px; top: -130px; right: -130px; animation-duration: 14s; }
+.fcr-orb--2 { width: 320px; height: 320px; bottom: -90px; left: -90px; animation-duration: 18s; animation-delay: -7s; }
+.fcr-orb--3 { width: 160px; height: 160px; top: 40%; left: 10%; animation-duration: 10s; animation-delay: -3s; background: radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 70%); }
 
-    input[type="radio"]:checked + .radio-card .icon {
-        animation: pulse 0.6s ease;
-    }
+.fcr-cross {
+    position: absolute; color: rgba(255,255,255,.07);
+    font-family: serif; animation: fcrDrift ease-in-out infinite; user-select: none;
+}
+.fcr-cross--1 { font-size: 4rem; top: 13%; left: 8%; animation-duration: 11s; }
+.fcr-cross--2 { font-size: 2.5rem; bottom: 16%; right: 13%; animation-duration: 14s; animation-delay: -5s; }
 
-    /* Steps Styling */
-    .steps {
-        position: relative;
-    }
+.fcr-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.06);
+    animation: fcrRing ease-in-out infinite;
+}
+.fcr-ring--1 { width: 280px; height: 280px; top: 50%; left: 50%; margin: -140px 0 0 -140px; animation-duration: 12s; }
+.fcr-ring--2 { width: 160px; height: 160px; top: 22%; left: 28%; animation-duration: 16s; animation-delay: -9s; }
 
-    .steps-content {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-    }
+/* Left body */
+.fcr-left__body {
+    position: relative; z-index: 1;
+    padding: 2.5rem 2.5rem;
+    width: 100%;
+}
 
-    .steps-item {
-        flex: 1;
-        position: relative;
-        text-align: center;
-        z-index: 2;
-    }
+@keyframes fcrUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.fcr-anim { animation: fcrUp .7s cubic-bezier(0.22,1,0.36,1) var(--d, 0s) both; }
 
-    .steps-marker {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: var(--light-gray);
-        margin: 0 auto 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--white);
-        transition: all 0.3s ease;
-        border: 3px solid var(--white);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+/* Brand */
+.fcr-brand { margin-bottom: 2rem; }
+.fcr-brand__logo {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,.11);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 9px; margin-bottom: 1rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14);
+    transition: transform .3s, box-shadow .3s;
+}
+.fcr-brand__logo:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 40px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.14); }
+.fcr-brand__logo img { width: 100%; height: 100%; object-fit: contain; }
+.fcr-brand h1 { font-size: 2.2rem; font-weight: 800; color: #fff; letter-spacing: -.4px; line-height: 1; margin: 0 0 6px; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
+.fcr-brand p  { font-size: .85rem; color: rgba(255,255,255,.5); }
 
-    .steps-item.is-active .steps-marker {
-        background: var(--primary);
-        transform: scale(1.1);
-        box-shadow: 0 4px 15px rgba(160, 90, 255, 0.3);
-    }
+/* Highlights */
+.fcr-highlights { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2rem; }
+.fcr-hl { display: flex; align-items: center; gap: .9rem; transition: transform .2s; }
+.fcr-hl:hover { transform: translateX(5px); }
+.fcr-hl__ico {
+    width: 42px; height: 42px; flex-shrink: 0; border-radius: 11px;
+    background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: rgba(255,255,255,.78);
+    transition: all .2s;
+}
+.fcr-hl:hover .fcr-hl__ico { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.26); color: #fff; }
+.fcr-hl__txt strong { display: block; color: rgba(255,255,255,.9); font-size: .86rem; font-weight: 600; }
+.fcr-hl__txt span   { color: rgba(255,255,255,.44); font-size: .77rem; }
 
-    .steps-item:not(.is-active) .steps-marker {
-        background: var(--medium-gray);
-    }
+/* Verse */
+.fcr-verse { border-top: 1px solid rgba(255,255,255,.1); padding-top: 1.25rem; }
+.fcr-verse p {
+    font-style: italic; color: rgba(255,255,255,.65);
+    font-size: .84rem; line-height: 1.75;
+    margin: 0 0 .4rem; padding-left: 1.1rem; position: relative;
+}
+.fcr-verse p::before {
+    content: '"'; position: absolute; left: 0; top: -.18rem;
+    font-size: 1.9rem; font-style: normal; color: rgba(255,255,255,.2); line-height: 1;
+}
+.fcr-verse cite { font-size: .74rem; color: rgba(255,255,255,.36); font-style: normal; }
 
-    .steps-title {
-        font-weight: 600;
-        color: var(--text-dark);
-        font-size: 0.9rem;
-    }
+/* ══════════════════════════════════════════════
+   RIGHT PANEL
+══════════════════════════════════════════════ */
+.fcr-right {
+    flex: 1;
+    background: #F1F3F5;
+    overflow-y: auto;
+    padding: 2.5rem 2rem;
+    display: flex;
+    justify-content: center;
+}
 
-    .steps-item.is-active .steps-title {
-        color: var(--primary);
-    }
+.fcr-form-wrap {
+    width: 100%;
+    max-width: 680px;
+}
 
-    /* Progress bar between steps */
-    .steps-content::before {
-        content: '';
-        position: absolute;
-        top: 25px;
-        left: 25px;
-        right: 25px;
-        height: 3px;
-        background: var(--light-gray);
-        z-index: 1;
-    }
+/* Form header */
+.fcr-form-head { text-align: center; margin-bottom: 1.5rem; }
+.fcr-form-logo {
+    width: 54px; height: 54px;
+    background: rgba(80,34,45,.07);
+    border: 1px solid rgba(80,34,45,.1);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .8rem; padding: 8px;
+}
+.fcr-form-logo img { width: 100%; height: 100%; object-fit: contain; }
+.fcr-form-head h2 { font-size: 1.6rem; font-weight: 700; color: #50222D; letter-spacing: -.3px; margin: 0 0 .25rem; }
+.fcr-form-head p  { color: #9199A3; font-size: .875rem; }
 
-    /* Password Strength */
-    .password-strength .progress {
-        height: 6px;
-        margin-bottom: 5px;
-    }
+/* Step indicator */
+.fcr-steps {
+    display: flex; align-items: center;
+    margin-bottom: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    padding: .9rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.fcr-step { display: flex; align-items: center; gap: .6rem; flex: 0; white-space: nowrap; }
+.fcr-step__dot {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #E5E7EB; color: #9CA3AF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 600;
+    transition: all .3s;
+}
+.fcr-step span { font-size: .8rem; font-weight: 500; color: #9CA3AF; }
+.fcr-step--active .fcr-step__dot { background: #50222D; color: #fff; box-shadow: 0 4px 14px rgba(80,34,45,.3); }
+.fcr-step--active span { color: #50222D; font-weight: 600; }
+.fcr-step-line { flex: 1; height: 2px; background: #E5E7EB; margin: 0 .75rem; }
 
-    .password-strength .progress::-webkit-progress-value {
-        transition: width 0.3s ease;
-    }
+/* Section cards */
+.fcr-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.03);
+    transition: box-shadow .2s;
+}
+.fcr-section:hover { box-shadow: 0 4px 20px rgba(80,34,45,.07), 0 0 0 1px rgba(80,34,45,.05); }
 
-    /* Requirements List */
-    .requirements-list {
-        list-style: none;
-        margin-left: 0;
-    }
+.fcr-section__hd {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 1.4rem; padding-bottom: 1rem;
+    border-bottom: 1px solid #F3F4F6;
+}
+.fcr-section__ico {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: rgba(80,34,45,.07); color: #50222D;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .88rem;
+}
+.fcr-section__hd h3 { font-size: 1rem; font-weight: 700; color: #374151; margin: 0; }
 
-    .requirement {
-        margin-bottom: 5px;
-        padding: 2px 0;
-    }
+/* Grid row */
+.fcr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 580px) { .fcr-row { grid-template-columns: 1fr; } }
 
-    .requirement .icon {
-        transition: all 0.3s ease;
-    }
+/* Field */
+.fcr-fld { margin-bottom: 1rem; }
+.fcr-fld--half { max-width: 50%; }
+@media (max-width: 580px) { .fcr-fld--half { max-width: 100%; } }
 
-    /* Feature Cards */
-    .feature-card {
-        padding: 1.5rem;
-        border-radius: 10px;
-        background: var(--white);
-        border: 1px solid var(--light-gray);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
+.fcr-lbl {
+    display: block; font-size: .79rem; font-weight: 600;
+    color: #374151; letter-spacing: .01em; margin-bottom: .4rem;
+}
+.fcr-ctrl { position: relative; display: flex; align-items: center; }
+.fcr-ctrl__ico {
+    position: absolute; left: .85rem; z-index: 1;
+    color: #B0BAC6; font-size: .78rem;
+    pointer-events: none; transition: color .2s;
+}
+.fcr-ctrl__lock {
+    position: absolute; right: .85rem;
+    color: #B0BAC6; font-size: .75rem; pointer-events: none;
+}
+.fcr-inp {
+    width: 100%; height: 42px;
+    padding: 0 2.5rem 0 2.4rem;
+    border: 1.5px solid #E5E7EB; border-radius: 9px;
+    font-size: .875rem; color: #111827; background: #FAFAFA;
+    outline: none; font-family: inherit; -webkit-appearance: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.fcr-inp:hover:not(:focus) { border-color: #C9D1DC; }
+.fcr-inp:focus {
+    border-color: #50222D; background: #fff;
+    box-shadow: 0 0 0 3px rgba(80,34,45,.08);
+}
+.fcr-ctrl:focus-within .fcr-ctrl__ico { color: #50222D; }
+.fcr-inp--locked { background: #F8F8FA; color: #6B7280; cursor: not-allowed; }
+.fcr-inp--locked:focus { border-color: #E5E7EB; box-shadow: none; background: #F8F8FA; }
 
-    .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(160, 90, 255, 0.1);
-        border-color: var(--primary);
-    }
+.fcr-help { font-size: .75rem; color: #7A8CA3; margin-top: .3rem; }
 
-    /* Button Gradient */
-    .button.has-gradient {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--support-purple) 100%);
-        color: var(--white);
-        border: none;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
+/* Password strength */
+.fcr-strength {
+    display: flex; align-items: center; gap: .6rem;
+    margin-top: .45rem;
+}
+.fcr-strength__bar {
+    flex: 1; height: 5px; border-radius: 3px;
+    background: #E5E7EB; overflow: hidden;
+}
+.fcr-strength__fill {
+    height: 100%; width: 0%; border-radius: 3px;
+    background: #EF4444;
+    transition: width .35s ease, background .35s ease;
+}
+.fcr-strength__lbl { font-size: .73rem; font-weight: 600; color: #9CA3AF; min-width: 42px; }
 
-    .button.has-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(160, 90, 255, 0.3);
-    }
+/* Password match */
+.fcr-match-msg { font-size: .75rem; margin-top: .35rem; min-height: 1em; }
 
-    /* Form Focus Effects */
-    .input:focus, .select select:focus {
-        box-shadow: 0 0 0 0.2em rgba(160, 90, 255, 0.2);
-        border-color: var(--primary);
-    }
+/* Requirements */
+.fcr-reqs {
+    background: #F8F9FA; border-radius: 10px;
+    padding: 1rem 1.1rem; margin-top: .5rem;
+}
+.fcr-reqs__title { font-size: .77rem; font-weight: 600; color: #50222D; margin: 0 0 .6rem; }
+.fcr-reqs__list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .35rem .8rem; }
+.fcr-req {
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .76rem; color: #9CA3AF;
+    transition: color .2s;
+}
+.fcr-req__ico { font-size: .45rem; color: #D1D5DB; transition: all .2s; }
+.fcr-req--met { color: #059669; }
+.fcr-req--met .fcr-req__ico { color: #10B981; font-size: .75rem; }
+.fcr-req--met .fcr-req__ico i::before { content: "\f058"; } /* fa-check-circle */
 
-    /* Animations */
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
+/* Terms */
+.fcr-terms { margin-bottom: 1.5rem; }
+.fcr-chk { display: flex; align-items: flex-start; gap: .6rem; cursor: pointer; user-select: none; }
+.fcr-chk__inp { display: none; }
+.fcr-chk__box {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+    border: 1.5px solid #D1D5DB; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; transition: all .18s;
+}
+.fcr-chk__inp:checked ~ .fcr-chk__box { background: #50222D; border-color: #50222D; }
+.fcr-chk__inp:checked ~ .fcr-chk__box::after {
+    content: '';
+    width: 5px; height: 9px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(45deg) translate(-1px,-1px); display: block;
+}
+.fcr-chk__lbl { font-size: .84rem; color: #4B5563; line-height: 1.5; }
+.fcr-link { color: #50222D; text-decoration: none; font-weight: 600; transition: opacity .15s; }
+.fcr-link:hover { opacity: .7; }
+.fcr-link--bold { font-weight: 700; }
 
-    .animate__animated {
-        animation-duration: 0.6s;
-    }
+/* Submit button */
+.fcr-btn {
+    position: relative; width: 100%; height: 50px;
+    background: linear-gradient(135deg, #50222D 0%, #6B2F3D 100%);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: .95rem; font-weight: 600; letter-spacing: .02em;
+    cursor: pointer; overflow: hidden; font-family: inherit;
+    transition: transform .2s, box-shadow .2s;
+}
+.fcr-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(80,34,45,.35); }
+.fcr-btn:active { transform: translateY(0); box-shadow: none; }
+.fcr-btn__inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    transition: opacity .2s;
+}
+.fcr-btn__shine {
+    position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    transform: skewX(-20deg); transition: left .55s ease; pointer-events: none;
+}
+.fcr-btn:hover .fcr-btn__shine { left: 130%; }
+.fcr-btn__spin {
+    display: none; width: 20px; height: 20px;
+    border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff;
+    border-radius: 50%;
+    animation: fcrSpin .6s linear infinite;
+    position: absolute; top: 50%; left: 50%; margin: -10px 0 0 -10px;
+}
+@keyframes fcrSpin { to { transform: rotate(360deg); } }
+.fcr-btn.is-loading .fcr-btn__inner { opacity: 0; }
+.fcr-btn.is-loading .fcr-btn__spin { display: block; }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .p-6 {
-            padding: 2rem 1.5rem !important;
-        }
+/* Form footer */
+.fcr-form-foot {
+    text-align: center; margin-top: 1.25rem;
+    display: flex; flex-direction: column; gap: .35rem;
+}
+.fcr-form-foot p { font-size: .82rem; color: #9CA3AF; margin: 0; }
 
-        .steps-marker {
-            width: 40px;
-            height: 40px;
-        }
-
-        .steps-content::before {
-            top: 20px;
-        }
-
-        .radio-card {
-            padding: 1rem;
-        }
-
-        .feature-card {
-            margin-bottom: 1rem;
-        }
-    }
-
-    /* Loading State */
-    .button.is-loading {
-        position: relative;
-        color: transparent !important;
-    }
-
-    .button.is-loading::after {
-        position: absolute;
-        left: calc(50% - 0.5em);
-        top: calc(50% - 0.5em);
-        animation: spinAround 0.5s infinite linear;
-        border: 2px solid var(--white);
-        border-radius: 290486px;
-        border-right-color: transparent;
-        border-top-color: transparent;
-        content: "";
-        display: block;
-        height: 1em;
-        width: 1em;
-    }
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    .fcr-left { display: none; }
+    .fcr-wrap { padding-top: 64px; }
+}
+@media (max-width: 600px) {
+    .fcr-right { padding: 1.5rem 1rem; }
+    .fcr-section { padding: 1.25rem; }
+    .fcr-steps { display: none; }
+}
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerForm');
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm_password');
-    const passwordMatch = document.getElementById('password-match');
-    const strengthText = document.getElementById('strength-text');
-    const progressBar = document.querySelector('.password-strength .progress');
-    const requirements = document.querySelectorAll('.requirement');
-    const submitBtn = document.getElementById('submitBtn');
+document.addEventListener('DOMContentLoaded', function () {
+    var form            = document.getElementById('registerForm');
+    var password        = document.getElementById('password');
+    var confirmPassword = document.getElementById('confirm_password');
+    var matchMsg        = document.getElementById('passwordMatch');
+    var strengthFill    = document.getElementById('strengthFill');
+    var strengthText    = document.getElementById('strengthText');
+    var submitBtn       = document.getElementById('submitBtn');
 
-    // Password strength checker
-    function checkPasswordStrength(pass) {
-        let strength = 0;
-        const requirementsMet = {
-            length: false,
-            uppercase: false,
-            lowercase: false,
-            number: false,
-            special: false
+    // ── Password strength ──────────────────────
+    function checkStrength(val) {
+        var met = {
+            length:    val.length >= 8,
+            uppercase: /[A-Z]/.test(val),
+            lowercase: /[a-z]/.test(val),
+            number:    /[0-9]/.test(val),
+            special:   /[^A-Za-z0-9]/.test(val)
         };
+        var count = Object.values(met).filter(Boolean).length;
+        var pct   = count * 20;
 
-        // Length requirement
-        if (pass.length >= 8) {
-            strength += 20;
-            requirementsMet.length = true;
-        }
-
-        // Uppercase letter
-        if (/[A-Z]/.test(pass)) {
-            strength += 20;
-            requirementsMet.uppercase = true;
-        }
-
-        // Lowercase letter
-        if (/[a-z]/.test(pass)) {
-            strength += 20;
-            requirementsMet.lowercase = true;
-        }
-
-        // Number
-        if (/[0-9]/.test(pass)) {
-            strength += 20;
-            requirementsMet.number = true;
-        }
-
-        // Special character
-        if (/[^A-Za-z0-9]/.test(pass)) {
-            strength += 20;
-            requirementsMet.special = true;
-        }
-
-        // Update progress bar
-        progressBar.value = strength;
-
-        // Update strength text
-        if (strength <= 40) {
+        // Update bar
+        strengthFill.style.width = pct + '%';
+        if (pct <= 40) {
+            strengthFill.style.background = '#EF4444';
             strengthText.textContent = 'Weak';
-            strengthText.className = 'has-text-danger';
-            progressBar.className = 'progress is-small is-danger';
-        } else if (strength <= 80) {
-            strengthText.textContent = 'Medium';
-            strengthText.className = 'has-text-warning';
-            progressBar.className = 'progress is-small is-warning';
+            strengthText.style.color = '#EF4444';
+        } else if (pct <= 60) {
+            strengthFill.style.background = '#F59E0B';
+            strengthText.textContent = 'Fair';
+            strengthText.style.color = '#F59E0B';
+        } else if (pct <= 80) {
+            strengthFill.style.background = '#3B82F6';
+            strengthText.textContent = 'Good';
+            strengthText.style.color = '#3B82F6';
         } else {
+            strengthFill.style.background = '#10B981';
             strengthText.textContent = 'Strong';
-            strengthText.className = 'has-text-success';
-            progressBar.className = 'progress is-small is-success';
+            strengthText.style.color = '#10B981';
         }
 
-        // Update requirement indicators
-        Object.keys(requirementsMet).forEach(key => {
-            const requirementElement = document.querySelector(`.requirement[data-requirement="${key}"]`);
-            const icon = requirementElement.querySelector('.icon i');
-            if (requirementsMet[key]) {
-                icon.className = 'fas fa-check-circle has-text-success';
+        // Update requirement items
+        Object.keys(met).forEach(function (key) {
+            var el = document.querySelector('.fcr-req[data-req="' + key + '"]');
+            if (!el) return;
+            if (met[key]) {
+                el.classList.add('fcr-req--met');
             } else {
-                icon.className = 'fas fa-times-circle has-text-danger';
+                el.classList.remove('fcr-req--met');
             }
         });
 
-        return strength;
+        return pct;
     }
 
-    // Check password match
-    function checkPasswordMatch() {
-        if (confirmPassword.value === '') {
-            passwordMatch.textContent = '';
-            passwordMatch.className = 'help has-text-dark';
+    // ── Password match ─────────────────────────
+    function checkMatch() {
+        if (!confirmPassword.value) {
+            matchMsg.textContent = '';
             return;
         }
-
         if (password.value === confirmPassword.value) {
-            passwordMatch.textContent = 'Passwords match!';
-            passwordMatch.className = 'help has-text-success';
+            matchMsg.textContent = 'Passwords match!';
+            matchMsg.style.color = '#10B981';
         } else {
-            passwordMatch.textContent = 'Passwords do not match';
-            passwordMatch.className = 'help has-text-danger';
+            matchMsg.textContent = 'Passwords do not match';
+            matchMsg.style.color = '#EF4444';
         }
     }
 
-    // Real-time password validation
-    password.addEventListener('input', function() {
-        checkPasswordStrength(this.value);
-        checkPasswordMatch();
+    password.addEventListener('input', function () {
+        checkStrength(this.value);
+        checkMatch();
     });
+    confirmPassword.addEventListener('input', checkMatch);
 
-    confirmPassword.addEventListener('input', checkPasswordMatch);
-
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        // Validate password match
+    // ── Form submit ────────────────────────────
+    form.addEventListener('submit', function (e) {
         if (password.value !== confirmPassword.value) {
             e.preventDefault();
             showDanger('Passwords do not match');
             confirmPassword.focus();
             return;
         }
-
-        // Validate password strength
-        if (checkPasswordStrength(password.value) < 60) {
+        if (checkStrength(password.value) < 60) {
             e.preventDefault();
             showDanger('Please use a stronger password');
             password.focus();
             return;
         }
-
-        // Validate terms
         if (!form.terms.checked) {
             e.preventDefault();
             showDanger('Please agree to the terms and conditions');
             return;
         }
-
-        // Show loading state and let the form POST normally
         submitBtn.classList.add('is-loading');
         submitBtn.disabled = true;
     });
 
-    // Toast notification functions
-    function showSuccess(message) {
-        bulmaToast.toast({
-            message: message,
-            type: 'is-success',
-            duration: 3000,
-            position: 'top-center',
-            animate: { in: 'fadeIn', out: 'fadeOut' }
-        });
-    }
-
-    function showPrimary(message) {
-        bulmaToast.toast({
-            message: message,
-            type: 'is-primary',
-            duration: 4000,
-            position: 'top-center',
-            animate: { in: 'fadeIn', out: 'fadeOut' }
-        });
-    }
-
-    function showDanger(message) {
-        bulmaToast.toast({
-            message: message,
-            type: 'is-danger',
-            duration: 5000,
-            position: 'top-center',
-            animate: { in: 'fadeIn', out: 'fadeOut' }
-        });
-    }
-
-    // Initialize with some animations
-    const steps = document.querySelectorAll('.steps-item');
-    steps.forEach((step, index) => {
-        step.style.animationDelay = `${index * 0.2}s`;
+    // ── Stagger highlights ──────────────────────
+    document.querySelectorAll('.fcr-hl').forEach(function (el, i) {
+        el.style.animation = 'fcrUp 0.6s cubic-bezier(0.22,1,0.36,1) ' + (0.22 + i * 0.07) + 's both';
     });
 });
 </script>

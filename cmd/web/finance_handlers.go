@@ -105,8 +105,14 @@ func paginationWindow(page, totalPages int) []int {
 
 // GET /giving/new
 func (app *application) financeNewGet(w http.ResponseWriter, r *http.Request) {
+	cid := 0
+	if u := app.getAuthenticatedUser(r); u != nil && u.Edges.Church != nil {
+		cid = u.Edges.Church.ID
+	}
+	members, _ := app.memberModel.ListContactsByChurch(r.Context(), cid)
 	data := app.newTemplateData(r)
 	data.Form = models.FinanceDto{}
+	data.Data = map[string]interface{}{"members": members}
 	app.render(w, r, http.StatusOK, "finance_new.gohtml", data)
 }
 
@@ -125,8 +131,14 @@ func (app *application) financeNewPost(w http.ResponseWriter, r *http.Request) {
 	dto.CheckField(validator.NotBlank(dto.TransactionDate), "transaction_date", "Date is required")
 
 	if !dto.Valid() {
+		cid := 0
+		if u := app.getAuthenticatedUser(r); u != nil && u.Edges.Church != nil {
+			cid = u.Edges.Church.ID
+		}
+		members, _ := app.memberModel.ListContactsByChurch(r.Context(), cid)
 		data := app.newTemplateData(r)
 		data.Form = dto
+		data.Data = map[string]interface{}{"members": members}
 		app.render(w, r, http.StatusUnprocessableEntity, "finance_new.gohtml", data)
 		return
 	}

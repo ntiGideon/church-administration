@@ -123,4 +123,113 @@ var functions = template.FuncMap{
 	"add":      func(a, b float64) float64 { return a + b },
 	"float64":  func(i int) float64 { return float64(i) },
 	"int":      func(f float64) int { return int(f) },
+	"enumStr":  func(v interface{ String() string }) string { return v.String() },
+	"docCategoryLabel": func(s string) string {
+		switch s {
+		case "minutes":
+			return "Meeting Minutes"
+		case "bulletin":
+			return "Bulletin"
+		case "constitution":
+			return "Constitution / Bylaws"
+		case "form":
+			return "Form"
+		case "report":
+			return "Report"
+		case "financial":
+			return "Financial Statement"
+		case "other":
+			return "Other"
+		default:
+			return s
+		}
+	},
+	"docCategoryIcon": func(s string) string {
+		switch s {
+		case "minutes":
+			return "fa-file-alt"
+		case "bulletin":
+			return "fa-newspaper"
+		case "constitution":
+			return "fa-scroll"
+		case "form":
+			return "fa-file-signature"
+		case "report":
+			return "fa-chart-bar"
+		case "financial":
+			return "fa-file-invoice-dollar"
+		default:
+			return "fa-file"
+		}
+	},
+	"humanFileSize": func(size int64) string {
+		const unit = 1024
+		if size < unit {
+			return fmt.Sprintf("%d B", size)
+		}
+		div, exp := int64(unit), 0
+		for n := size / unit; n >= unit; n /= unit {
+			div *= unit
+			exp++
+		}
+		return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "KMGTPE"[exp])
+	},
+	"prayerStatusLabel": func(s string) string {
+		switch s {
+		case "active":
+			return "Active"
+		case "answered":
+			return "Answered"
+		case "closed":
+			return "Closed"
+		default:
+			return s
+		}
+	},
+	"statusOptions": func() [][2]string {
+		return [][2]string{
+			{"new", "New"},
+			{"contacted", "Contacted"},
+			{"follow_up_scheduled", "Follow-up scheduled"},
+			{"follow_up_done", "Follow-up done"},
+			{"converted", "Converted"},
+			{"no_response", "No response"},
+		}
+	},
+	"howHeardLabel": func(s string) string {
+		switch s {
+		case "walk_in":
+			return "Walk-in"
+		case "invited_by_member":
+			return "Invited by member"
+		case "social_media":
+			return "Social media"
+		case "website":
+			return "Website"
+		case "flyer":
+			return "Flyer / poster"
+		case "other":
+			return "Other"
+		default:
+			return s
+		}
+	},
+	"statusLabel": func(s string) string {
+		switch s {
+		case "new":
+			return "New"
+		case "contacted":
+			return "Contacted"
+		case "follow_up_scheduled":
+			return "Follow-up scheduled"
+		case "follow_up_done":
+			return "Follow-up done"
+		case "converted":
+			return "Converted"
+		case "no_response":
+			return "No response"
+		default:
+			return s
+		}
+	},
 }

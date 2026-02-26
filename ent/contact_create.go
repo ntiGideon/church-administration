@@ -10,8 +10,14 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
+	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -572,6 +578,111 @@ func (_c *ContactCreate) SetSpouseOfContact(v *Contact) *ContactCreate {
 	return _c.SetSpouseOfContactID(v.ID)
 }
 
+// AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
+func (_c *ContactCreate) AddAttendanceIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddAttendanceIDs(ids...)
+	return _c
+}
+
+// AddAttendances adds the "attendances" edges to the Attendance entity.
+func (_c *ContactCreate) AddAttendances(v ...*Attendance) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddAttendanceIDs(ids...)
+}
+
+// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+func (_c *ContactCreate) AddGroupIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddGroupIDs(ids...)
+	return _c
+}
+
+// AddGroups adds the "groups" edges to the Group entity.
+func (_c *ContactCreate) AddGroups(v ...*Group) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGroupIDs(ids...)
+}
+
+// AddLeadingGroupIDs adds the "leading_groups" edge to the Group entity by IDs.
+func (_c *ContactCreate) AddLeadingGroupIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddLeadingGroupIDs(ids...)
+	return _c
+}
+
+// AddLeadingGroups adds the "leading_groups" edges to the Group entity.
+func (_c *ContactCreate) AddLeadingGroups(v ...*Group) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddLeadingGroupIDs(ids...)
+}
+
+// AddGivingRecordIDs adds the "giving_records" edge to the Finance entity by IDs.
+func (_c *ContactCreate) AddGivingRecordIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddGivingRecordIDs(ids...)
+	return _c
+}
+
+// AddGivingRecords adds the "giving_records" edges to the Finance entity.
+func (_c *ContactCreate) AddGivingRecords(v ...*Finance) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddGivingRecordIDs(ids...)
+}
+
+// AddPledgeIDs adds the "pledges" edge to the Pledge entity by IDs.
+func (_c *ContactCreate) AddPledgeIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddPledgeIDs(ids...)
+	return _c
+}
+
+// AddPledges adds the "pledges" edges to the Pledge entity.
+func (_c *ContactCreate) AddPledges(v ...*Pledge) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPledgeIDs(ids...)
+}
+
+// AddRosterEntryIDs adds the "roster_entries" edge to the RosterEntry entity by IDs.
+func (_c *ContactCreate) AddRosterEntryIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddRosterEntryIDs(ids...)
+	return _c
+}
+
+// AddRosterEntries adds the "roster_entries" edges to the RosterEntry entity.
+func (_c *ContactCreate) AddRosterEntries(v ...*RosterEntry) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRosterEntryIDs(ids...)
+}
+
+// AddPrayerRequestIDs adds the "prayer_requests" edge to the PrayerRequest entity by IDs.
+func (_c *ContactCreate) AddPrayerRequestIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddPrayerRequestIDs(ids...)
+	return _c
+}
+
+// AddPrayerRequests adds the "prayer_requests" edges to the PrayerRequest entity.
+func (_c *ContactCreate) AddPrayerRequests(v ...*PrayerRequest) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPrayerRequestIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_c *ContactCreate) Mutation() *ContactMutation {
 	return _c.mutation
@@ -887,6 +998,118 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.SpouseID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.AttendancesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.GroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.LeadingGroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.GivingRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PledgesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RosterEntriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PrayerRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

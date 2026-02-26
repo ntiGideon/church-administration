@@ -47,9 +47,11 @@ type Event struct {
 type EventEdges struct {
 	// Church holds the value of the church edge.
 	Church *Church `json:"church,omitempty"`
+	// Attendances holds the value of the attendances edge.
+	Attendances []*Attendance `json:"attendances,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ChurchOrErr returns the Church value or an error if the edge
@@ -61,6 +63,15 @@ func (e EventEdges) ChurchOrErr() (*Church, error) {
 		return nil, &NotFoundError{label: church.Label}
 	}
 	return nil, &NotLoadedError{edge: "church"}
+}
+
+// AttendancesOrErr returns the Attendances value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventEdges) AttendancesOrErr() ([]*Attendance, error) {
+	if e.loadedTypes[1] {
+		return e.Attendances, nil
+	}
+	return nil, &NotLoadedError{edge: "attendances"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -176,6 +187,11 @@ func (_m *Event) Value(name string) (ent.Value, error) {
 // QueryChurch queries the "church" edge of the Event entity.
 func (_m *Event) QueryChurch() *ChurchQuery {
 	return NewEventClient(_m.config).QueryChurch(_m)
+}
+
+// QueryAttendances queries the "attendances" edge of the Event entity.
+func (_m *Event) QueryAttendances() *AttendanceQuery {
+	return NewEventClient(_m.config).QueryAttendances(_m)
 }
 
 // Update returns a builder for updating this Event.

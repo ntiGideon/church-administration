@@ -41,6 +41,42 @@ var (
 			},
 		},
 	}
+	// AttendancesColumns holds the columns for the "attendances" table.
+	AttendancesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"present", "late"}, Default: "present"},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "check_in_time", Type: field.TypeTime},
+		{Name: "contact_id", Type: field.TypeInt},
+		{Name: "event_id", Type: field.TypeInt},
+	}
+	// AttendancesTable holds the schema information for the "attendances" table.
+	AttendancesTable = &schema.Table{
+		Name:       "attendances",
+		Columns:    AttendancesColumns,
+		PrimaryKey: []*schema.Column{AttendancesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "attendances_contacts_attendances",
+				Columns:    []*schema.Column{AttendancesColumns[4]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "attendances_events_attendances",
+				Columns:    []*schema.Column{AttendancesColumns[5]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "attendance_event_id_contact_id",
+				Unique:  true,
+				Columns: []*schema.Column{AttendancesColumns[5], AttendancesColumns[4]},
+			},
+		},
+	}
 	// ChurchesColumns holds the columns for the "churches" table.
 	ChurchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -180,6 +216,41 @@ var (
 			},
 		},
 	}
+	// DocumentsColumns holds the columns for the "documents" table.
+	DocumentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "category", Type: field.TypeEnum, Enums: []string{"minutes", "bulletin", "constitution", "form", "report", "financial", "other"}, Default: "other"},
+		{Name: "file_url", Type: field.TypeString},
+		{Name: "file_name", Type: field.TypeString},
+		{Name: "file_size", Type: field.TypeInt64},
+		{Name: "mime_type", Type: field.TypeString, Nullable: true},
+		{Name: "is_public", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// DocumentsTable holds the schema information for the "documents" table.
+	DocumentsTable = &schema.Table{
+		Name:       "documents",
+		Columns:    DocumentsColumns,
+		PrimaryKey: []*schema.Column{DocumentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "documents_churches_documents",
+				Columns:    []*schema.Column{DocumentsColumns[10]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "document_church_id_category",
+				Unique:  false,
+				Columns: []*schema.Column{DocumentsColumns[10], DocumentsColumns[3]},
+			},
+		},
+	}
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -221,6 +292,7 @@ var (
 		{Name: "reference_number", Type: field.TypeString, Nullable: true},
 		{Name: "notes", Type: field.TypeString, Nullable: true},
 		{Name: "church_finances", Type: field.TypeInt, Nullable: true},
+		{Name: "contact_id", Type: field.TypeInt, Nullable: true},
 		{Name: "user_finance_records", Type: field.TypeInt, Nullable: true},
 	}
 	// FinancesTable holds the schema information for the "finances" table.
@@ -236,9 +308,50 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "finances_users_finance_records",
+				Symbol:     "finances_contacts_donor",
 				Columns:    []*schema.Column{FinancesColumns[11]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "finances_users_finance_records",
+				Columns:    []*schema.Column{FinancesColumns[12]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// GroupsColumns holds the columns for the "groups" table.
+	GroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "group_type", Type: field.TypeEnum, Enums: []string{"cell_group", "bible_study", "youth", "women", "men", "choir", "committee", "prayer_team", "other"}, Default: "cell_group"},
+		{Name: "meeting_day", Type: field.TypeEnum, Nullable: true, Enums: []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}},
+		{Name: "meeting_time", Type: field.TypeString, Nullable: true},
+		{Name: "location", Type: field.TypeString, Nullable: true},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "leader_id", Type: field.TypeInt, Nullable: true},
+	}
+	// GroupsTable holds the schema information for the "groups" table.
+	GroupsTable = &schema.Table{
+		Name:       "groups",
+		Columns:    GroupsColumns,
+		PrimaryKey: []*schema.Column{GroupsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "groups_churches_groups",
+				Columns:    []*schema.Column{GroupsColumns[10]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "groups_contacts_leader",
+				Columns:    []*schema.Column{GroupsColumns[11]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -274,6 +387,87 @@ var (
 				Columns:    []*schema.Column{InvitationsColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// PledgesColumns holds the columns for the "pledges" table.
+	PledgesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "category", Type: field.TypeString, Default: "General Fund"},
+		{Name: "amount", Type: field.TypeFloat64},
+		{Name: "currency", Type: field.TypeString, Default: "GHS"},
+		{Name: "start_date", Type: field.TypeTime},
+		{Name: "end_date", Type: field.TypeTime, Nullable: true},
+		{Name: "frequency", Type: field.TypeEnum, Enums: []string{"one_time", "weekly", "monthly", "quarterly", "yearly"}, Default: "one_time"},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt},
+	}
+	// PledgesTable holds the schema information for the "pledges" table.
+	PledgesTable = &schema.Table{
+		Name:       "pledges",
+		Columns:    PledgesColumns,
+		PrimaryKey: []*schema.Column{PledgesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "pledges_churches_pledges",
+				Columns:    []*schema.Column{PledgesColumns[10]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "pledges_contacts_pledges",
+				Columns:    []*schema.Column{PledgesColumns[11]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// PrayerRequestsColumns holds the columns for the "prayer_requests" table.
+	PrayerRequestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "body", Type: field.TypeString, Size: 2147483647},
+		{Name: "requester_name", Type: field.TypeString, Nullable: true},
+		{Name: "is_anonymous", Type: field.TypeBool, Default: false},
+		{Name: "is_private", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "answered", "closed"}, Default: "active"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt, Nullable: true},
+	}
+	// PrayerRequestsTable holds the schema information for the "prayer_requests" table.
+	PrayerRequestsTable = &schema.Table{
+		Name:       "prayer_requests",
+		Columns:    PrayerRequestsColumns,
+		PrimaryKey: []*schema.Column{PrayerRequestsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "prayer_requests_churches_prayer_requests",
+				Columns:    []*schema.Column{PrayerRequestsColumns[9]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "prayer_requests_contacts_prayer_requests",
+				Columns:    []*schema.Column{PrayerRequestsColumns[10]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "prayerrequest_church_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{PrayerRequestsColumns[9], PrayerRequestsColumns[6]},
+			},
+			{
+				Name:    "prayerrequest_is_private",
+				Unique:  false,
+				Columns: []*schema.Column{PrayerRequestsColumns[5]},
 			},
 		},
 	}
@@ -314,6 +508,105 @@ var (
 				Name:    "programentry_date",
 				Unique:  false,
 				Columns: []*schema.Column{ProgramEntriesColumns[3]},
+			},
+		},
+	}
+	// RostersColumns holds the columns for the "rosters" table.
+	RostersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "service_date", Type: field.TypeTime},
+		{Name: "department", Type: field.TypeString, Nullable: true},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// RostersTable holds the schema information for the "rosters" table.
+	RostersTable = &schema.Table{
+		Name:       "rosters",
+		Columns:    RostersColumns,
+		PrimaryKey: []*schema.Column{RostersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "rosters_churches_rosters",
+				Columns:    []*schema.Column{RostersColumns[6]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// RosterEntriesColumns holds the columns for the "roster_entries" table.
+	RosterEntriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "role", Type: field.TypeString},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "contact_id", Type: field.TypeInt},
+		{Name: "roster_id", Type: field.TypeInt},
+	}
+	// RosterEntriesTable holds the schema information for the "roster_entries" table.
+	RosterEntriesTable = &schema.Table{
+		Name:       "roster_entries",
+		Columns:    RosterEntriesColumns,
+		PrimaryKey: []*schema.Column{RosterEntriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "roster_entries_contacts_roster_entries",
+				Columns:    []*schema.Column{RosterEntriesColumns[3]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "roster_entries_rosters_entries",
+				Columns:    []*schema.Column{RosterEntriesColumns[4]},
+				RefColumns: []*schema.Column{RostersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "rosterentry_roster_id_contact_id",
+				Unique:  true,
+				Columns: []*schema.Column{RosterEntriesColumns[4], RosterEntriesColumns[3]},
+			},
+		},
+	}
+	// SermonsColumns holds the columns for the "sermons" table.
+	SermonsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "speaker", Type: field.TypeString},
+		{Name: "series", Type: field.TypeString, Nullable: true},
+		{Name: "scripture", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "media_url", Type: field.TypeString, Nullable: true},
+		{Name: "service_date", Type: field.TypeTime},
+		{Name: "is_published", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// SermonsTable holds the schema information for the "sermons" table.
+	SermonsTable = &schema.Table{
+		Name:       "sermons",
+		Columns:    SermonsColumns,
+		PrimaryKey: []*schema.Column{SermonsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sermons_churches_sermons",
+				Columns:    []*schema.Column{SermonsColumns[10]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "sermon_church_id_service_date",
+				Unique:  false,
+				Columns: []*schema.Column{SermonsColumns[10], SermonsColumns[7]},
+			},
+			{
+				Name:    "sermon_is_published",
+				Unique:  false,
+				Columns: []*schema.Column{SermonsColumns[8]},
 			},
 		},
 	}
@@ -389,35 +682,129 @@ var (
 			},
 		},
 	}
+	// VisitorsColumns holds the columns for the "visitors" table.
+	VisitorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString, Nullable: true},
+		{Name: "phone", Type: field.TypeString, Nullable: true},
+		{Name: "address", Type: field.TypeString, Nullable: true},
+		{Name: "visit_date", Type: field.TypeTime},
+		{Name: "how_heard", Type: field.TypeEnum, Nullable: true, Enums: []string{"walk_in", "invited_by_member", "social_media", "website", "flyer", "other"}},
+		{Name: "invited_by", Type: field.TypeString, Nullable: true},
+		{Name: "notes", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "follow_up_status", Type: field.TypeEnum, Enums: []string{"new", "contacted", "follow_up_scheduled", "follow_up_done", "converted", "no_response"}, Default: "new"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// VisitorsTable holds the schema information for the "visitors" table.
+	VisitorsTable = &schema.Table{
+		Name:       "visitors",
+		Columns:    VisitorsColumns,
+		PrimaryKey: []*schema.Column{VisitorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "visitors_churches_visitors",
+				Columns:    []*schema.Column{VisitorsColumns[12]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "visitor_church_id_visit_date",
+				Unique:  false,
+				Columns: []*schema.Column{VisitorsColumns[12], VisitorsColumns[6]},
+			},
+			{
+				Name:    "visitor_follow_up_status",
+				Unique:  false,
+				Columns: []*schema.Column{VisitorsColumns[10]},
+			},
+		},
+	}
+	// GroupMembersColumns holds the columns for the "group_members" table.
+	GroupMembersColumns = []*schema.Column{
+		{Name: "group_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt},
+	}
+	// GroupMembersTable holds the schema information for the "group_members" table.
+	GroupMembersTable = &schema.Table{
+		Name:       "group_members",
+		Columns:    GroupMembersColumns,
+		PrimaryKey: []*schema.Column{GroupMembersColumns[0], GroupMembersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "group_members_group_id",
+				Columns:    []*schema.Column{GroupMembersColumns[0]},
+				RefColumns: []*schema.Column{GroupsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "group_members_contact_id",
+				Columns:    []*schema.Column{GroupMembersColumns[1]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AnnouncementsTable,
+		AttendancesTable,
 		ChurchesTable,
 		ContactsTable,
 		DepartmentsTable,
+		DocumentsTable,
 		EventsTable,
 		FinancesTable,
+		GroupsTable,
 		InvitationsTable,
+		PledgesTable,
+		PrayerRequestsTable,
 		ProgramEntriesTable,
+		RostersTable,
+		RosterEntriesTable,
+		SermonsTable,
 		SessionsTable,
 		UsersTable,
+		VisitorsTable,
+		GroupMembersTable,
 	}
 )
 
 func init() {
 	AnnouncementsTable.ForeignKeys[0].RefTable = ChurchesTable
 	AnnouncementsTable.ForeignKeys[1].RefTable = UsersTable
+	AttendancesTable.ForeignKeys[0].RefTable = ContactsTable
+	AttendancesTable.ForeignKeys[1].RefTable = EventsTable
 	ChurchesTable.ForeignKeys[0].RefTable = ChurchesTable
 	ContactsTable.ForeignKeys[0].RefTable = ChurchesTable
 	ContactsTable.ForeignKeys[1].RefTable = ContactsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = ChurchesTable
+	DocumentsTable.ForeignKeys[0].RefTable = ChurchesTable
 	EventsTable.ForeignKeys[0].RefTable = ChurchesTable
 	FinancesTable.ForeignKeys[0].RefTable = ChurchesTable
-	FinancesTable.ForeignKeys[1].RefTable = UsersTable
+	FinancesTable.ForeignKeys[1].RefTable = ContactsTable
+	FinancesTable.ForeignKeys[2].RefTable = UsersTable
+	GroupsTable.ForeignKeys[0].RefTable = ChurchesTable
+	GroupsTable.ForeignKeys[1].RefTable = ContactsTable
 	InvitationsTable.ForeignKeys[0].RefTable = ChurchesTable
 	InvitationsTable.ForeignKeys[1].RefTable = UsersTable
+	PledgesTable.ForeignKeys[0].RefTable = ChurchesTable
+	PledgesTable.ForeignKeys[1].RefTable = ContactsTable
+	PrayerRequestsTable.ForeignKeys[0].RefTable = ChurchesTable
+	PrayerRequestsTable.ForeignKeys[1].RefTable = ContactsTable
 	ProgramEntriesTable.ForeignKeys[0].RefTable = ChurchesTable
+	RostersTable.ForeignKeys[0].RefTable = ChurchesTable
+	RosterEntriesTable.ForeignKeys[0].RefTable = ContactsTable
+	RosterEntriesTable.ForeignKeys[1].RefTable = RostersTable
+	SermonsTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[1].RefTable = ContactsTable
 	UsersTable.ForeignKeys[2].RefTable = InvitationsTable
+	VisitorsTable.ForeignKeys[0].RefTable = ChurchesTable
+	GroupMembersTable.ForeignKeys[0].RefTable = GroupsTable
+	GroupMembersTable.ForeignKeys[1].RefTable = ContactsTable
 }

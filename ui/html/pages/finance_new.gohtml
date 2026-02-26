@@ -144,6 +144,27 @@
                         </div>
                     </div>
 
+                    {{$members := index .Data "members"}}
+                    {{if $members}}
+                    <div class="field">
+                        <label class="label">Donor / Member <span class="has-text-grey">(optional)</span></label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="contact_id">
+                                    <option value="0">— Anonymous / not linked —</option>
+                                    {{$sel := 0}}{{with .Form}}{{$sel = .ContactID}}{{end}}
+                                    {{range $members}}
+                                    <option value="{{.ID}}" {{if eq $sel .ID}}selected{{end}}>
+                                        {{.FirstName}} {{.LastName}}{{if .Phone}} · {{.Phone}}{{end}}
+                                    </option>
+                                    {{end}}
+                                </select>
+                            </div>
+                        </div>
+                        <p class="help">Link this transaction to a specific congregation member.</p>
+                    </div>
+                    {{end}}
+
                     <div class="field">
                         <label class="label">Notes <span class="has-text-grey">(optional)</span></label>
                         <div class="control">

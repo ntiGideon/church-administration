@@ -11,9 +11,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/finance"
+	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/pledge"
+	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -775,6 +781,111 @@ func (_u *ContactUpdate) SetSpouseOfContact(v *Contact) *ContactUpdate {
 	return _u.SetSpouseOfContactID(v.ID)
 }
 
+// AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
+func (_u *ContactUpdate) AddAttendanceIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddAttendanceIDs(ids...)
+	return _u
+}
+
+// AddAttendances adds the "attendances" edges to the Attendance entity.
+func (_u *ContactUpdate) AddAttendances(v ...*Attendance) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAttendanceIDs(ids...)
+}
+
+// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+func (_u *ContactUpdate) AddGroupIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddGroupIDs(ids...)
+	return _u
+}
+
+// AddGroups adds the "groups" edges to the Group entity.
+func (_u *ContactUpdate) AddGroups(v ...*Group) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGroupIDs(ids...)
+}
+
+// AddLeadingGroupIDs adds the "leading_groups" edge to the Group entity by IDs.
+func (_u *ContactUpdate) AddLeadingGroupIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddLeadingGroupIDs(ids...)
+	return _u
+}
+
+// AddLeadingGroups adds the "leading_groups" edges to the Group entity.
+func (_u *ContactUpdate) AddLeadingGroups(v ...*Group) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddLeadingGroupIDs(ids...)
+}
+
+// AddGivingRecordIDs adds the "giving_records" edge to the Finance entity by IDs.
+func (_u *ContactUpdate) AddGivingRecordIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddGivingRecordIDs(ids...)
+	return _u
+}
+
+// AddGivingRecords adds the "giving_records" edges to the Finance entity.
+func (_u *ContactUpdate) AddGivingRecords(v ...*Finance) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGivingRecordIDs(ids...)
+}
+
+// AddPledgeIDs adds the "pledges" edge to the Pledge entity by IDs.
+func (_u *ContactUpdate) AddPledgeIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddPledgeIDs(ids...)
+	return _u
+}
+
+// AddPledges adds the "pledges" edges to the Pledge entity.
+func (_u *ContactUpdate) AddPledges(v ...*Pledge) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPledgeIDs(ids...)
+}
+
+// AddRosterEntryIDs adds the "roster_entries" edge to the RosterEntry entity by IDs.
+func (_u *ContactUpdate) AddRosterEntryIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddRosterEntryIDs(ids...)
+	return _u
+}
+
+// AddRosterEntries adds the "roster_entries" edges to the RosterEntry entity.
+func (_u *ContactUpdate) AddRosterEntries(v ...*RosterEntry) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRosterEntryIDs(ids...)
+}
+
+// AddPrayerRequestIDs adds the "prayer_requests" edge to the PrayerRequest entity by IDs.
+func (_u *ContactUpdate) AddPrayerRequestIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddPrayerRequestIDs(ids...)
+	return _u
+}
+
+// AddPrayerRequests adds the "prayer_requests" edges to the PrayerRequest entity.
+func (_u *ContactUpdate) AddPrayerRequests(v ...*PrayerRequest) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPrayerRequestIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdate) Mutation() *ContactMutation {
 	return _u.mutation
@@ -802,6 +913,153 @@ func (_u *ContactUpdate) ClearSpouseContact() *ContactUpdate {
 func (_u *ContactUpdate) ClearSpouseOfContact() *ContactUpdate {
 	_u.mutation.ClearSpouseOfContact()
 	return _u
+}
+
+// ClearAttendances clears all "attendances" edges to the Attendance entity.
+func (_u *ContactUpdate) ClearAttendances() *ContactUpdate {
+	_u.mutation.ClearAttendances()
+	return _u
+}
+
+// RemoveAttendanceIDs removes the "attendances" edge to Attendance entities by IDs.
+func (_u *ContactUpdate) RemoveAttendanceIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveAttendanceIDs(ids...)
+	return _u
+}
+
+// RemoveAttendances removes "attendances" edges to Attendance entities.
+func (_u *ContactUpdate) RemoveAttendances(v ...*Attendance) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAttendanceIDs(ids...)
+}
+
+// ClearGroups clears all "groups" edges to the Group entity.
+func (_u *ContactUpdate) ClearGroups() *ContactUpdate {
+	_u.mutation.ClearGroups()
+	return _u
+}
+
+// RemoveGroupIDs removes the "groups" edge to Group entities by IDs.
+func (_u *ContactUpdate) RemoveGroupIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveGroupIDs(ids...)
+	return _u
+}
+
+// RemoveGroups removes "groups" edges to Group entities.
+func (_u *ContactUpdate) RemoveGroups(v ...*Group) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGroupIDs(ids...)
+}
+
+// ClearLeadingGroups clears all "leading_groups" edges to the Group entity.
+func (_u *ContactUpdate) ClearLeadingGroups() *ContactUpdate {
+	_u.mutation.ClearLeadingGroups()
+	return _u
+}
+
+// RemoveLeadingGroupIDs removes the "leading_groups" edge to Group entities by IDs.
+func (_u *ContactUpdate) RemoveLeadingGroupIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveLeadingGroupIDs(ids...)
+	return _u
+}
+
+// RemoveLeadingGroups removes "leading_groups" edges to Group entities.
+func (_u *ContactUpdate) RemoveLeadingGroups(v ...*Group) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveLeadingGroupIDs(ids...)
+}
+
+// ClearGivingRecords clears all "giving_records" edges to the Finance entity.
+func (_u *ContactUpdate) ClearGivingRecords() *ContactUpdate {
+	_u.mutation.ClearGivingRecords()
+	return _u
+}
+
+// RemoveGivingRecordIDs removes the "giving_records" edge to Finance entities by IDs.
+func (_u *ContactUpdate) RemoveGivingRecordIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveGivingRecordIDs(ids...)
+	return _u
+}
+
+// RemoveGivingRecords removes "giving_records" edges to Finance entities.
+func (_u *ContactUpdate) RemoveGivingRecords(v ...*Finance) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGivingRecordIDs(ids...)
+}
+
+// ClearPledges clears all "pledges" edges to the Pledge entity.
+func (_u *ContactUpdate) ClearPledges() *ContactUpdate {
+	_u.mutation.ClearPledges()
+	return _u
+}
+
+// RemovePledgeIDs removes the "pledges" edge to Pledge entities by IDs.
+func (_u *ContactUpdate) RemovePledgeIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemovePledgeIDs(ids...)
+	return _u
+}
+
+// RemovePledges removes "pledges" edges to Pledge entities.
+func (_u *ContactUpdate) RemovePledges(v ...*Pledge) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePledgeIDs(ids...)
+}
+
+// ClearRosterEntries clears all "roster_entries" edges to the RosterEntry entity.
+func (_u *ContactUpdate) ClearRosterEntries() *ContactUpdate {
+	_u.mutation.ClearRosterEntries()
+	return _u
+}
+
+// RemoveRosterEntryIDs removes the "roster_entries" edge to RosterEntry entities by IDs.
+func (_u *ContactUpdate) RemoveRosterEntryIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveRosterEntryIDs(ids...)
+	return _u
+}
+
+// RemoveRosterEntries removes "roster_entries" edges to RosterEntry entities.
+func (_u *ContactUpdate) RemoveRosterEntries(v ...*RosterEntry) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRosterEntryIDs(ids...)
+}
+
+// ClearPrayerRequests clears all "prayer_requests" edges to the PrayerRequest entity.
+func (_u *ContactUpdate) ClearPrayerRequests() *ContactUpdate {
+	_u.mutation.ClearPrayerRequests()
+	return _u
+}
+
+// RemovePrayerRequestIDs removes the "prayer_requests" edge to PrayerRequest entities by IDs.
+func (_u *ContactUpdate) RemovePrayerRequestIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemovePrayerRequestIDs(ids...)
+	return _u
+}
+
+// RemovePrayerRequests removes "prayer_requests" edges to PrayerRequest entities.
+func (_u *ContactUpdate) RemovePrayerRequests(v ...*PrayerRequest) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePrayerRequestIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1170,6 +1428,321 @@ func (_u *ContactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AttendancesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAttendancesIDs(); len(nodes) > 0 && !_u.mutation.AttendancesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AttendancesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !_u.mutation.GroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeadingGroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedLeadingGroupsIDs(); len(nodes) > 0 && !_u.mutation.LeadingGroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeadingGroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GivingRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGivingRecordsIDs(); len(nodes) > 0 && !_u.mutation.GivingRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GivingRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PledgesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPledgesIDs(); len(nodes) > 0 && !_u.mutation.PledgesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PledgesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RosterEntriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRosterEntriesIDs(); len(nodes) > 0 && !_u.mutation.RosterEntriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RosterEntriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PrayerRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPrayerRequestsIDs(); len(nodes) > 0 && !_u.mutation.PrayerRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PrayerRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1942,6 +2515,111 @@ func (_u *ContactUpdateOne) SetSpouseOfContact(v *Contact) *ContactUpdateOne {
 	return _u.SetSpouseOfContactID(v.ID)
 }
 
+// AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
+func (_u *ContactUpdateOne) AddAttendanceIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddAttendanceIDs(ids...)
+	return _u
+}
+
+// AddAttendances adds the "attendances" edges to the Attendance entity.
+func (_u *ContactUpdateOne) AddAttendances(v ...*Attendance) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAttendanceIDs(ids...)
+}
+
+// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+func (_u *ContactUpdateOne) AddGroupIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddGroupIDs(ids...)
+	return _u
+}
+
+// AddGroups adds the "groups" edges to the Group entity.
+func (_u *ContactUpdateOne) AddGroups(v ...*Group) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGroupIDs(ids...)
+}
+
+// AddLeadingGroupIDs adds the "leading_groups" edge to the Group entity by IDs.
+func (_u *ContactUpdateOne) AddLeadingGroupIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddLeadingGroupIDs(ids...)
+	return _u
+}
+
+// AddLeadingGroups adds the "leading_groups" edges to the Group entity.
+func (_u *ContactUpdateOne) AddLeadingGroups(v ...*Group) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddLeadingGroupIDs(ids...)
+}
+
+// AddGivingRecordIDs adds the "giving_records" edge to the Finance entity by IDs.
+func (_u *ContactUpdateOne) AddGivingRecordIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddGivingRecordIDs(ids...)
+	return _u
+}
+
+// AddGivingRecords adds the "giving_records" edges to the Finance entity.
+func (_u *ContactUpdateOne) AddGivingRecords(v ...*Finance) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddGivingRecordIDs(ids...)
+}
+
+// AddPledgeIDs adds the "pledges" edge to the Pledge entity by IDs.
+func (_u *ContactUpdateOne) AddPledgeIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddPledgeIDs(ids...)
+	return _u
+}
+
+// AddPledges adds the "pledges" edges to the Pledge entity.
+func (_u *ContactUpdateOne) AddPledges(v ...*Pledge) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPledgeIDs(ids...)
+}
+
+// AddRosterEntryIDs adds the "roster_entries" edge to the RosterEntry entity by IDs.
+func (_u *ContactUpdateOne) AddRosterEntryIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddRosterEntryIDs(ids...)
+	return _u
+}
+
+// AddRosterEntries adds the "roster_entries" edges to the RosterEntry entity.
+func (_u *ContactUpdateOne) AddRosterEntries(v ...*RosterEntry) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRosterEntryIDs(ids...)
+}
+
+// AddPrayerRequestIDs adds the "prayer_requests" edge to the PrayerRequest entity by IDs.
+func (_u *ContactUpdateOne) AddPrayerRequestIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddPrayerRequestIDs(ids...)
+	return _u
+}
+
+// AddPrayerRequests adds the "prayer_requests" edges to the PrayerRequest entity.
+func (_u *ContactUpdateOne) AddPrayerRequests(v ...*PrayerRequest) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPrayerRequestIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdateOne) Mutation() *ContactMutation {
 	return _u.mutation
@@ -1969,6 +2647,153 @@ func (_u *ContactUpdateOne) ClearSpouseContact() *ContactUpdateOne {
 func (_u *ContactUpdateOne) ClearSpouseOfContact() *ContactUpdateOne {
 	_u.mutation.ClearSpouseOfContact()
 	return _u
+}
+
+// ClearAttendances clears all "attendances" edges to the Attendance entity.
+func (_u *ContactUpdateOne) ClearAttendances() *ContactUpdateOne {
+	_u.mutation.ClearAttendances()
+	return _u
+}
+
+// RemoveAttendanceIDs removes the "attendances" edge to Attendance entities by IDs.
+func (_u *ContactUpdateOne) RemoveAttendanceIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveAttendanceIDs(ids...)
+	return _u
+}
+
+// RemoveAttendances removes "attendances" edges to Attendance entities.
+func (_u *ContactUpdateOne) RemoveAttendances(v ...*Attendance) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAttendanceIDs(ids...)
+}
+
+// ClearGroups clears all "groups" edges to the Group entity.
+func (_u *ContactUpdateOne) ClearGroups() *ContactUpdateOne {
+	_u.mutation.ClearGroups()
+	return _u
+}
+
+// RemoveGroupIDs removes the "groups" edge to Group entities by IDs.
+func (_u *ContactUpdateOne) RemoveGroupIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveGroupIDs(ids...)
+	return _u
+}
+
+// RemoveGroups removes "groups" edges to Group entities.
+func (_u *ContactUpdateOne) RemoveGroups(v ...*Group) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGroupIDs(ids...)
+}
+
+// ClearLeadingGroups clears all "leading_groups" edges to the Group entity.
+func (_u *ContactUpdateOne) ClearLeadingGroups() *ContactUpdateOne {
+	_u.mutation.ClearLeadingGroups()
+	return _u
+}
+
+// RemoveLeadingGroupIDs removes the "leading_groups" edge to Group entities by IDs.
+func (_u *ContactUpdateOne) RemoveLeadingGroupIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveLeadingGroupIDs(ids...)
+	return _u
+}
+
+// RemoveLeadingGroups removes "leading_groups" edges to Group entities.
+func (_u *ContactUpdateOne) RemoveLeadingGroups(v ...*Group) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveLeadingGroupIDs(ids...)
+}
+
+// ClearGivingRecords clears all "giving_records" edges to the Finance entity.
+func (_u *ContactUpdateOne) ClearGivingRecords() *ContactUpdateOne {
+	_u.mutation.ClearGivingRecords()
+	return _u
+}
+
+// RemoveGivingRecordIDs removes the "giving_records" edge to Finance entities by IDs.
+func (_u *ContactUpdateOne) RemoveGivingRecordIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveGivingRecordIDs(ids...)
+	return _u
+}
+
+// RemoveGivingRecords removes "giving_records" edges to Finance entities.
+func (_u *ContactUpdateOne) RemoveGivingRecords(v ...*Finance) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveGivingRecordIDs(ids...)
+}
+
+// ClearPledges clears all "pledges" edges to the Pledge entity.
+func (_u *ContactUpdateOne) ClearPledges() *ContactUpdateOne {
+	_u.mutation.ClearPledges()
+	return _u
+}
+
+// RemovePledgeIDs removes the "pledges" edge to Pledge entities by IDs.
+func (_u *ContactUpdateOne) RemovePledgeIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemovePledgeIDs(ids...)
+	return _u
+}
+
+// RemovePledges removes "pledges" edges to Pledge entities.
+func (_u *ContactUpdateOne) RemovePledges(v ...*Pledge) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePledgeIDs(ids...)
+}
+
+// ClearRosterEntries clears all "roster_entries" edges to the RosterEntry entity.
+func (_u *ContactUpdateOne) ClearRosterEntries() *ContactUpdateOne {
+	_u.mutation.ClearRosterEntries()
+	return _u
+}
+
+// RemoveRosterEntryIDs removes the "roster_entries" edge to RosterEntry entities by IDs.
+func (_u *ContactUpdateOne) RemoveRosterEntryIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveRosterEntryIDs(ids...)
+	return _u
+}
+
+// RemoveRosterEntries removes "roster_entries" edges to RosterEntry entities.
+func (_u *ContactUpdateOne) RemoveRosterEntries(v ...*RosterEntry) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRosterEntryIDs(ids...)
+}
+
+// ClearPrayerRequests clears all "prayer_requests" edges to the PrayerRequest entity.
+func (_u *ContactUpdateOne) ClearPrayerRequests() *ContactUpdateOne {
+	_u.mutation.ClearPrayerRequests()
+	return _u
+}
+
+// RemovePrayerRequestIDs removes the "prayer_requests" edge to PrayerRequest entities by IDs.
+func (_u *ContactUpdateOne) RemovePrayerRequestIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemovePrayerRequestIDs(ids...)
+	return _u
+}
+
+// RemovePrayerRequests removes "prayer_requests" edges to PrayerRequest entities.
+func (_u *ContactUpdateOne) RemovePrayerRequests(v ...*PrayerRequest) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePrayerRequestIDs(ids...)
 }
 
 // Where appends a list predicates to the ContactUpdate builder.
@@ -2367,6 +3192,321 @@ func (_u *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AttendancesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAttendancesIDs(); len(nodes) > 0 && !_u.mutation.AttendancesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AttendancesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.AttendancesTable,
+			Columns: []string{contact.AttendancesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(attendance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGroupsIDs(); len(nodes) > 0 && !_u.mutation.GroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.GroupsTable,
+			Columns: contact.GroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeadingGroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedLeadingGroupsIDs(); len(nodes) > 0 && !_u.mutation.LeadingGroupsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeadingGroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingGroupsTable,
+			Columns: []string{contact.LeadingGroupsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.GivingRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedGivingRecordsIDs(); len(nodes) > 0 && !_u.mutation.GivingRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.GivingRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.GivingRecordsTable,
+			Columns: []string{contact.GivingRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(finance.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PledgesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPledgesIDs(); len(nodes) > 0 && !_u.mutation.PledgesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PledgesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PledgesTable,
+			Columns: []string{contact.PledgesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pledge.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RosterEntriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRosterEntriesIDs(); len(nodes) > 0 && !_u.mutation.RosterEntriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RosterEntriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RosterEntriesTable,
+			Columns: []string{contact.RosterEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rosterentry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PrayerRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPrayerRequestsIDs(); len(nodes) > 0 && !_u.mutation.PrayerRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PrayerRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PrayerRequestsTable,
+			Columns: []string{contact.PrayerRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

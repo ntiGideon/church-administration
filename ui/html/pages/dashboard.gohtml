@@ -163,6 +163,48 @@
         <a href="/giving/donations" class="month-strip-link">View Finance <i class="fas fa-arrow-right"></i></a>
     </div>
 
+    <!-- ── Charts Row ────────────────────────────────────────────────── -->
+    {{if index .Data "monthlyTrend"}}
+    <div class="charts-row">
+
+        <!-- Monthly Income vs Expenses bar chart -->
+        <div class="chart-card chart-card--wide">
+            <div class="chart-card__head">
+                <div class="chart-card__title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Income vs Expenses</span>
+                    <span class="chart-card__sub">Last 6 months</span>
+                </div>
+                <a href="/giving/donations" class="chart-card__link">Details <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="chart-card__body">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Income category donut -->
+        <div class="chart-card chart-card--narrow">
+            <div class="chart-card__head">
+                <div class="chart-card__title">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Income Breakdown</span>
+                    <span class="chart-card__sub">All time</span>
+                </div>
+            </div>
+            <div class="chart-card__body chart-card__body--donut">
+                <div class="donut-wrap">
+                    <canvas id="breakdownChart"></canvas>
+                    <div class="donut-center" id="donutCenter">
+                        <span class="donut-center__lbl">Total</span>
+                        <span class="donut-center__val" id="donutTotal">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {{end}}
+
     <!-- ── Super Admin: Church Network ───────────────────────────────── -->
     {{if $isSA}}
     {{$churches := index .Data "churches"}}
@@ -645,14 +687,75 @@
 .ann-badge-pub  { background: rgba(40,167,69,0.1); color: #28A745; padding: 1px 6px; border-radius: 8px; font-weight: 700; font-size: 0.65rem; }
 .ann-badge-draft { background: rgba(214,160,0,0.1); color: #856404; padding: 1px 6px; border-radius: 8px; font-weight: 700; font-size: 0.65rem; }
 
+/* ── Charts Row ──────────────────────────────────────────────────────── */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.chart-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.chart-card__head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.3rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+.chart-card__title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.9rem; font-weight: 700; color: var(--text-dark);
+}
+.chart-card__title i { color: var(--primary); }
+.chart-card__sub {
+    font-size: 0.72rem; font-weight: 400;
+    color: var(--text-light); margin-left: 4px;
+}
+.chart-card__link {
+    font-size: 0.78rem; font-weight: 600; color: var(--primary);
+    text-decoration: none; display: flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(80,34,45,0.2);
+}
+.chart-card__link:hover { background: rgba(80,34,45,0.05); }
+.chart-card__body {
+    padding: 1.25rem 1.3rem;
+    height: 260px;
+    position: relative;
+}
+.chart-card__body--donut {
+    display: flex; align-items: center; justify-content: center;
+    height: 260px; padding: 1rem;
+}
+.donut-wrap {
+    position: relative;
+    width: 100%; max-width: 220px;
+    height: 220px;
+}
+.donut-wrap canvas { width: 100% !important; height: 100% !important; }
+.donut-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+.donut-center__lbl { display: block; font-size: 0.7rem; color: var(--text-light); font-weight: 500; }
+.donut-center__val { display: block; font-size: 1.05rem; font-weight: 800; color: var(--text-dark); white-space: nowrap; }
+
 /* ── Responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 1200px) {
     .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 900px) {
     .main-grid { grid-template-columns: 1fr; }
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .qa-grid { grid-template-columns: repeat(3, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
     .dash-wrapper { padding: 1rem; }
@@ -663,8 +766,128 @@
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // ── Charts ──────────────────────────────────────────────────────────
+    {{if index .Data "monthlyTrend"}}
+    var trendData     = {{index .Data "monthlyTrend"}};
+    var breakdownData = {{index .Data "categoryBreakdown"}};
+
+    // Shared font defaults
+    Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+    Chart.defaults.font.size   = 12;
+
+    // — Monthly trend bar chart —
+    var trendCtx = document.getElementById('trendChart');
+    if (trendCtx && trendData && trendData.length) {
+        new Chart(trendCtx, {
+            type: 'bar',
+            data: {
+                labels: trendData.map(function(d){ return d.month; }),
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: trendData.map(function(d){ return d.income; }),
+                        backgroundColor: 'rgba(40,167,69,0.75)',
+                        borderColor: 'rgba(40,167,69,1)',
+                        borderRadius: 5,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'Expenses',
+                        data: trendData.map(function(d){ return d.expenses; }),
+                        backgroundColor: 'rgba(220,53,69,0.75)',
+                        borderColor: 'rgba(220,53,69,1)',
+                        borderRadius: 5,
+                        borderSkipped: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, padding: 16, font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ' ' + ctx.dataset.label + ': GH\u20B5 ' + ctx.parsed.y.toLocaleString('en-GH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#868E96' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: {
+                            color: '#868E96',
+                            callback: function(v) {
+                                if (v >= 1000) return 'GH\u20B5 ' + (v/1000).toFixed(1) + 'K';
+                                return 'GH\u20B5 ' + v;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // — Income category donut chart —
+    var donutCtx = document.getElementById('breakdownChart');
+    if (donutCtx && breakdownData && breakdownData.length) {
+        var totalIncome = breakdownData.reduce(function(s, d){ return s + d.amount; }, 0);
+        var donutTotalEl = document.getElementById('donutTotal');
+        if (donutTotalEl) {
+            var fmt = totalIncome >= 1000
+                ? 'GH\u20B5 ' + (totalIncome/1000).toFixed(1) + 'K'
+                : 'GH\u20B5 ' + totalIncome.toFixed(2);
+            donutTotalEl.textContent = fmt;
+        }
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: breakdownData.map(function(d){ return d.label; }),
+                datasets: [{
+                    data: breakdownData.map(function(d){ return d.amount; }),
+                    backgroundColor: ['#50222D', '#7A8CA3', '#9E8FB5'],
+                    borderWidth: 3,
+                    borderColor: '#fff',
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                var pct = totalIncome > 0 ? ((ctx.parsed / totalIncome) * 100).toFixed(1) : 0;
+                                return ' ' + ctx.label + ': GH\u20B5 ' + ctx.parsed.toLocaleString('en-GH', {minimumFractionDigits: 2}) + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    {{end}}
+
     // Time-aware greeting
     var h = new Date().getHours();
     var greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';

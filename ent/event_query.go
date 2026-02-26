@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/event"
 	"github.com/ntiGideon/ent/predicate"
@@ -19,12 +21,13 @@ import (
 // EventQuery is the builder for querying Event entities.
 type EventQuery struct {
 	config
-	ctx        *QueryContext
-	order      []event.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Event
-	withChurch *ChurchQuery
-	withFKs    bool
+	ctx             *QueryContext
+	order           []event.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Event
+	withChurch      *ChurchQuery
+	withAttendances *AttendanceQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +79,28 @@ func (_q *EventQuery) QueryChurch() *ChurchQuery {
 			sqlgraph.From(event.Table, event.FieldID, selector),
 			sqlgraph.To(church.Table, church.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, event.ChurchTable, event.ChurchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAttendances chains the current query on the "attendances" edge.
+func (_q *EventQuery) QueryAttendances() *AttendanceQuery {
+	query := (&AttendanceClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(attendance.Table, attendance.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.AttendancesTable, event.AttendancesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +295,13 @@ func (_q *EventQuery) Clone() *EventQuery {
 		return nil
 	}
 	return &EventQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]event.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.Event{}, _q.predicates...),
-		withChurch: _q.withChurch.Clone(),
+		config:          _q.config,
+		ctx:             _q.ctx.Clone(),
+		order:           append([]event.OrderOption{}, _q.order...),
+		inters:          append([]Interceptor{}, _q.inters...),
+		predicates:      append([]predicate.Event{}, _q.predicates...),
+		withChurch:      _q.withChurch.Clone(),
+		withAttendances: _q.withAttendances.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -290,6 +316,17 @@ func (_q *EventQuery) WithChurch(opts ...func(*ChurchQuery)) *EventQuery {
 		opt(query)
 	}
 	_q.withChurch = query
+	return _q
+}
+
+// WithAttendances tells the query-builder to eager-load the nodes that are connected to
+// the "attendances" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *EventQuery) WithAttendances(opts ...func(*AttendanceQuery)) *EventQuery {
+	query := (&AttendanceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withAttendances = query
 	return _q
 }
 
@@ -372,8 +409,9 @@ func (_q *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 		nodes       = []*Event{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			_q.withChurch != nil,
+			_q.withAttendances != nil,
 		}
 	)
 	if _q.withChurch != nil {
@@ -403,6 +441,13 @@ func (_q *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	if query := _q.withChurch; query != nil {
 		if err := _q.loadChurch(ctx, query, nodes, nil,
 			func(n *Event, e *Church) { n.Edges.Church = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withAttendances; query != nil {
+		if err := _q.loadAttendances(ctx, query, nodes,
+			func(n *Event) { n.Edges.Attendances = []*Attendance{} },
+			func(n *Event, e *Attendance) { n.Edges.Attendances = append(n.Edges.Attendances, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -438,6 +483,36 @@ func (_q *EventQuery) loadChurch(ctx context.Context, query *ChurchQuery, nodes 
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *EventQuery) loadAttendances(ctx context.Context, query *AttendanceQuery, nodes []*Event, init func(*Event), assign func(*Event, *Attendance)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(attendance.FieldEventID)
+	}
+	query.Where(predicate.Attendance(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.AttendancesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.EventID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

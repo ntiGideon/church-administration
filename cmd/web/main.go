@@ -104,6 +104,14 @@ func main() {
 		invitationModel:   &models.InvitationModel{Db: db},
 		announcementModel: &models.AnnouncementModel{Db: db},
 		programModel:      &models.ProgramModel{Db: db},
+		attendanceModel:   &models.AttendanceModel{Db: db},
+		groupModel:        &models.GroupModel{Db: db},
+		pledgeModel:       &models.PledgeModel{Db: db},
+		rosterModel:       &models.RosterModel{Db: db},
+		sermonModel:       &models.SermonModel{Db: db},
+		visitorModel:      &models.VisitorModel{Db: db},
+		prayerModel:       &models.PrayerRequestModel{Db: db},
+		documentModel:     &models.DocumentModel{Db: db},
 	}
 
 	server := &http.Server{
