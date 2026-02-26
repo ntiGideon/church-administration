@@ -48,9 +48,11 @@
             <!-- User Menu -->
             <div class="user-menu" id="userMenu">
                 <button class="user-trigger" id="userTrigger">
-                    <div class="user-avatar">
+                    <div class="user-avatar {{if and .LoggedInUser .LoggedInUser.Edges.Contact .LoggedInUser.Edges.Contact.ProfilePictureURL}}has-photo{{end}}">
                         {{if .LoggedInUser}}
-                            {{if .LoggedInUser.Edges.Contact}}
+                            {{if and .LoggedInUser.Edges.Contact .LoggedInUser.Edges.Contact.ProfilePictureURL}}
+                                <img src="{{.LoggedInUser.Edges.Contact.ProfilePictureURL}}" alt="Profile">
+                            {{else if .LoggedInUser.Edges.Contact}}
                                 {{slice .LoggedInUser.Edges.Contact.FirstName 0 1}}{{slice .LoggedInUser.Edges.Contact.LastName 0 1}}
                             {{else}}
                                 <i class="fas fa-user"></i>
@@ -75,8 +77,10 @@
                 <div class="user-dropdown" id="userDropdown">
                     {{if .LoggedInUser}}
                     <div class="dropdown-header">
-                        <div class="dh-avatar">
-                            {{if .LoggedInUser.Edges.Contact}}
+                        <div class="dh-avatar {{if and .LoggedInUser.Edges.Contact .LoggedInUser.Edges.Contact.ProfilePictureURL}}has-photo{{end}}">
+                            {{if and .LoggedInUser.Edges.Contact .LoggedInUser.Edges.Contact.ProfilePictureURL}}
+                                <img src="{{.LoggedInUser.Edges.Contact.ProfilePictureURL}}" alt="Profile">
+                            {{else if .LoggedInUser.Edges.Contact}}
                                 {{slice .LoggedInUser.Edges.Contact.FirstName 0 1}}{{slice .LoggedInUser.Edges.Contact.LastName 0 1}}
                             {{else}}SA{{end}}
                         </div>
@@ -222,7 +226,10 @@ body { padding-top: 64px; }
     font-weight: 700;
     text-transform: uppercase;
     flex-shrink: 0;
+    overflow: hidden;
 }
+.user-avatar.has-photo { background: none; padding: 0; }
+.user-avatar.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .user-info { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; }
 .user-name { font-size: 0.83rem; font-weight: 600; color: var(--text-dark); }
 .user-role { font-size: 0.68rem; color: var(--primary); font-weight: 500; text-transform: capitalize; }
@@ -271,7 +278,10 @@ body { padding-top: 64px; }
     font-size: 0.85rem;
     text-transform: uppercase;
     flex-shrink: 0;
+    overflow: hidden;
 }
+.dh-avatar.has-photo { background: none; padding: 0; }
+.dh-avatar.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 10px; }
 .dh-info { display: flex; flex-direction: column; }
 .dh-info strong { font-size: 0.88rem; color: var(--text-dark); }
 .dh-info small { font-size: 0.75rem; color: var(--text-light); }
