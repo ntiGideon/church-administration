@@ -1,0 +1,175 @@
+{{define "title"}}Pastoral Care | FaithConnect{{end}}
+{{define "description"}}Pastoral care notes and member visit records{{end}}
+
+{{define "main"}}
+{{$notes   := index .Data "notes"}}
+{{$pending := index .Data "pending"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">Pastoral Care</h1>
+            <p class="page-subtitle">Member visit records, counseling notes, and follow-ups</p>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        <a href="/pastoral/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Record</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    {{if gt $pending 0}}
+    <div class="followup-alert">
+        <i class="fas fa-bell"></i>
+        <span><strong>{{$pending}}</strong> member{{if gt $pending 1}}s{{end}} need{{if eq $pending 1}}s{{end}} follow-up</span>
+        <a href="#" id="showPendingOnly" class="fa-link">View pending</a>
+    </div>
+    {{end}}
+
+    {{if $notes}}
+    <div class="notes-list" id="notesList">
+        {{range $notes}}
+        <a href="/pastoral/{{.ID}}" class="note-row {{if and .NeedsFollowUp (not .FollowUpDone)}}needs-fu{{end}}" data-followup="{{if and .NeedsFollowUp (not .FollowUpDone)}}yes{{else}}no{{end}}">
+            <!-- Icon -->
+            <div class="note-icon ct-{{.CareType}}">
+                <i class="fas {{careTypeIcon (enumStr .CareType)}}"></i>
+            </div>
+
+            <!-- Info -->
+            <div class="note-info">
+                <div class="note-member">
+                    {{if .Edges.Member}}{{.Edges.Member.FirstName}} {{.Edges.Member.LastName}}{{else}}Unknown Member{{end}}
+                </div>
+                <div class="note-meta">
+                    <span class="nm-type">{{careTypeLabel (enumStr .CareType)}}</span>
+                    <span class="nm-sep">·</span>
+                    <span class="nm-date">{{.VisitDate.Format "2 Jan 2006"}}</span>
+                    {{if and .NeedsFollowUp (not .FollowUpDone)}}
+                    <span class="nm-fu-badge"><i class="fas fa-clock"></i> Follow-up needed</span>
+                    {{else if .FollowUpDone}}
+                    <span class="nm-done-badge"><i class="fas fa-check"></i> Follow-up done</span>
+                    {{end}}
+                </div>
+                <div class="note-preview">{{.Notes}}</div>
+            </div>
+
+            <!-- Recorder -->
+            <div class="note-recorder">
+                {{if .Edges.Recorder}}
+                    {{if .Edges.Recorder.Edges.Contact}}
+                    <span>{{.Edges.Recorder.Edges.Contact.FirstName}} {{.Edges.Recorder.Edges.Contact.LastName}}</span>
+                    {{else}}
+                    <span>{{.Edges.Recorder.Email}}</span>
+                    {{end}}
+                {{end}}
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <i class="fas fa-hand-holding-heart empty-icon"></i>
+        <h3>No pastoral records yet</h3>
+        <p>Start recording visits, counseling sessions, and pastoral interactions.</p>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        <a href="/pastoral/new" class="button is-primary mt-4">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Add First Record</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+
+.followup-alert {
+    display: flex; align-items: center; gap: 10px;
+    background: #FFF7ED; border: 1px solid #FED7AA;
+    border-radius: 10px; padding: 10px 16px;
+    font-size: 0.85rem; color: #92400E;
+    margin-bottom: 1.25rem;
+}
+.followup-alert i { color: #F97316; }
+.fa-link { color: #F97316; font-weight: 600; text-decoration: none; margin-left: auto; }
+.fa-link:hover { text-decoration: underline; }
+
+.notes-list { display: flex; flex-direction: column; gap: 0.55rem; }
+.note-row {
+    background: white; border: 1px solid var(--light-gray); border-radius: 14px;
+    padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem;
+    text-decoration: none; color: inherit; transition: box-shadow 0.15s;
+}
+.note-row:hover { box-shadow: 0 3px 16px rgba(0,0,0,0.07); }
+.note-row.needs-fu { border-left: 3px solid #F97316; }
+
+/* Care type icon */
+.note-icon {
+    width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.ct-visit          { background: #EFF6FF; color: #3B82F6; }
+.ct-counseling     { background: #FDF4FF; color: #A855F7; }
+.ct-phone_call     { background: #F0FDFA; color: #14B8A6; }
+.ct-prayer_session { background: #FFF7ED; color: #F97316; }
+.ct-hospital_visit { background: #FFF1F2; color: #F43F5E; }
+.ct-bereavement    { background: #F9FAFB; color: #6B7280; }
+.ct-other          { background: #F9FAFB; color: #6B7280; }
+
+.note-info { flex: 1; min-width: 0; }
+.note-member { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+.note-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+.nm-type { font-size: 0.75rem; font-weight: 600; color: var(--primary); }
+.nm-sep { color: var(--text-light); font-size: 0.7rem; }
+.nm-date { font-size: 0.75rem; color: var(--text-light); }
+.nm-fu-badge { font-size: 0.7rem; background: #FFF7ED; color: #F97316; border-radius: 20px; padding: 1px 8px; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
+.nm-done-badge { font-size: 0.7rem; background: #ECFDF5; color: #10B981; border-radius: 20px; padding: 1px 8px; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
+.note-preview { font-size: 0.8rem; color: var(--text-light); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.note-recorder { font-size: 0.78rem; color: var(--text-light); flex-shrink: 0; align-self: center; }
+
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); }
+.empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.25; }
+.empty-state h3 { font-size: 1.15rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.9rem; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .note-recorder { display: none; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+
+const showPending = document.getElementById('showPendingOnly');
+if (showPending) {
+    let filtered = false;
+    showPending.addEventListener('click', function(e) {
+        e.preventDefault();
+        filtered = !filtered;
+        document.querySelectorAll('.note-row').forEach(row => {
+            row.style.display = filtered && row.dataset.followup !== 'yes' ? 'none' : '';
+        });
+        this.textContent = filtered ? 'Show all' : 'View pending';
+    });
+}
+</script>
+{{end}}

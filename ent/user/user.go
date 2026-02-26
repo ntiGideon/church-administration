@@ -41,6 +41,8 @@ const (
 	EdgeAnnouncements = "announcements"
 	// EdgeAcceptedInvitation holds the string denoting the accepted_invitation edge name in mutations.
 	EdgeAcceptedInvitation = "accepted_invitation"
+	// EdgePastoralNotesRecorded holds the string denoting the pastoral_notes_recorded edge name in mutations.
+	EdgePastoralNotesRecorded = "pastoral_notes_recorded"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -85,6 +87,13 @@ const (
 	AcceptedInvitationInverseTable = "invitations"
 	// AcceptedInvitationColumn is the table column denoting the accepted_invitation relation/edge.
 	AcceptedInvitationColumn = "invitation_accepted_user"
+	// PastoralNotesRecordedTable is the table that holds the pastoral_notes_recorded relation/edge.
+	PastoralNotesRecordedTable = "pastoral_notes"
+	// PastoralNotesRecordedInverseTable is the table name for the PastoralNote entity.
+	// It exists in this package in order to avoid circular dependency with the "pastoralnote" package.
+	PastoralNotesRecordedInverseTable = "pastoral_notes"
+	// PastoralNotesRecordedColumn is the table column denoting the pastoral_notes_recorded relation/edge.
+	PastoralNotesRecordedColumn = "recorded_by_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -269,6 +278,20 @@ func ByAcceptedInvitationField(field string, opts ...sql.OrderTermOption) OrderO
 		sqlgraph.OrderByNeighborTerms(s, newAcceptedInvitationStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByPastoralNotesRecordedCount orders the results by pastoral_notes_recorded count.
+func ByPastoralNotesRecordedCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPastoralNotesRecordedStep(), opts...)
+	}
+}
+
+// ByPastoralNotesRecorded orders the results by pastoral_notes_recorded terms.
+func ByPastoralNotesRecorded(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesRecordedStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newChurchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -309,5 +332,12 @@ func newAcceptedInvitationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AcceptedInvitationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, true, AcceptedInvitationTable, AcceptedInvitationColumn),
+	)
+}
+func newPastoralNotesRecordedStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PastoralNotesRecordedInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesRecordedTable, PastoralNotesRecordedColumn),
 	)
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/user"
 )
 
@@ -199,6 +200,21 @@ func (_c *UserCreate) SetNillableAcceptedInvitationID(id *int) *UserCreate {
 // SetAcceptedInvitation sets the "accepted_invitation" edge to the Invitation entity.
 func (_c *UserCreate) SetAcceptedInvitation(v *Invitation) *UserCreate {
 	return _c.SetAcceptedInvitationID(v.ID)
+}
+
+// AddPastoralNotesRecordedIDs adds the "pastoral_notes_recorded" edge to the PastoralNote entity by IDs.
+func (_c *UserCreate) AddPastoralNotesRecordedIDs(ids ...int) *UserCreate {
+	_c.mutation.AddPastoralNotesRecordedIDs(ids...)
+	return _c
+}
+
+// AddPastoralNotesRecorded adds the "pastoral_notes_recorded" edges to the PastoralNote entity.
+func (_c *UserCreate) AddPastoralNotesRecorded(v ...*PastoralNote) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPastoralNotesRecordedIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -433,6 +449,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.invitation_accepted_user = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PastoralNotesRecordedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.PastoralNotesRecordedTable,
+			Columns: []string{user.PastoralNotesRecordedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

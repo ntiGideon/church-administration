@@ -214,6 +214,55 @@ var functions = template.FuncMap{
 			return s
 		}
 	},
+	"careTypeLabel": func(s string) string {
+		switch s {
+		case "visit":
+			return "Pastoral Visit"
+		case "counseling":
+			return "Counseling"
+		case "phone_call":
+			return "Phone Call"
+		case "prayer_session":
+			return "Prayer Session"
+		case "hospital_visit":
+			return "Hospital Visit"
+		case "bereavement":
+			return "Bereavement Support"
+		case "other":
+			return "Other"
+		default:
+			return s
+		}
+	},
+	"careTypeIcon": func(s string) string {
+		switch s {
+		case "visit":
+			return "fa-house-user"
+		case "counseling":
+			return "fa-comments"
+		case "phone_call":
+			return "fa-phone"
+		case "prayer_session":
+			return "fa-hands-praying"
+		case "hospital_visit":
+			return "fa-hospital"
+		case "bereavement":
+			return "fa-heart"
+		default:
+			return "fa-hand-holding-heart"
+		}
+	},
+	"careTypeOptions": func() [][2]string {
+		return [][2]string{
+			{"visit", "Pastoral Visit"},
+			{"counseling", "Counseling"},
+			{"phone_call", "Phone Call"},
+			{"prayer_session", "Prayer Session"},
+			{"hospital_visit", "Hospital Visit"},
+			{"bereavement", "Bereavement Support"},
+			{"other", "Other"},
+		}
+	},
 	"statusLabel": func(s string) string {
 		switch s {
 		case "new":

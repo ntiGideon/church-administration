@@ -98,6 +98,16 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /rosters/{id}/entries/{eid}/remove", adminOnly.ThenFunc(app.rosterRemoveEntry))
 	mux.Handle("POST /rosters/{id}/delete", adminOnly.ThenFunc(app.rosterDelete))
 
+	// Pastoral Care Notes
+	mux.Handle("GET /pastoral", protected.ThenFunc(app.pastoralList))
+	mux.Handle("GET /pastoral/new", adminOnly.ThenFunc(app.pastoralNewGet))
+	mux.Handle("POST /pastoral/new", adminOnly.ThenFunc(app.pastoralNewPost))
+	mux.Handle("GET /pastoral/{id}", protected.ThenFunc(app.pastoralDetail))
+	mux.Handle("GET /pastoral/{id}/edit", adminOnly.ThenFunc(app.pastoralEditGet))
+	mux.Handle("POST /pastoral/{id}/edit", adminOnly.ThenFunc(app.pastoralEditPost))
+	mux.Handle("POST /pastoral/{id}/followup", adminOnly.ThenFunc(app.pastoralMarkFollowUpDone))
+	mux.Handle("POST /pastoral/{id}/delete", adminOnly.ThenFunc(app.pastoralDelete))
+
 	// Document Library
 	mux.Handle("GET /documents", protected.ThenFunc(app.documentsList))
 	mux.Handle("GET /documents/upload", adminOnly.ThenFunc(app.documentUploadGet))

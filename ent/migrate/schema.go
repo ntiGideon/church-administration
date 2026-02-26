@@ -390,6 +390,47 @@ var (
 			},
 		},
 	}
+	// PastoralNotesColumns holds the columns for the "pastoral_notes" table.
+	PastoralNotesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "visit_date", Type: field.TypeTime},
+		{Name: "care_type", Type: field.TypeEnum, Enums: []string{"visit", "counseling", "phone_call", "prayer_session", "hospital_visit", "bereavement", "other"}, Default: "visit"},
+		{Name: "notes", Type: field.TypeString, Size: 2147483647},
+		{Name: "needs_follow_up", Type: field.TypeBool, Default: false},
+		{Name: "follow_up_date", Type: field.TypeTime, Nullable: true},
+		{Name: "follow_up_done", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt},
+		{Name: "recorded_by_id", Type: field.TypeInt, Nullable: true},
+	}
+	// PastoralNotesTable holds the schema information for the "pastoral_notes" table.
+	PastoralNotesTable = &schema.Table{
+		Name:       "pastoral_notes",
+		Columns:    PastoralNotesColumns,
+		PrimaryKey: []*schema.Column{PastoralNotesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "pastoral_notes_churches_pastoral_notes",
+				Columns:    []*schema.Column{PastoralNotesColumns[9]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "pastoral_notes_contacts_pastoral_notes",
+				Columns:    []*schema.Column{PastoralNotesColumns[10]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "pastoral_notes_users_pastoral_notes_recorded",
+				Columns:    []*schema.Column{PastoralNotesColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// PledgesColumns holds the columns for the "pledges" table.
 	PledgesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -761,6 +802,7 @@ var (
 		FinancesTable,
 		GroupsTable,
 		InvitationsTable,
+		PastoralNotesTable,
 		PledgesTable,
 		PrayerRequestsTable,
 		ProgramEntriesTable,
@@ -792,6 +834,9 @@ func init() {
 	GroupsTable.ForeignKeys[1].RefTable = ContactsTable
 	InvitationsTable.ForeignKeys[0].RefTable = ChurchesTable
 	InvitationsTable.ForeignKeys[1].RefTable = UsersTable
+	PastoralNotesTable.ForeignKeys[0].RefTable = ChurchesTable
+	PastoralNotesTable.ForeignKeys[1].RefTable = ContactsTable
+	PastoralNotesTable.ForeignKeys[2].RefTable = UsersTable
 	PledgesTable.ForeignKeys[0].RefTable = ChurchesTable
 	PledgesTable.ForeignKeys[1].RefTable = ContactsTable
 	PrayerRequestsTable.ForeignKeys[0].RefTable = ChurchesTable

@@ -22,6 +22,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
@@ -101,6 +102,7 @@ func checkColumn(t, c string) error {
 			finance.Table:       finance.ValidColumn,
 			group.Table:         group.ValidColumn,
 			invitation.Table:    invitation.ValidColumn,
+			pastoralnote.Table:  pastoralnote.ValidColumn,
 			pledge.Table:        pledge.ValidColumn,
 			prayerrequest.Table: prayerrequest.ValidColumn,
 			programentry.Table:  programentry.ValidColumn,

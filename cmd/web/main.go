@@ -112,6 +112,7 @@ func main() {
 		visitorModel:      &models.VisitorModel{Db: db},
 		prayerModel:       &models.PrayerRequestModel{Db: db},
 		documentModel:     &models.DocumentModel{Db: db},
+		pastoralModel:     &models.PastoralNoteModel{Db: db},
 	}
 
 	server := &http.Server{

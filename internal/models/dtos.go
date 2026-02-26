@@ -247,6 +247,18 @@ type GroupDto struct {
 	validator.Validator `form:"-"`
 }
 
+// PastoralNoteDto is used to create or update a pastoral care note.
+type PastoralNoteDto struct {
+	VisitDate     string `form:"visit_date"`
+	CareType      string `form:"care_type"`
+	Notes         string `form:"notes"`
+	NeedsFollowUp bool   `form:"needs_follow_up"`
+	FollowUpDate  string `form:"follow_up_date"`
+	ContactID     int    `form:"contact_id"`
+
+	validator.Validator `form:"-"`
+}
+
 // MemberDto is used for creating/editing a member profile
 type MemberDto struct {
 	FirstName    string `form:"first_name"`

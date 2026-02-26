@@ -121,9 +121,11 @@ type ContactEdges struct {
 	RosterEntries []*RosterEntry `json:"roster_entries,omitempty"`
 	// PrayerRequests holds the value of the prayer_requests edge.
 	PrayerRequests []*PrayerRequest `json:"prayer_requests,omitempty"`
+	// PastoralNotes holds the value of the pastoral_notes edge.
+	PastoralNotes []*PastoralNote `json:"pastoral_notes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [11]bool
+	loadedTypes [12]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -231,6 +233,15 @@ func (e ContactEdges) PrayerRequestsOrErr() ([]*PrayerRequest, error) {
 		return e.PrayerRequests, nil
 	}
 	return nil, &NotLoadedError{edge: "prayer_requests"}
+}
+
+// PastoralNotesOrErr returns the PastoralNotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) PastoralNotesOrErr() ([]*PastoralNote, error) {
+	if e.loadedTypes[11] {
+		return e.PastoralNotes, nil
+	}
+	return nil, &NotLoadedError{edge: "pastoral_notes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -549,6 +560,11 @@ func (_m *Contact) QueryRosterEntries() *RosterEntryQuery {
 // QueryPrayerRequests queries the "prayer_requests" edge of the Contact entity.
 func (_m *Contact) QueryPrayerRequests() *PrayerRequestQuery {
 	return NewContactClient(_m.config).QueryPrayerRequests(_m)
+}
+
+// QueryPastoralNotes queries the "pastoral_notes" edge of the Contact entity.
+func (_m *Contact) QueryPastoralNotes() *PastoralNoteQuery {
+	return NewContactClient(_m.config).QueryPastoralNotes(_m)
 }
 
 // Update returns a builder for updating this Contact.

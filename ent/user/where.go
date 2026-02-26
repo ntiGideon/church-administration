@@ -513,6 +513,29 @@ func HasAcceptedInvitationWith(preds ...predicate.Invitation) predicate.User {
 	})
 }
 
+// HasPastoralNotesRecorded applies the HasEdge predicate on the "pastoral_notes_recorded" edge.
+func HasPastoralNotesRecorded() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesRecordedTable, PastoralNotesRecordedColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPastoralNotesRecordedWith applies the HasEdge predicate on the "pastoral_notes_recorded" edge with a given conditions (other predicates).
+func HasPastoralNotesRecordedWith(preds ...predicate.PastoralNote) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newPastoralNotesRecordedStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(sql.AndPredicates(predicates...))

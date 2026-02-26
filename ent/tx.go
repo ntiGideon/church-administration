@@ -32,6 +32,8 @@ type Tx struct {
 	Group *GroupClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// PastoralNote is the client for interacting with the PastoralNote builders.
+	PastoralNote *PastoralNoteClient
 	// Pledge is the client for interacting with the Pledge builders.
 	Pledge *PledgeClient
 	// PrayerRequest is the client for interacting with the PrayerRequest builders.
@@ -191,6 +193,7 @@ func (tx *Tx) init() {
 	tx.Finance = NewFinanceClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
+	tx.PastoralNote = NewPastoralNoteClient(tx.config)
 	tx.Pledge = NewPledgeClient(tx.config)
 	tx.PrayerRequest = NewPrayerRequestClient(tx.config)
 	tx.ProgramEntry = NewProgramEntryClient(tx.config)

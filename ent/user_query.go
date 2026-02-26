@@ -17,6 +17,7 @@ import (
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
 )
@@ -24,17 +25,18 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []user.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.User
-	withChurch             *ChurchQuery
-	withContact            *ContactQuery
-	withFinanceRecords     *FinanceQuery
-	withSentInvitations    *InvitationQuery
-	withAnnouncements      *AnnouncementQuery
-	withAcceptedInvitation *InvitationQuery
-	withFKs                bool
+	ctx                       *QueryContext
+	order                     []user.OrderOption
+	inters                    []Interceptor
+	predicates                []predicate.User
+	withChurch                *ChurchQuery
+	withContact               *ContactQuery
+	withFinanceRecords        *FinanceQuery
+	withSentInvitations       *InvitationQuery
+	withAnnouncements         *AnnouncementQuery
+	withAcceptedInvitation    *InvitationQuery
+	withPastoralNotesRecorded *PastoralNoteQuery
+	withFKs                   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -196,6 +198,28 @@ func (_q *UserQuery) QueryAcceptedInvitation() *InvitationQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(invitation.Table, invitation.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, user.AcceptedInvitationTable, user.AcceptedInvitationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPastoralNotesRecorded chains the current query on the "pastoral_notes_recorded" edge.
+func (_q *UserQuery) QueryPastoralNotesRecorded() *PastoralNoteQuery {
+	query := (&PastoralNoteClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.PastoralNotesRecordedTable, user.PastoralNotesRecordedColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -390,17 +414,18 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:                 _q.config,
-		ctx:                    _q.ctx.Clone(),
-		order:                  append([]user.OrderOption{}, _q.order...),
-		inters:                 append([]Interceptor{}, _q.inters...),
-		predicates:             append([]predicate.User{}, _q.predicates...),
-		withChurch:             _q.withChurch.Clone(),
-		withContact:            _q.withContact.Clone(),
-		withFinanceRecords:     _q.withFinanceRecords.Clone(),
-		withSentInvitations:    _q.withSentInvitations.Clone(),
-		withAnnouncements:      _q.withAnnouncements.Clone(),
-		withAcceptedInvitation: _q.withAcceptedInvitation.Clone(),
+		config:                    _q.config,
+		ctx:                       _q.ctx.Clone(),
+		order:                     append([]user.OrderOption{}, _q.order...),
+		inters:                    append([]Interceptor{}, _q.inters...),
+		predicates:                append([]predicate.User{}, _q.predicates...),
+		withChurch:                _q.withChurch.Clone(),
+		withContact:               _q.withContact.Clone(),
+		withFinanceRecords:        _q.withFinanceRecords.Clone(),
+		withSentInvitations:       _q.withSentInvitations.Clone(),
+		withAnnouncements:         _q.withAnnouncements.Clone(),
+		withAcceptedInvitation:    _q.withAcceptedInvitation.Clone(),
+		withPastoralNotesRecorded: _q.withPastoralNotesRecorded.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -470,6 +495,17 @@ func (_q *UserQuery) WithAcceptedInvitation(opts ...func(*InvitationQuery)) *Use
 		opt(query)
 	}
 	_q.withAcceptedInvitation = query
+	return _q
+}
+
+// WithPastoralNotesRecorded tells the query-builder to eager-load the nodes that are connected to
+// the "pastoral_notes_recorded" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithPastoralNotesRecorded(opts ...func(*PastoralNoteQuery)) *UserQuery {
+	query := (&PastoralNoteClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPastoralNotesRecorded = query
 	return _q
 }
 
@@ -552,13 +588,14 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [7]bool{
 			_q.withChurch != nil,
 			_q.withContact != nil,
 			_q.withFinanceRecords != nil,
 			_q.withSentInvitations != nil,
 			_q.withAnnouncements != nil,
 			_q.withAcceptedInvitation != nil,
+			_q.withPastoralNotesRecorded != nil,
 		}
 	)
 	if _q.withChurch != nil || _q.withContact != nil || _q.withAcceptedInvitation != nil {
@@ -621,6 +658,15 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if query := _q.withAcceptedInvitation; query != nil {
 		if err := _q.loadAcceptedInvitation(ctx, query, nodes, nil,
 			func(n *User, e *Invitation) { n.Edges.AcceptedInvitation = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPastoralNotesRecorded; query != nil {
+		if err := _q.loadPastoralNotesRecorded(ctx, query, nodes,
+			func(n *User) { n.Edges.PastoralNotesRecorded = []*PastoralNote{} },
+			func(n *User, e *PastoralNote) {
+				n.Edges.PastoralNotesRecorded = append(n.Edges.PastoralNotesRecorded, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -813,6 +859,36 @@ func (_q *UserQuery) loadAcceptedInvitation(ctx context.Context, query *Invitati
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadPastoralNotesRecorded(ctx context.Context, query *PastoralNoteQuery, nodes []*User, init func(*User), assign func(*User, *PastoralNote)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(pastoralnote.FieldRecordedByID)
+	}
+	query.Where(predicate.PastoralNote(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.PastoralNotesRecordedColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RecordedByID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "recorded_by_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

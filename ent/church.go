@@ -101,9 +101,11 @@ type ChurchEdges struct {
 	PrayerRequests []*PrayerRequest `json:"prayer_requests,omitempty"`
 	// Documents holds the value of the documents edge.
 	Documents []*Document `json:"documents,omitempty"`
+	// PastoralNotes holds the value of the pastoral_notes edge.
+	PastoralNotes []*PastoralNote `json:"pastoral_notes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [17]bool
+	loadedTypes [18]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -259,6 +261,15 @@ func (e ChurchEdges) DocumentsOrErr() ([]*Document, error) {
 		return e.Documents, nil
 	}
 	return nil, &NotLoadedError{edge: "documents"}
+}
+
+// PastoralNotesOrErr returns the PastoralNotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) PastoralNotesOrErr() ([]*PastoralNote, error) {
+	if e.loadedTypes[17] {
+		return e.PastoralNotes, nil
+	}
+	return nil, &NotLoadedError{edge: "pastoral_notes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -520,6 +531,11 @@ func (_m *Church) QueryPrayerRequests() *PrayerRequestQuery {
 // QueryDocuments queries the "documents" edge of the Church entity.
 func (_m *Church) QueryDocuments() *DocumentQuery {
 	return NewChurchClient(_m.config).QueryDocuments(_m)
+}
+
+// QueryPastoralNotes queries the "pastoral_notes" edge of the Church entity.
+func (_m *Church) QueryPastoralNotes() *PastoralNoteQuery {
+	return NewChurchClient(_m.config).QueryPastoralNotes(_m)
 }
 
 // Update returns a builder for updating this Church.

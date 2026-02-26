@@ -21,6 +21,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
@@ -55,6 +56,7 @@ type ChurchQuery struct {
 	withVisitors       *VisitorQuery
 	withPrayerRequests *PrayerRequestQuery
 	withDocuments      *DocumentQuery
+	withPastoralNotes  *PastoralNoteQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -465,6 +467,28 @@ func (_q *ChurchQuery) QueryDocuments() *DocumentQuery {
 	return query
 }
 
+// QueryPastoralNotes chains the current query on the "pastoral_notes" edge.
+func (_q *ChurchQuery) QueryPastoralNotes() *PastoralNoteQuery {
+	query := (&PastoralNoteClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.PastoralNotesTable, church.PastoralNotesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Church entity from the query.
 // Returns a *NotFoundError when no Church was found.
 func (_q *ChurchQuery) First(ctx context.Context) (*Church, error) {
@@ -674,6 +698,7 @@ func (_q *ChurchQuery) Clone() *ChurchQuery {
 		withVisitors:       _q.withVisitors.Clone(),
 		withPrayerRequests: _q.withPrayerRequests.Clone(),
 		withDocuments:      _q.withDocuments.Clone(),
+		withPastoralNotes:  _q.withPastoralNotes.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -867,6 +892,17 @@ func (_q *ChurchQuery) WithDocuments(opts ...func(*DocumentQuery)) *ChurchQuery 
 	return _q
 }
 
+// WithPastoralNotes tells the query-builder to eager-load the nodes that are connected to
+// the "pastoral_notes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithPastoralNotes(opts ...func(*PastoralNoteQuery)) *ChurchQuery {
+	query := (&PastoralNoteClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPastoralNotes = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -945,7 +981,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 	var (
 		nodes       = []*Church{}
 		_spec       = _q.querySpec()
-		loadedTypes = [17]bool{
+		loadedTypes = [18]bool{
 			_q.withParent != nil,
 			_q.withChildren != nil,
 			_q.withUsers != nil,
@@ -963,6 +999,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 			_q.withVisitors != nil,
 			_q.withPrayerRequests != nil,
 			_q.withDocuments != nil,
+			_q.withPastoralNotes != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1098,6 +1135,13 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 		if err := _q.loadDocuments(ctx, query, nodes,
 			func(n *Church) { n.Edges.Documents = []*Document{} },
 			func(n *Church, e *Document) { n.Edges.Documents = append(n.Edges.Documents, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPastoralNotes; query != nil {
+		if err := _q.loadPastoralNotes(ctx, query, nodes,
+			func(n *Church) { n.Edges.PastoralNotes = []*PastoralNote{} },
+			func(n *Church, e *PastoralNote) { n.Edges.PastoralNotes = append(n.Edges.PastoralNotes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1605,6 +1649,36 @@ func (_q *ChurchQuery) loadDocuments(ctx context.Context, query *DocumentQuery, 
 	}
 	query.Where(predicate.Document(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(church.DocumentsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadPastoralNotes(ctx context.Context, query *PastoralNoteQuery, nodes []*Church, init func(*Church), assign func(*Church, *PastoralNote)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(pastoralnote.FieldChurchID)
+	}
+	query.Where(predicate.PastoralNote(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.PastoralNotesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

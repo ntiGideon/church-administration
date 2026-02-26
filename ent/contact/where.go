@@ -2653,6 +2653,29 @@ func HasPrayerRequestsWith(preds ...predicate.PrayerRequest) predicate.Contact {
 	})
 }
 
+// HasPastoralNotes applies the HasEdge predicate on the "pastoral_notes" edge.
+func HasPastoralNotes() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesTable, PastoralNotesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPastoralNotesWith applies the HasEdge predicate on the "pastoral_notes" edge with a given conditions (other predicates).
+func HasPastoralNotesWith(preds ...predicate.PastoralNote) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newPastoralNotesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Contact) predicate.Contact {
 	return predicate.Contact(sql.AndPredicates(predicates...))

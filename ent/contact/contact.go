@@ -109,6 +109,8 @@ const (
 	EdgeRosterEntries = "roster_entries"
 	// EdgePrayerRequests holds the string denoting the prayer_requests edge name in mutations.
 	EdgePrayerRequests = "prayer_requests"
+	// EdgePastoralNotes holds the string denoting the pastoral_notes edge name in mutations.
+	EdgePastoralNotes = "pastoral_notes"
 	// Table holds the table name of the contact in the database.
 	Table = "contacts"
 	// UserTable is the table that holds the user relation/edge.
@@ -180,6 +182,13 @@ const (
 	PrayerRequestsInverseTable = "prayer_requests"
 	// PrayerRequestsColumn is the table column denoting the prayer_requests relation/edge.
 	PrayerRequestsColumn = "contact_id"
+	// PastoralNotesTable is the table that holds the pastoral_notes relation/edge.
+	PastoralNotesTable = "pastoral_notes"
+	// PastoralNotesInverseTable is the table name for the PastoralNote entity.
+	// It exists in this package in order to avoid circular dependency with the "pastoralnote" package.
+	PastoralNotesInverseTable = "pastoral_notes"
+	// PastoralNotesColumn is the table column denoting the pastoral_notes relation/edge.
+	PastoralNotesColumn = "contact_id"
 )
 
 // Columns holds all SQL columns for contact fields.
@@ -642,6 +651,20 @@ func ByPrayerRequests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPrayerRequestsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPastoralNotesCount orders the results by pastoral_notes count.
+func ByPastoralNotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPastoralNotesStep(), opts...)
+	}
+}
+
+// ByPastoralNotes orders the results by pastoral_notes terms.
+func ByPastoralNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -717,5 +740,12 @@ func newPrayerRequestsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PrayerRequestsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PrayerRequestsTable, PrayerRequestsColumn),
+	)
+}
+func newPastoralNotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PastoralNotesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesTable, PastoralNotesColumn),
 	)
 }

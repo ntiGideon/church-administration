@@ -20,6 +20,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
@@ -661,6 +662,21 @@ func (_u *ChurchUpdate) AddDocuments(v ...*Document) *ChurchUpdate {
 	return _u.AddDocumentIDs(ids...)
 }
 
+// AddPastoralNoteIDs adds the "pastoral_notes" edge to the PastoralNote entity by IDs.
+func (_u *ChurchUpdate) AddPastoralNoteIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddPastoralNoteIDs(ids...)
+	return _u
+}
+
+// AddPastoralNotes adds the "pastoral_notes" edges to the PastoralNote entity.
+func (_u *ChurchUpdate) AddPastoralNotes(v ...*PastoralNote) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPastoralNoteIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdate) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -1006,6 +1022,27 @@ func (_u *ChurchUpdate) RemoveDocuments(v ...*Document) *ChurchUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveDocumentIDs(ids...)
+}
+
+// ClearPastoralNotes clears all "pastoral_notes" edges to the PastoralNote entity.
+func (_u *ChurchUpdate) ClearPastoralNotes() *ChurchUpdate {
+	_u.mutation.ClearPastoralNotes()
+	return _u
+}
+
+// RemovePastoralNoteIDs removes the "pastoral_notes" edge to PastoralNote entities by IDs.
+func (_u *ChurchUpdate) RemovePastoralNoteIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemovePastoralNoteIDs(ids...)
+	return _u
+}
+
+// RemovePastoralNotes removes "pastoral_notes" edges to PastoralNote entities.
+func (_u *ChurchUpdate) RemovePastoralNotes(v ...*PastoralNote) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePastoralNoteIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1914,6 +1951,51 @@ func (_u *ChurchUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.PastoralNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPastoralNotesIDs(); len(nodes) > 0 && !_u.mutation.PastoralNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PastoralNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{church.Label}
@@ -2552,6 +2634,21 @@ func (_u *ChurchUpdateOne) AddDocuments(v ...*Document) *ChurchUpdateOne {
 	return _u.AddDocumentIDs(ids...)
 }
 
+// AddPastoralNoteIDs adds the "pastoral_notes" edge to the PastoralNote entity by IDs.
+func (_u *ChurchUpdateOne) AddPastoralNoteIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddPastoralNoteIDs(ids...)
+	return _u
+}
+
+// AddPastoralNotes adds the "pastoral_notes" edges to the PastoralNote entity.
+func (_u *ChurchUpdateOne) AddPastoralNotes(v ...*PastoralNote) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPastoralNoteIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdateOne) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -2897,6 +2994,27 @@ func (_u *ChurchUpdateOne) RemoveDocuments(v ...*Document) *ChurchUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveDocumentIDs(ids...)
+}
+
+// ClearPastoralNotes clears all "pastoral_notes" edges to the PastoralNote entity.
+func (_u *ChurchUpdateOne) ClearPastoralNotes() *ChurchUpdateOne {
+	_u.mutation.ClearPastoralNotes()
+	return _u
+}
+
+// RemovePastoralNoteIDs removes the "pastoral_notes" edge to PastoralNote entities by IDs.
+func (_u *ChurchUpdateOne) RemovePastoralNoteIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemovePastoralNoteIDs(ids...)
+	return _u
+}
+
+// RemovePastoralNotes removes "pastoral_notes" edges to PastoralNote entities.
+func (_u *ChurchUpdateOne) RemovePastoralNotes(v ...*PastoralNote) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePastoralNoteIDs(ids...)
 }
 
 // Where appends a list predicates to the ChurchUpdate builder.
@@ -3828,6 +3946,51 @@ func (_u *ChurchUpdateOne) sqlSave(ctx context.Context) (_node *Church, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(document.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PastoralNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPastoralNotesIDs(); len(nodes) > 0 && !_u.mutation.PastoralNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PastoralNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.PastoralNotesTable,
+			Columns: []string{church.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

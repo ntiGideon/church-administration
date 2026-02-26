@@ -55,6 +55,7 @@ func (User) Edges() []ent.Edge {
 		edge.From("accepted_invitation", Invitation.Type).
 			Ref("accepted_user").
 			Unique(),
+		edge.To("pastoral_notes_recorded", PastoralNote.Type),
 	}
 }
 

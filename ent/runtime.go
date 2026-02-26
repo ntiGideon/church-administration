@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
@@ -160,6 +161,26 @@ func init() {
 	invitation.DefaultUpdatedAt = invitationDescUpdatedAt.Default.(func() time.Time)
 	// invitation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	invitation.UpdateDefaultUpdatedAt = invitationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	pastoralnoteFields := schema.PastoralNote{}.Fields()
+	_ = pastoralnoteFields
+	// pastoralnoteDescNeedsFollowUp is the schema descriptor for needs_follow_up field.
+	pastoralnoteDescNeedsFollowUp := pastoralnoteFields[3].Descriptor()
+	// pastoralnote.DefaultNeedsFollowUp holds the default value on creation for the needs_follow_up field.
+	pastoralnote.DefaultNeedsFollowUp = pastoralnoteDescNeedsFollowUp.Default.(bool)
+	// pastoralnoteDescFollowUpDone is the schema descriptor for follow_up_done field.
+	pastoralnoteDescFollowUpDone := pastoralnoteFields[5].Descriptor()
+	// pastoralnote.DefaultFollowUpDone holds the default value on creation for the follow_up_done field.
+	pastoralnote.DefaultFollowUpDone = pastoralnoteDescFollowUpDone.Default.(bool)
+	// pastoralnoteDescCreatedAt is the schema descriptor for created_at field.
+	pastoralnoteDescCreatedAt := pastoralnoteFields[9].Descriptor()
+	// pastoralnote.DefaultCreatedAt holds the default value on creation for the created_at field.
+	pastoralnote.DefaultCreatedAt = pastoralnoteDescCreatedAt.Default.(func() time.Time)
+	// pastoralnoteDescUpdatedAt is the schema descriptor for updated_at field.
+	pastoralnoteDescUpdatedAt := pastoralnoteFields[10].Descriptor()
+	// pastoralnote.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	pastoralnote.DefaultUpdatedAt = pastoralnoteDescUpdatedAt.Default.(func() time.Time)
+	// pastoralnote.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	pastoralnote.UpdateDefaultUpdatedAt = pastoralnoteDescUpdatedAt.UpdateDefault.(func() time.Time)
 	pledgeFields := schema.Pledge{}.Fields()
 	_ = pledgeFields
 	// pledgeDescCategory is the schema descriptor for category field.

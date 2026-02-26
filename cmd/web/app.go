@@ -35,4 +35,5 @@ type application struct {
 	visitorModel      *models.VisitorModel
 	prayerModel       *models.PrayerRequestModel
 	documentModel     *models.DocumentModel
+	pastoralModel     *models.PastoralNoteModel
 }

@@ -1,0 +1,190 @@
+{{define "title"}}Pastoral Record | FaithConnect{{end}}
+{{define "description"}}Pastoral care record detail{{end}}
+
+{{define "main"}}
+{{$note := index .Data "note"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <a href="/pastoral" class="back-link"><i class="fas fa-arrow-left"></i> Pastoral Care</a>
+            <h1 class="page-title-text">Pastoral Record</h1>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        <div class="action-btns">
+            <a href="/pastoral/{{$note.ID}}/edit" class="button is-small is-warning is-light">
+                <span class="icon"><i class="fas fa-edit"></i></span>
+                <span>Edit</span>
+            </a>
+            <form action="/pastoral/{{$note.ID}}/delete" method="POST"
+                  onsubmit="return confirm('Delete this pastoral record?')">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                </button>
+            </form>
+        </div>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    <div class="detail-card">
+        <!-- Header row -->
+        <div class="dc-header">
+            <div class="dc-icon ct-{{$note.CareType}}">
+                <i class="fas {{careTypeIcon (enumStr $note.CareType)}}"></i>
+            </div>
+            <div class="dc-header-info">
+                <div class="dc-care-type">{{careTypeLabel (enumStr $note.CareType)}}</div>
+                <div class="dc-date">{{$note.VisitDate.Format "Monday, 2 January 2006"}}</div>
+                {{if $note.Edges.Member}}
+                <div class="dc-member">
+                    <i class="fas fa-user-circle"></i>
+                    {{$note.Edges.Member.FirstName}} {{$note.Edges.Member.LastName}}
+                </div>
+                {{end}}
+            </div>
+            {{if and $note.NeedsFollowUp (not $note.FollowUpDone)}}
+            <span class="fu-badge-large"><i class="fas fa-clock"></i> Follow-up Needed</span>
+            {{else if $note.FollowUpDone}}
+            <span class="done-badge-large"><i class="fas fa-check-circle"></i> Follow-up Done</span>
+            {{end}}
+        </div>
+
+        <div class="dc-divider"></div>
+
+        <!-- Notes -->
+        <div class="dc-section">
+            <div class="dc-section-label">Notes</div>
+            <div class="dc-notes">{{$note.Notes}}</div>
+        </div>
+
+        <!-- Follow-up details -->
+        {{if $note.NeedsFollowUp}}
+        <div class="dc-divider"></div>
+        <div class="dc-section dc-fu-section">
+            <div class="dc-section-label">Follow-up</div>
+            <div class="dc-fu-row">
+                <div class="dc-fu-info">
+                    {{if not $note.FollowUpDate.IsZero}}
+                    <div class="dc-fu-date">
+                        <i class="fas fa-calendar-day"></i>
+                        Scheduled for: <strong>{{$note.FollowUpDate.Format "2 January 2006"}}</strong>
+                    </div>
+                    {{end}}
+                    <div class="dc-fu-status {{if $note.FollowUpDone}}done{{else}}pending{{end}}">
+                        {{if $note.FollowUpDone}}
+                        <i class="fas fa-check-circle"></i> Completed
+                        {{else}}
+                        <i class="fas fa-clock"></i> Pending
+                        {{end}}
+                    </div>
+                </div>
+                {{if and $note.NeedsFollowUp (not $note.FollowUpDone)}}
+                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+                {{$role := $.LoggedInUser.Role.String}}
+                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+                <form action="/pastoral/{{$note.ID}}/followup" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                    <button type="submit" class="button is-small is-success is-light">
+                        <span class="icon"><i class="fas fa-check"></i></span>
+                        <span>Mark Done</span>
+                    </button>
+                </form>
+                {{end}}{{end}}{{end}}
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        <!-- Metadata -->
+        <div class="dc-divider"></div>
+        <div class="dc-meta-row">
+            {{if $note.Edges.Recorder}}
+            <div class="dc-meta-item">
+                <span class="dc-meta-label">Recorded by</span>
+                <span class="dc-meta-val">
+                    {{if $note.Edges.Recorder.Edges.Contact}}
+                    {{$note.Edges.Recorder.Edges.Contact.FirstName}} {{$note.Edges.Recorder.Edges.Contact.LastName}}
+                    {{else}}
+                    {{$note.Edges.Recorder.Email}}
+                    {{end}}
+                </span>
+            </div>
+            {{end}}
+            <div class="dc-meta-item">
+                <span class="dc-meta-label">Created</span>
+                <span class="dc-meta-val">{{$note.CreatedAt.Format "2 Jan 2006"}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 760px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-light); text-decoration: none; margin-bottom: 6px; }
+.back-link:hover { color: var(--primary); }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.action-btns { display: flex; gap: 8px; align-items: center; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.detail-card { background: white; border: 1px solid var(--light-gray); border-radius: 16px; overflow: hidden; }
+
+.dc-header { display: flex; align-items: center; gap: 1rem; padding: 1.5rem 1.75rem; flex-wrap: wrap; }
+.dc-icon {
+    width: 54px; height: 54px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.ct-visit          { background: #EFF6FF; color: #3B82F6; }
+.ct-counseling     { background: #FDF4FF; color: #A855F7; }
+.ct-phone_call     { background: #F0FDFA; color: #14B8A6; }
+.ct-prayer_session { background: #FFF7ED; color: #F97316; }
+.ct-hospital_visit { background: #FFF1F2; color: #F43F5E; }
+.ct-bereavement    { background: #F9FAFB; color: #6B7280; }
+.ct-other          { background: #F9FAFB; color: #6B7280; }
+
+.dc-header-info { flex: 1; }
+.dc-care-type { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
+.dc-date { font-size: 0.85rem; color: var(--text-light); margin-top: 2px; }
+.dc-member { font-size: 0.88rem; color: var(--primary); margin-top: 4px; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+
+.fu-badge-large { background: #FFF7ED; color: #F97316; border-radius: 20px; padding: 5px 14px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.done-badge-large { background: #ECFDF5; color: #10B981; border-radius: 20px; padding: 5px 14px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+.dc-divider { height: 1px; background: var(--light-gray); }
+.dc-section { padding: 1.25rem 1.75rem; }
+.dc-section-label { font-size: 0.72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.dc-notes { font-size: 0.92rem; color: var(--text-dark); line-height: 1.7; white-space: pre-wrap; }
+
+.dc-fu-section { background: #FFFBF0; }
+.dc-fu-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.dc-fu-date { font-size: 0.875rem; color: var(--text-dark); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.dc-fu-date i { color: #F97316; }
+.dc-fu-status { font-size: 0.82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+.dc-fu-status.pending { color: #F97316; }
+.dc-fu-status.done { color: #10B981; }
+
+.dc-meta-row { display: flex; gap: 2rem; padding: 1rem 1.75rem; flex-wrap: wrap; }
+.dc-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.dc-meta-label { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; }
+.dc-meta-val { font-size: 0.875rem; color: var(--text-dark); font-weight: 500; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .dc-header, .dc-section, .dc-meta-row { padding: 1rem; }
+    .action-btns { width: 100%; justify-content: flex-end; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

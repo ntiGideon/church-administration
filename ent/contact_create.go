@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/rosterentry"
@@ -683,6 +684,21 @@ func (_c *ContactCreate) AddPrayerRequests(v ...*PrayerRequest) *ContactCreate {
 	return _c.AddPrayerRequestIDs(ids...)
 }
 
+// AddPastoralNoteIDs adds the "pastoral_notes" edge to the PastoralNote entity by IDs.
+func (_c *ContactCreate) AddPastoralNoteIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddPastoralNoteIDs(ids...)
+	return _c
+}
+
+// AddPastoralNotes adds the "pastoral_notes" edges to the PastoralNote entity.
+func (_c *ContactCreate) AddPastoralNotes(v ...*PastoralNote) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPastoralNoteIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_c *ContactCreate) Mutation() *ContactMutation {
 	return _c.mutation
@@ -1105,6 +1121,22 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(prayerrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PastoralNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.PastoralNotesTable,
+			Columns: []string{contact.PastoralNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

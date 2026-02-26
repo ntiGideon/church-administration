@@ -21,6 +21,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
@@ -52,6 +53,7 @@ const (
 	TypeFinance       = "Finance"
 	TypeGroup         = "Group"
 	TypeInvitation    = "Invitation"
+	TypePastoralNote  = "PastoralNote"
 	TypePledge        = "Pledge"
 	TypePrayerRequest = "PrayerRequest"
 	TypeProgramEntry  = "ProgramEntry"
@@ -1608,6 +1610,9 @@ type ChurchMutation struct {
 	documents              map[int]struct{}
 	removeddocuments       map[int]struct{}
 	cleareddocuments       bool
+	pastoral_notes         map[int]struct{}
+	removedpastoral_notes  map[int]struct{}
+	clearedpastoral_notes  bool
 	done                   bool
 	oldValue               func(context.Context) (*Church, error)
 	predicates             []predicate.Church
@@ -3563,6 +3568,60 @@ func (m *ChurchMutation) ResetDocuments() {
 	m.removeddocuments = nil
 }
 
+// AddPastoralNoteIDs adds the "pastoral_notes" edge to the PastoralNote entity by ids.
+func (m *ChurchMutation) AddPastoralNoteIDs(ids ...int) {
+	if m.pastoral_notes == nil {
+		m.pastoral_notes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.pastoral_notes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPastoralNotes clears the "pastoral_notes" edge to the PastoralNote entity.
+func (m *ChurchMutation) ClearPastoralNotes() {
+	m.clearedpastoral_notes = true
+}
+
+// PastoralNotesCleared reports if the "pastoral_notes" edge to the PastoralNote entity was cleared.
+func (m *ChurchMutation) PastoralNotesCleared() bool {
+	return m.clearedpastoral_notes
+}
+
+// RemovePastoralNoteIDs removes the "pastoral_notes" edge to the PastoralNote entity by IDs.
+func (m *ChurchMutation) RemovePastoralNoteIDs(ids ...int) {
+	if m.removedpastoral_notes == nil {
+		m.removedpastoral_notes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.pastoral_notes, ids[i])
+		m.removedpastoral_notes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPastoralNotes returns the removed IDs of the "pastoral_notes" edge to the PastoralNote entity.
+func (m *ChurchMutation) RemovedPastoralNotesIDs() (ids []int) {
+	for id := range m.removedpastoral_notes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PastoralNotesIDs returns the "pastoral_notes" edge IDs in the mutation.
+func (m *ChurchMutation) PastoralNotesIDs() (ids []int) {
+	for id := range m.pastoral_notes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPastoralNotes resets all changes to the "pastoral_notes" edge.
+func (m *ChurchMutation) ResetPastoralNotes() {
+	m.pastoral_notes = nil
+	m.clearedpastoral_notes = false
+	m.removedpastoral_notes = nil
+}
+
 // Where appends a list predicates to the ChurchMutation builder.
 func (m *ChurchMutation) Where(ps ...predicate.Church) {
 	m.predicates = append(m.predicates, ps...)
@@ -4144,7 +4203,7 @@ func (m *ChurchMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChurchMutation) AddedEdges() []string {
-	edges := make([]string, 0, 17)
+	edges := make([]string, 0, 18)
 	if m.parent != nil {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -4195,6 +4254,9 @@ func (m *ChurchMutation) AddedEdges() []string {
 	}
 	if m.documents != nil {
 		edges = append(edges, church.EdgeDocuments)
+	}
+	if m.pastoral_notes != nil {
+		edges = append(edges, church.EdgePastoralNotes)
 	}
 	return edges
 }
@@ -4303,13 +4365,19 @@ func (m *ChurchMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgePastoralNotes:
+		ids := make([]ent.Value, 0, len(m.pastoral_notes))
+		for id := range m.pastoral_notes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChurchMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 17)
+	edges := make([]string, 0, 18)
 	if m.removedchildren != nil {
 		edges = append(edges, church.EdgeChildren)
 	}
@@ -4357,6 +4425,9 @@ func (m *ChurchMutation) RemovedEdges() []string {
 	}
 	if m.removeddocuments != nil {
 		edges = append(edges, church.EdgeDocuments)
+	}
+	if m.removedpastoral_notes != nil {
+		edges = append(edges, church.EdgePastoralNotes)
 	}
 	return edges
 }
@@ -4461,13 +4532,19 @@ func (m *ChurchMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgePastoralNotes:
+		ids := make([]ent.Value, 0, len(m.removedpastoral_notes))
+		for id := range m.removedpastoral_notes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChurchMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 17)
+	edges := make([]string, 0, 18)
 	if m.clearedparent {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -4519,6 +4596,9 @@ func (m *ChurchMutation) ClearedEdges() []string {
 	if m.cleareddocuments {
 		edges = append(edges, church.EdgeDocuments)
 	}
+	if m.clearedpastoral_notes {
+		edges = append(edges, church.EdgePastoralNotes)
+	}
 	return edges
 }
 
@@ -4560,6 +4640,8 @@ func (m *ChurchMutation) EdgeCleared(name string) bool {
 		return m.clearedprayer_requests
 	case church.EdgeDocuments:
 		return m.cleareddocuments
+	case church.EdgePastoralNotes:
+		return m.clearedpastoral_notes
 	}
 	return false
 }
@@ -4629,6 +4711,9 @@ func (m *ChurchMutation) ResetEdge(name string) error {
 		return nil
 	case church.EdgeDocuments:
 		m.ResetDocuments()
+		return nil
+	case church.EdgePastoralNotes:
+		m.ResetPastoralNotes()
 		return nil
 	}
 	return fmt.Errorf("unknown Church edge %s", name)
@@ -4705,6 +4790,9 @@ type ContactMutation struct {
 	prayer_requests                map[int]struct{}
 	removedprayer_requests         map[int]struct{}
 	clearedprayer_requests         bool
+	pastoral_notes                 map[int]struct{}
+	removedpastoral_notes          map[int]struct{}
+	clearedpastoral_notes          bool
 	done                           bool
 	oldValue                       func(context.Context) (*Contact, error)
 	predicates                     []predicate.Contact
@@ -7039,6 +7127,60 @@ func (m *ContactMutation) ResetPrayerRequests() {
 	m.removedprayer_requests = nil
 }
 
+// AddPastoralNoteIDs adds the "pastoral_notes" edge to the PastoralNote entity by ids.
+func (m *ContactMutation) AddPastoralNoteIDs(ids ...int) {
+	if m.pastoral_notes == nil {
+		m.pastoral_notes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.pastoral_notes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPastoralNotes clears the "pastoral_notes" edge to the PastoralNote entity.
+func (m *ContactMutation) ClearPastoralNotes() {
+	m.clearedpastoral_notes = true
+}
+
+// PastoralNotesCleared reports if the "pastoral_notes" edge to the PastoralNote entity was cleared.
+func (m *ContactMutation) PastoralNotesCleared() bool {
+	return m.clearedpastoral_notes
+}
+
+// RemovePastoralNoteIDs removes the "pastoral_notes" edge to the PastoralNote entity by IDs.
+func (m *ContactMutation) RemovePastoralNoteIDs(ids ...int) {
+	if m.removedpastoral_notes == nil {
+		m.removedpastoral_notes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.pastoral_notes, ids[i])
+		m.removedpastoral_notes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPastoralNotes returns the removed IDs of the "pastoral_notes" edge to the PastoralNote entity.
+func (m *ContactMutation) RemovedPastoralNotesIDs() (ids []int) {
+	for id := range m.removedpastoral_notes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PastoralNotesIDs returns the "pastoral_notes" edge IDs in the mutation.
+func (m *ContactMutation) PastoralNotesIDs() (ids []int) {
+	for id := range m.pastoral_notes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPastoralNotes resets all changes to the "pastoral_notes" edge.
+func (m *ContactMutation) ResetPastoralNotes() {
+	m.pastoral_notes = nil
+	m.clearedpastoral_notes = false
+	m.removedpastoral_notes = nil
+}
+
 // Where appends a list predicates to the ContactMutation builder.
 func (m *ContactMutation) Where(ps ...predicate.Contact) {
 	m.predicates = append(m.predicates, ps...)
@@ -7965,7 +8107,7 @@ func (m *ContactMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ContactMutation) AddedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.user != nil {
 		edges = append(edges, contact.EdgeUser)
 	}
@@ -7998,6 +8140,9 @@ func (m *ContactMutation) AddedEdges() []string {
 	}
 	if m.prayer_requests != nil {
 		edges = append(edges, contact.EdgePrayerRequests)
+	}
+	if m.pastoral_notes != nil {
+		edges = append(edges, contact.EdgePastoralNotes)
 	}
 	return edges
 }
@@ -8064,13 +8209,19 @@ func (m *ContactMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case contact.EdgePastoralNotes:
+		ids := make([]ent.Value, 0, len(m.pastoral_notes))
+		for id := range m.pastoral_notes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ContactMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.removedattendances != nil {
 		edges = append(edges, contact.EdgeAttendances)
 	}
@@ -8091,6 +8242,9 @@ func (m *ContactMutation) RemovedEdges() []string {
 	}
 	if m.removedprayer_requests != nil {
 		edges = append(edges, contact.EdgePrayerRequests)
+	}
+	if m.removedpastoral_notes != nil {
+		edges = append(edges, contact.EdgePastoralNotes)
 	}
 	return edges
 }
@@ -8141,13 +8295,19 @@ func (m *ContactMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case contact.EdgePastoralNotes:
+		ids := make([]ent.Value, 0, len(m.removedpastoral_notes))
+		for id := range m.removedpastoral_notes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ContactMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.cleareduser {
 		edges = append(edges, contact.EdgeUser)
 	}
@@ -8181,6 +8341,9 @@ func (m *ContactMutation) ClearedEdges() []string {
 	if m.clearedprayer_requests {
 		edges = append(edges, contact.EdgePrayerRequests)
 	}
+	if m.clearedpastoral_notes {
+		edges = append(edges, contact.EdgePastoralNotes)
+	}
 	return edges
 }
 
@@ -8210,6 +8373,8 @@ func (m *ContactMutation) EdgeCleared(name string) bool {
 		return m.clearedroster_entries
 	case contact.EdgePrayerRequests:
 		return m.clearedprayer_requests
+	case contact.EdgePastoralNotes:
+		return m.clearedpastoral_notes
 	}
 	return false
 }
@@ -8270,6 +8435,9 @@ func (m *ContactMutation) ResetEdge(name string) error {
 		return nil
 	case contact.EdgePrayerRequests:
 		m.ResetPrayerRequests()
+		return nil
+	case contact.EdgePastoralNotes:
+		m.ResetPastoralNotes()
 		return nil
 	}
 	return fmt.Errorf("unknown Contact edge %s", name)
@@ -13914,6 +14082,1088 @@ func (m *InvitationMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Invitation edge %s", name)
+}
+
+// PastoralNoteMutation represents an operation that mutates the PastoralNote nodes in the graph.
+type PastoralNoteMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	visit_date      *time.Time
+	care_type       *pastoralnote.CareType
+	notes           *string
+	needs_follow_up *bool
+	follow_up_date  *time.Time
+	follow_up_done  *bool
+	created_at      *time.Time
+	updated_at      *time.Time
+	clearedFields   map[string]struct{}
+	church          *int
+	clearedchurch   bool
+	member          *int
+	clearedmember   bool
+	recorder        *int
+	clearedrecorder bool
+	done            bool
+	oldValue        func(context.Context) (*PastoralNote, error)
+	predicates      []predicate.PastoralNote
+}
+
+var _ ent.Mutation = (*PastoralNoteMutation)(nil)
+
+// pastoralnoteOption allows management of the mutation configuration using functional options.
+type pastoralnoteOption func(*PastoralNoteMutation)
+
+// newPastoralNoteMutation creates new mutation for the PastoralNote entity.
+func newPastoralNoteMutation(c config, op Op, opts ...pastoralnoteOption) *PastoralNoteMutation {
+	m := &PastoralNoteMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePastoralNote,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPastoralNoteID sets the ID field of the mutation.
+func withPastoralNoteID(id int) pastoralnoteOption {
+	return func(m *PastoralNoteMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *PastoralNote
+		)
+		m.oldValue = func(ctx context.Context) (*PastoralNote, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().PastoralNote.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPastoralNote sets the old PastoralNote of the mutation.
+func withPastoralNote(node *PastoralNote) pastoralnoteOption {
+	return func(m *PastoralNoteMutation) {
+		m.oldValue = func(context.Context) (*PastoralNote, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PastoralNoteMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PastoralNoteMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PastoralNoteMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PastoralNoteMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().PastoralNote.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetVisitDate sets the "visit_date" field.
+func (m *PastoralNoteMutation) SetVisitDate(t time.Time) {
+	m.visit_date = &t
+}
+
+// VisitDate returns the value of the "visit_date" field in the mutation.
+func (m *PastoralNoteMutation) VisitDate() (r time.Time, exists bool) {
+	v := m.visit_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisitDate returns the old "visit_date" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldVisitDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisitDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisitDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisitDate: %w", err)
+	}
+	return oldValue.VisitDate, nil
+}
+
+// ResetVisitDate resets all changes to the "visit_date" field.
+func (m *PastoralNoteMutation) ResetVisitDate() {
+	m.visit_date = nil
+}
+
+// SetCareType sets the "care_type" field.
+func (m *PastoralNoteMutation) SetCareType(pt pastoralnote.CareType) {
+	m.care_type = &pt
+}
+
+// CareType returns the value of the "care_type" field in the mutation.
+func (m *PastoralNoteMutation) CareType() (r pastoralnote.CareType, exists bool) {
+	v := m.care_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCareType returns the old "care_type" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldCareType(ctx context.Context) (v pastoralnote.CareType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCareType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCareType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCareType: %w", err)
+	}
+	return oldValue.CareType, nil
+}
+
+// ResetCareType resets all changes to the "care_type" field.
+func (m *PastoralNoteMutation) ResetCareType() {
+	m.care_type = nil
+}
+
+// SetNotes sets the "notes" field.
+func (m *PastoralNoteMutation) SetNotes(s string) {
+	m.notes = &s
+}
+
+// Notes returns the value of the "notes" field in the mutation.
+func (m *PastoralNoteMutation) Notes() (r string, exists bool) {
+	v := m.notes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotes returns the old "notes" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldNotes(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotes: %w", err)
+	}
+	return oldValue.Notes, nil
+}
+
+// ResetNotes resets all changes to the "notes" field.
+func (m *PastoralNoteMutation) ResetNotes() {
+	m.notes = nil
+}
+
+// SetNeedsFollowUp sets the "needs_follow_up" field.
+func (m *PastoralNoteMutation) SetNeedsFollowUp(b bool) {
+	m.needs_follow_up = &b
+}
+
+// NeedsFollowUp returns the value of the "needs_follow_up" field in the mutation.
+func (m *PastoralNoteMutation) NeedsFollowUp() (r bool, exists bool) {
+	v := m.needs_follow_up
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNeedsFollowUp returns the old "needs_follow_up" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldNeedsFollowUp(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNeedsFollowUp is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNeedsFollowUp requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNeedsFollowUp: %w", err)
+	}
+	return oldValue.NeedsFollowUp, nil
+}
+
+// ResetNeedsFollowUp resets all changes to the "needs_follow_up" field.
+func (m *PastoralNoteMutation) ResetNeedsFollowUp() {
+	m.needs_follow_up = nil
+}
+
+// SetFollowUpDate sets the "follow_up_date" field.
+func (m *PastoralNoteMutation) SetFollowUpDate(t time.Time) {
+	m.follow_up_date = &t
+}
+
+// FollowUpDate returns the value of the "follow_up_date" field in the mutation.
+func (m *PastoralNoteMutation) FollowUpDate() (r time.Time, exists bool) {
+	v := m.follow_up_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFollowUpDate returns the old "follow_up_date" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldFollowUpDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFollowUpDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFollowUpDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFollowUpDate: %w", err)
+	}
+	return oldValue.FollowUpDate, nil
+}
+
+// ClearFollowUpDate clears the value of the "follow_up_date" field.
+func (m *PastoralNoteMutation) ClearFollowUpDate() {
+	m.follow_up_date = nil
+	m.clearedFields[pastoralnote.FieldFollowUpDate] = struct{}{}
+}
+
+// FollowUpDateCleared returns if the "follow_up_date" field was cleared in this mutation.
+func (m *PastoralNoteMutation) FollowUpDateCleared() bool {
+	_, ok := m.clearedFields[pastoralnote.FieldFollowUpDate]
+	return ok
+}
+
+// ResetFollowUpDate resets all changes to the "follow_up_date" field.
+func (m *PastoralNoteMutation) ResetFollowUpDate() {
+	m.follow_up_date = nil
+	delete(m.clearedFields, pastoralnote.FieldFollowUpDate)
+}
+
+// SetFollowUpDone sets the "follow_up_done" field.
+func (m *PastoralNoteMutation) SetFollowUpDone(b bool) {
+	m.follow_up_done = &b
+}
+
+// FollowUpDone returns the value of the "follow_up_done" field in the mutation.
+func (m *PastoralNoteMutation) FollowUpDone() (r bool, exists bool) {
+	v := m.follow_up_done
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFollowUpDone returns the old "follow_up_done" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldFollowUpDone(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFollowUpDone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFollowUpDone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFollowUpDone: %w", err)
+	}
+	return oldValue.FollowUpDone, nil
+}
+
+// ResetFollowUpDone resets all changes to the "follow_up_done" field.
+func (m *PastoralNoteMutation) ResetFollowUpDone() {
+	m.follow_up_done = nil
+}
+
+// SetContactID sets the "contact_id" field.
+func (m *PastoralNoteMutation) SetContactID(i int) {
+	m.member = &i
+}
+
+// ContactID returns the value of the "contact_id" field in the mutation.
+func (m *PastoralNoteMutation) ContactID() (r int, exists bool) {
+	v := m.member
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContactID returns the old "contact_id" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldContactID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContactID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContactID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContactID: %w", err)
+	}
+	return oldValue.ContactID, nil
+}
+
+// ResetContactID resets all changes to the "contact_id" field.
+func (m *PastoralNoteMutation) ResetContactID() {
+	m.member = nil
+}
+
+// SetChurchID sets the "church_id" field.
+func (m *PastoralNoteMutation) SetChurchID(i int) {
+	m.church = &i
+}
+
+// ChurchID returns the value of the "church_id" field in the mutation.
+func (m *PastoralNoteMutation) ChurchID() (r int, exists bool) {
+	v := m.church
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChurchID returns the old "church_id" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldChurchID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChurchID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChurchID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChurchID: %w", err)
+	}
+	return oldValue.ChurchID, nil
+}
+
+// ResetChurchID resets all changes to the "church_id" field.
+func (m *PastoralNoteMutation) ResetChurchID() {
+	m.church = nil
+}
+
+// SetRecordedByID sets the "recorded_by_id" field.
+func (m *PastoralNoteMutation) SetRecordedByID(i int) {
+	m.recorder = &i
+}
+
+// RecordedByID returns the value of the "recorded_by_id" field in the mutation.
+func (m *PastoralNoteMutation) RecordedByID() (r int, exists bool) {
+	v := m.recorder
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecordedByID returns the old "recorded_by_id" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldRecordedByID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecordedByID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecordedByID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecordedByID: %w", err)
+	}
+	return oldValue.RecordedByID, nil
+}
+
+// ClearRecordedByID clears the value of the "recorded_by_id" field.
+func (m *PastoralNoteMutation) ClearRecordedByID() {
+	m.recorder = nil
+	m.clearedFields[pastoralnote.FieldRecordedByID] = struct{}{}
+}
+
+// RecordedByIDCleared returns if the "recorded_by_id" field was cleared in this mutation.
+func (m *PastoralNoteMutation) RecordedByIDCleared() bool {
+	_, ok := m.clearedFields[pastoralnote.FieldRecordedByID]
+	return ok
+}
+
+// ResetRecordedByID resets all changes to the "recorded_by_id" field.
+func (m *PastoralNoteMutation) ResetRecordedByID() {
+	m.recorder = nil
+	delete(m.clearedFields, pastoralnote.FieldRecordedByID)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *PastoralNoteMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *PastoralNoteMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *PastoralNoteMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *PastoralNoteMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *PastoralNoteMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the PastoralNote entity.
+// If the PastoralNote object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PastoralNoteMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *PastoralNoteMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// ClearChurch clears the "church" edge to the Church entity.
+func (m *PastoralNoteMutation) ClearChurch() {
+	m.clearedchurch = true
+	m.clearedFields[pastoralnote.FieldChurchID] = struct{}{}
+}
+
+// ChurchCleared reports if the "church" edge to the Church entity was cleared.
+func (m *PastoralNoteMutation) ChurchCleared() bool {
+	return m.clearedchurch
+}
+
+// ChurchIDs returns the "church" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChurchID instead. It exists only for internal usage by the builders.
+func (m *PastoralNoteMutation) ChurchIDs() (ids []int) {
+	if id := m.church; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChurch resets all changes to the "church" edge.
+func (m *PastoralNoteMutation) ResetChurch() {
+	m.church = nil
+	m.clearedchurch = false
+}
+
+// SetMemberID sets the "member" edge to the Contact entity by id.
+func (m *PastoralNoteMutation) SetMemberID(id int) {
+	m.member = &id
+}
+
+// ClearMember clears the "member" edge to the Contact entity.
+func (m *PastoralNoteMutation) ClearMember() {
+	m.clearedmember = true
+	m.clearedFields[pastoralnote.FieldContactID] = struct{}{}
+}
+
+// MemberCleared reports if the "member" edge to the Contact entity was cleared.
+func (m *PastoralNoteMutation) MemberCleared() bool {
+	return m.clearedmember
+}
+
+// MemberID returns the "member" edge ID in the mutation.
+func (m *PastoralNoteMutation) MemberID() (id int, exists bool) {
+	if m.member != nil {
+		return *m.member, true
+	}
+	return
+}
+
+// MemberIDs returns the "member" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MemberID instead. It exists only for internal usage by the builders.
+func (m *PastoralNoteMutation) MemberIDs() (ids []int) {
+	if id := m.member; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMember resets all changes to the "member" edge.
+func (m *PastoralNoteMutation) ResetMember() {
+	m.member = nil
+	m.clearedmember = false
+}
+
+// SetRecorderID sets the "recorder" edge to the User entity by id.
+func (m *PastoralNoteMutation) SetRecorderID(id int) {
+	m.recorder = &id
+}
+
+// ClearRecorder clears the "recorder" edge to the User entity.
+func (m *PastoralNoteMutation) ClearRecorder() {
+	m.clearedrecorder = true
+	m.clearedFields[pastoralnote.FieldRecordedByID] = struct{}{}
+}
+
+// RecorderCleared reports if the "recorder" edge to the User entity was cleared.
+func (m *PastoralNoteMutation) RecorderCleared() bool {
+	return m.RecordedByIDCleared() || m.clearedrecorder
+}
+
+// RecorderID returns the "recorder" edge ID in the mutation.
+func (m *PastoralNoteMutation) RecorderID() (id int, exists bool) {
+	if m.recorder != nil {
+		return *m.recorder, true
+	}
+	return
+}
+
+// RecorderIDs returns the "recorder" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RecorderID instead. It exists only for internal usage by the builders.
+func (m *PastoralNoteMutation) RecorderIDs() (ids []int) {
+	if id := m.recorder; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRecorder resets all changes to the "recorder" edge.
+func (m *PastoralNoteMutation) ResetRecorder() {
+	m.recorder = nil
+	m.clearedrecorder = false
+}
+
+// Where appends a list predicates to the PastoralNoteMutation builder.
+func (m *PastoralNoteMutation) Where(ps ...predicate.PastoralNote) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PastoralNoteMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PastoralNoteMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.PastoralNote, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PastoralNoteMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PastoralNoteMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (PastoralNote).
+func (m *PastoralNoteMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PastoralNoteMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.visit_date != nil {
+		fields = append(fields, pastoralnote.FieldVisitDate)
+	}
+	if m.care_type != nil {
+		fields = append(fields, pastoralnote.FieldCareType)
+	}
+	if m.notes != nil {
+		fields = append(fields, pastoralnote.FieldNotes)
+	}
+	if m.needs_follow_up != nil {
+		fields = append(fields, pastoralnote.FieldNeedsFollowUp)
+	}
+	if m.follow_up_date != nil {
+		fields = append(fields, pastoralnote.FieldFollowUpDate)
+	}
+	if m.follow_up_done != nil {
+		fields = append(fields, pastoralnote.FieldFollowUpDone)
+	}
+	if m.member != nil {
+		fields = append(fields, pastoralnote.FieldContactID)
+	}
+	if m.church != nil {
+		fields = append(fields, pastoralnote.FieldChurchID)
+	}
+	if m.recorder != nil {
+		fields = append(fields, pastoralnote.FieldRecordedByID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, pastoralnote.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, pastoralnote.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PastoralNoteMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case pastoralnote.FieldVisitDate:
+		return m.VisitDate()
+	case pastoralnote.FieldCareType:
+		return m.CareType()
+	case pastoralnote.FieldNotes:
+		return m.Notes()
+	case pastoralnote.FieldNeedsFollowUp:
+		return m.NeedsFollowUp()
+	case pastoralnote.FieldFollowUpDate:
+		return m.FollowUpDate()
+	case pastoralnote.FieldFollowUpDone:
+		return m.FollowUpDone()
+	case pastoralnote.FieldContactID:
+		return m.ContactID()
+	case pastoralnote.FieldChurchID:
+		return m.ChurchID()
+	case pastoralnote.FieldRecordedByID:
+		return m.RecordedByID()
+	case pastoralnote.FieldCreatedAt:
+		return m.CreatedAt()
+	case pastoralnote.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PastoralNoteMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case pastoralnote.FieldVisitDate:
+		return m.OldVisitDate(ctx)
+	case pastoralnote.FieldCareType:
+		return m.OldCareType(ctx)
+	case pastoralnote.FieldNotes:
+		return m.OldNotes(ctx)
+	case pastoralnote.FieldNeedsFollowUp:
+		return m.OldNeedsFollowUp(ctx)
+	case pastoralnote.FieldFollowUpDate:
+		return m.OldFollowUpDate(ctx)
+	case pastoralnote.FieldFollowUpDone:
+		return m.OldFollowUpDone(ctx)
+	case pastoralnote.FieldContactID:
+		return m.OldContactID(ctx)
+	case pastoralnote.FieldChurchID:
+		return m.OldChurchID(ctx)
+	case pastoralnote.FieldRecordedByID:
+		return m.OldRecordedByID(ctx)
+	case pastoralnote.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case pastoralnote.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown PastoralNote field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PastoralNoteMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case pastoralnote.FieldVisitDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisitDate(v)
+		return nil
+	case pastoralnote.FieldCareType:
+		v, ok := value.(pastoralnote.CareType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCareType(v)
+		return nil
+	case pastoralnote.FieldNotes:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotes(v)
+		return nil
+	case pastoralnote.FieldNeedsFollowUp:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNeedsFollowUp(v)
+		return nil
+	case pastoralnote.FieldFollowUpDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFollowUpDate(v)
+		return nil
+	case pastoralnote.FieldFollowUpDone:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFollowUpDone(v)
+		return nil
+	case pastoralnote.FieldContactID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContactID(v)
+		return nil
+	case pastoralnote.FieldChurchID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChurchID(v)
+		return nil
+	case pastoralnote.FieldRecordedByID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecordedByID(v)
+		return nil
+	case pastoralnote.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case pastoralnote.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PastoralNote field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PastoralNoteMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PastoralNoteMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PastoralNoteMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown PastoralNote numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PastoralNoteMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(pastoralnote.FieldFollowUpDate) {
+		fields = append(fields, pastoralnote.FieldFollowUpDate)
+	}
+	if m.FieldCleared(pastoralnote.FieldRecordedByID) {
+		fields = append(fields, pastoralnote.FieldRecordedByID)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PastoralNoteMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PastoralNoteMutation) ClearField(name string) error {
+	switch name {
+	case pastoralnote.FieldFollowUpDate:
+		m.ClearFollowUpDate()
+		return nil
+	case pastoralnote.FieldRecordedByID:
+		m.ClearRecordedByID()
+		return nil
+	}
+	return fmt.Errorf("unknown PastoralNote nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PastoralNoteMutation) ResetField(name string) error {
+	switch name {
+	case pastoralnote.FieldVisitDate:
+		m.ResetVisitDate()
+		return nil
+	case pastoralnote.FieldCareType:
+		m.ResetCareType()
+		return nil
+	case pastoralnote.FieldNotes:
+		m.ResetNotes()
+		return nil
+	case pastoralnote.FieldNeedsFollowUp:
+		m.ResetNeedsFollowUp()
+		return nil
+	case pastoralnote.FieldFollowUpDate:
+		m.ResetFollowUpDate()
+		return nil
+	case pastoralnote.FieldFollowUpDone:
+		m.ResetFollowUpDone()
+		return nil
+	case pastoralnote.FieldContactID:
+		m.ResetContactID()
+		return nil
+	case pastoralnote.FieldChurchID:
+		m.ResetChurchID()
+		return nil
+	case pastoralnote.FieldRecordedByID:
+		m.ResetRecordedByID()
+		return nil
+	case pastoralnote.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case pastoralnote.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown PastoralNote field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PastoralNoteMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.church != nil {
+		edges = append(edges, pastoralnote.EdgeChurch)
+	}
+	if m.member != nil {
+		edges = append(edges, pastoralnote.EdgeMember)
+	}
+	if m.recorder != nil {
+		edges = append(edges, pastoralnote.EdgeRecorder)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PastoralNoteMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case pastoralnote.EdgeChurch:
+		if id := m.church; id != nil {
+			return []ent.Value{*id}
+		}
+	case pastoralnote.EdgeMember:
+		if id := m.member; id != nil {
+			return []ent.Value{*id}
+		}
+	case pastoralnote.EdgeRecorder:
+		if id := m.recorder; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PastoralNoteMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PastoralNoteMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PastoralNoteMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedchurch {
+		edges = append(edges, pastoralnote.EdgeChurch)
+	}
+	if m.clearedmember {
+		edges = append(edges, pastoralnote.EdgeMember)
+	}
+	if m.clearedrecorder {
+		edges = append(edges, pastoralnote.EdgeRecorder)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PastoralNoteMutation) EdgeCleared(name string) bool {
+	switch name {
+	case pastoralnote.EdgeChurch:
+		return m.clearedchurch
+	case pastoralnote.EdgeMember:
+		return m.clearedmember
+	case pastoralnote.EdgeRecorder:
+		return m.clearedrecorder
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PastoralNoteMutation) ClearEdge(name string) error {
+	switch name {
+	case pastoralnote.EdgeChurch:
+		m.ClearChurch()
+		return nil
+	case pastoralnote.EdgeMember:
+		m.ClearMember()
+		return nil
+	case pastoralnote.EdgeRecorder:
+		m.ClearRecorder()
+		return nil
+	}
+	return fmt.Errorf("unknown PastoralNote unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PastoralNoteMutation) ResetEdge(name string) error {
+	switch name {
+	case pastoralnote.EdgeChurch:
+		m.ResetChurch()
+		return nil
+	case pastoralnote.EdgeMember:
+		m.ResetMember()
+		return nil
+	case pastoralnote.EdgeRecorder:
+		m.ResetRecorder()
+		return nil
+	}
+	return fmt.Errorf("unknown PastoralNote edge %s", name)
 }
 
 // PledgeMutation represents an operation that mutates the Pledge nodes in the graph.
@@ -19961,35 +21211,38 @@ func (m *SessionMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *int
-	email                      *string
-	password_hash              *string
-	role                       *user.Role
-	is_active                  *bool
-	last_login                 *time.Time
-	created_at                 *time.Time
-	updated_at                 *time.Time
-	clearedFields              map[string]struct{}
-	church                     *int
-	clearedchurch              bool
-	contact                    *int
-	clearedcontact             bool
-	finance_records            map[int]struct{}
-	removedfinance_records     map[int]struct{}
-	clearedfinance_records     bool
-	sent_invitations           map[int]struct{}
-	removedsent_invitations    map[int]struct{}
-	clearedsent_invitations    bool
-	announcements              map[int]struct{}
-	removedannouncements       map[int]struct{}
-	clearedannouncements       bool
-	accepted_invitation        *int
-	clearedaccepted_invitation bool
-	done                       bool
-	oldValue                   func(context.Context) (*User, error)
-	predicates                 []predicate.User
+	op                             Op
+	typ                            string
+	id                             *int
+	email                          *string
+	password_hash                  *string
+	role                           *user.Role
+	is_active                      *bool
+	last_login                     *time.Time
+	created_at                     *time.Time
+	updated_at                     *time.Time
+	clearedFields                  map[string]struct{}
+	church                         *int
+	clearedchurch                  bool
+	contact                        *int
+	clearedcontact                 bool
+	finance_records                map[int]struct{}
+	removedfinance_records         map[int]struct{}
+	clearedfinance_records         bool
+	sent_invitations               map[int]struct{}
+	removedsent_invitations        map[int]struct{}
+	clearedsent_invitations        bool
+	announcements                  map[int]struct{}
+	removedannouncements           map[int]struct{}
+	clearedannouncements           bool
+	accepted_invitation            *int
+	clearedaccepted_invitation     bool
+	pastoral_notes_recorded        map[int]struct{}
+	removedpastoral_notes_recorded map[int]struct{}
+	clearedpastoral_notes_recorded bool
+	done                           bool
+	oldValue                       func(context.Context) (*User, error)
+	predicates                     []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -20634,6 +21887,60 @@ func (m *UserMutation) ResetAcceptedInvitation() {
 	m.clearedaccepted_invitation = false
 }
 
+// AddPastoralNotesRecordedIDs adds the "pastoral_notes_recorded" edge to the PastoralNote entity by ids.
+func (m *UserMutation) AddPastoralNotesRecordedIDs(ids ...int) {
+	if m.pastoral_notes_recorded == nil {
+		m.pastoral_notes_recorded = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.pastoral_notes_recorded[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPastoralNotesRecorded clears the "pastoral_notes_recorded" edge to the PastoralNote entity.
+func (m *UserMutation) ClearPastoralNotesRecorded() {
+	m.clearedpastoral_notes_recorded = true
+}
+
+// PastoralNotesRecordedCleared reports if the "pastoral_notes_recorded" edge to the PastoralNote entity was cleared.
+func (m *UserMutation) PastoralNotesRecordedCleared() bool {
+	return m.clearedpastoral_notes_recorded
+}
+
+// RemovePastoralNotesRecordedIDs removes the "pastoral_notes_recorded" edge to the PastoralNote entity by IDs.
+func (m *UserMutation) RemovePastoralNotesRecordedIDs(ids ...int) {
+	if m.removedpastoral_notes_recorded == nil {
+		m.removedpastoral_notes_recorded = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.pastoral_notes_recorded, ids[i])
+		m.removedpastoral_notes_recorded[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPastoralNotesRecorded returns the removed IDs of the "pastoral_notes_recorded" edge to the PastoralNote entity.
+func (m *UserMutation) RemovedPastoralNotesRecordedIDs() (ids []int) {
+	for id := range m.removedpastoral_notes_recorded {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PastoralNotesRecordedIDs returns the "pastoral_notes_recorded" edge IDs in the mutation.
+func (m *UserMutation) PastoralNotesRecordedIDs() (ids []int) {
+	for id := range m.pastoral_notes_recorded {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPastoralNotesRecorded resets all changes to the "pastoral_notes_recorded" edge.
+func (m *UserMutation) ResetPastoralNotesRecorded() {
+	m.pastoral_notes_recorded = nil
+	m.clearedpastoral_notes_recorded = false
+	m.removedpastoral_notes_recorded = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -20878,7 +22185,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.church != nil {
 		edges = append(edges, user.EdgeChurch)
 	}
@@ -20896,6 +22203,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.accepted_invitation != nil {
 		edges = append(edges, user.EdgeAcceptedInvitation)
+	}
+	if m.pastoral_notes_recorded != nil {
+		edges = append(edges, user.EdgePastoralNotesRecorded)
 	}
 	return edges
 }
@@ -20934,13 +22244,19 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 		if id := m.accepted_invitation; id != nil {
 			return []ent.Value{*id}
 		}
+	case user.EdgePastoralNotesRecorded:
+		ids := make([]ent.Value, 0, len(m.pastoral_notes_recorded))
+		for id := range m.pastoral_notes_recorded {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedfinance_records != nil {
 		edges = append(edges, user.EdgeFinanceRecords)
 	}
@@ -20949,6 +22265,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedannouncements != nil {
 		edges = append(edges, user.EdgeAnnouncements)
+	}
+	if m.removedpastoral_notes_recorded != nil {
+		edges = append(edges, user.EdgePastoralNotesRecorded)
 	}
 	return edges
 }
@@ -20975,13 +22294,19 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgePastoralNotesRecorded:
+		ids := make([]ent.Value, 0, len(m.removedpastoral_notes_recorded))
+		for id := range m.removedpastoral_notes_recorded {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedchurch {
 		edges = append(edges, user.EdgeChurch)
 	}
@@ -20999,6 +22324,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedaccepted_invitation {
 		edges = append(edges, user.EdgeAcceptedInvitation)
+	}
+	if m.clearedpastoral_notes_recorded {
+		edges = append(edges, user.EdgePastoralNotesRecorded)
 	}
 	return edges
 }
@@ -21019,6 +22347,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedannouncements
 	case user.EdgeAcceptedInvitation:
 		return m.clearedaccepted_invitation
+	case user.EdgePastoralNotesRecorded:
+		return m.clearedpastoral_notes_recorded
 	}
 	return false
 }
@@ -21061,6 +22391,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeAcceptedInvitation:
 		m.ResetAcceptedInvitation()
+		return nil
+	case user.EdgePastoralNotesRecorded:
+		m.ResetPastoralNotesRecorded()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

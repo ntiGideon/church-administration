@@ -36,6 +36,9 @@ type Group func(*sql.Selector)
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 
+// PastoralNote is the predicate function for pastoralnote builders.
+type PastoralNote func(*sql.Selector)
+
 // Pledge is the predicate function for pledge builders.
 type Pledge func(*sql.Selector)
 

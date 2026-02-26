@@ -25,6 +25,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
@@ -61,6 +62,8 @@ type Client struct {
 	Group *GroupClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// PastoralNote is the client for interacting with the PastoralNote builders.
+	PastoralNote *PastoralNoteClient
 	// Pledge is the client for interacting with the Pledge builders.
 	Pledge *PledgeClient
 	// PrayerRequest is the client for interacting with the PrayerRequest builders.
@@ -100,6 +103,7 @@ func (c *Client) init() {
 	c.Finance = NewFinanceClient(c.config)
 	c.Group = NewGroupClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
+	c.PastoralNote = NewPastoralNoteClient(c.config)
 	c.Pledge = NewPledgeClient(c.config)
 	c.PrayerRequest = NewPrayerRequestClient(c.config)
 	c.ProgramEntry = NewProgramEntryClient(c.config)
@@ -211,6 +215,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Finance:       NewFinanceClient(cfg),
 		Group:         NewGroupClient(cfg),
 		Invitation:    NewInvitationClient(cfg),
+		PastoralNote:  NewPastoralNoteClient(cfg),
 		Pledge:        NewPledgeClient(cfg),
 		PrayerRequest: NewPrayerRequestClient(cfg),
 		ProgramEntry:  NewProgramEntryClient(cfg),
@@ -249,6 +254,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Finance:       NewFinanceClient(cfg),
 		Group:         NewGroupClient(cfg),
 		Invitation:    NewInvitationClient(cfg),
+		PastoralNote:  NewPastoralNoteClient(cfg),
 		Pledge:        NewPledgeClient(cfg),
 		PrayerRequest: NewPrayerRequestClient(cfg),
 		ProgramEntry:  NewProgramEntryClient(cfg),
@@ -288,9 +294,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Announcement, c.Attendance, c.Church, c.Contact, c.Department, c.Document,
-		c.Event, c.Finance, c.Group, c.Invitation, c.Pledge, c.PrayerRequest,
-		c.ProgramEntry, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
-		c.Visitor,
+		c.Event, c.Finance, c.Group, c.Invitation, c.PastoralNote, c.Pledge,
+		c.PrayerRequest, c.ProgramEntry, c.Roster, c.RosterEntry, c.Sermon, c.Session,
+		c.User, c.Visitor,
 	} {
 		n.Use(hooks...)
 	}
@@ -301,9 +307,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Announcement, c.Attendance, c.Church, c.Contact, c.Department, c.Document,
-		c.Event, c.Finance, c.Group, c.Invitation, c.Pledge, c.PrayerRequest,
-		c.ProgramEntry, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
-		c.Visitor,
+		c.Event, c.Finance, c.Group, c.Invitation, c.PastoralNote, c.Pledge,
+		c.PrayerRequest, c.ProgramEntry, c.Roster, c.RosterEntry, c.Sermon, c.Session,
+		c.User, c.Visitor,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -332,6 +338,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Group.mutate(ctx, m)
 	case *InvitationMutation:
 		return c.Invitation.mutate(ctx, m)
+	case *PastoralNoteMutation:
+		return c.PastoralNote.mutate(ctx, m)
 	case *PledgeMutation:
 		return c.Pledge.mutate(ctx, m)
 	case *PrayerRequestMutation:
@@ -1065,6 +1073,22 @@ func (c *ChurchClient) QueryDocuments(_m *Church) *DocumentQuery {
 	return query
 }
 
+// QueryPastoralNotes queries the pastoral_notes edge of a Church.
+func (c *ChurchClient) QueryPastoralNotes(_m *Church) *PastoralNoteQuery {
+	query := (&PastoralNoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, id),
+			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.PastoralNotesTable, church.PastoralNotesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChurchClient) Hooks() []Hook {
 	return c.hooks.Church
@@ -1367,6 +1391,22 @@ func (c *ContactClient) QueryPrayerRequests(_m *Contact) *PrayerRequestQuery {
 			sqlgraph.From(contact.Table, contact.FieldID, id),
 			sqlgraph.To(prayerrequest.Table, prayerrequest.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, contact.PrayerRequestsTable, contact.PrayerRequestsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPastoralNotes queries the pastoral_notes edge of a Contact.
+func (c *ContactClient) QueryPastoralNotes(_m *Contact) *PastoralNoteQuery {
+	query := (&PastoralNoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(contact.Table, contact.FieldID, id),
+			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, contact.PastoralNotesTable, contact.PastoralNotesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -2402,6 +2442,187 @@ func (c *InvitationClient) mutate(ctx context.Context, m *InvitationMutation) (V
 		return (&InvitationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Invitation mutation op: %q", m.Op())
+	}
+}
+
+// PastoralNoteClient is a client for the PastoralNote schema.
+type PastoralNoteClient struct {
+	config
+}
+
+// NewPastoralNoteClient returns a client for the PastoralNote from the given config.
+func NewPastoralNoteClient(c config) *PastoralNoteClient {
+	return &PastoralNoteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `pastoralnote.Hooks(f(g(h())))`.
+func (c *PastoralNoteClient) Use(hooks ...Hook) {
+	c.hooks.PastoralNote = append(c.hooks.PastoralNote, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `pastoralnote.Intercept(f(g(h())))`.
+func (c *PastoralNoteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PastoralNote = append(c.inters.PastoralNote, interceptors...)
+}
+
+// Create returns a builder for creating a PastoralNote entity.
+func (c *PastoralNoteClient) Create() *PastoralNoteCreate {
+	mutation := newPastoralNoteMutation(c.config, OpCreate)
+	return &PastoralNoteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PastoralNote entities.
+func (c *PastoralNoteClient) CreateBulk(builders ...*PastoralNoteCreate) *PastoralNoteCreateBulk {
+	return &PastoralNoteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PastoralNoteClient) MapCreateBulk(slice any, setFunc func(*PastoralNoteCreate, int)) *PastoralNoteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PastoralNoteCreateBulk{err: fmt.Errorf("calling to PastoralNoteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PastoralNoteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PastoralNoteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PastoralNote.
+func (c *PastoralNoteClient) Update() *PastoralNoteUpdate {
+	mutation := newPastoralNoteMutation(c.config, OpUpdate)
+	return &PastoralNoteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PastoralNoteClient) UpdateOne(_m *PastoralNote) *PastoralNoteUpdateOne {
+	mutation := newPastoralNoteMutation(c.config, OpUpdateOne, withPastoralNote(_m))
+	return &PastoralNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PastoralNoteClient) UpdateOneID(id int) *PastoralNoteUpdateOne {
+	mutation := newPastoralNoteMutation(c.config, OpUpdateOne, withPastoralNoteID(id))
+	return &PastoralNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PastoralNote.
+func (c *PastoralNoteClient) Delete() *PastoralNoteDelete {
+	mutation := newPastoralNoteMutation(c.config, OpDelete)
+	return &PastoralNoteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PastoralNoteClient) DeleteOne(_m *PastoralNote) *PastoralNoteDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PastoralNoteClient) DeleteOneID(id int) *PastoralNoteDeleteOne {
+	builder := c.Delete().Where(pastoralnote.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PastoralNoteDeleteOne{builder}
+}
+
+// Query returns a query builder for PastoralNote.
+func (c *PastoralNoteClient) Query() *PastoralNoteQuery {
+	return &PastoralNoteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePastoralNote},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PastoralNote entity by its id.
+func (c *PastoralNoteClient) Get(ctx context.Context, id int) (*PastoralNote, error) {
+	return c.Query().Where(pastoralnote.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PastoralNoteClient) GetX(ctx context.Context, id int) *PastoralNote {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChurch queries the church edge of a PastoralNote.
+func (c *PastoralNoteClient) QueryChurch(_m *PastoralNote) *ChurchQuery {
+	query := (&ChurchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(pastoralnote.Table, pastoralnote.FieldID, id),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, pastoralnote.ChurchTable, pastoralnote.ChurchColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMember queries the member edge of a PastoralNote.
+func (c *PastoralNoteClient) QueryMember(_m *PastoralNote) *ContactQuery {
+	query := (&ContactClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(pastoralnote.Table, pastoralnote.FieldID, id),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, pastoralnote.MemberTable, pastoralnote.MemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRecorder queries the recorder edge of a PastoralNote.
+func (c *PastoralNoteClient) QueryRecorder(_m *PastoralNote) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(pastoralnote.Table, pastoralnote.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, pastoralnote.RecorderTable, pastoralnote.RecorderColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PastoralNoteClient) Hooks() []Hook {
+	return c.hooks.PastoralNote
+}
+
+// Interceptors returns the client interceptors.
+func (c *PastoralNoteClient) Interceptors() []Interceptor {
+	return c.inters.PastoralNote
+}
+
+func (c *PastoralNoteClient) mutate(ctx context.Context, m *PastoralNoteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PastoralNoteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PastoralNoteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PastoralNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PastoralNoteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PastoralNote mutation op: %q", m.Op())
 	}
 }
 
@@ -3700,6 +3921,22 @@ func (c *UserClient) QueryAcceptedInvitation(_m *User) *InvitationQuery {
 	return query
 }
 
+// QueryPastoralNotesRecorded queries the pastoral_notes_recorded edge of a User.
+func (c *UserClient) QueryPastoralNotesRecorded(_m *User) *PastoralNoteQuery {
+	query := (&PastoralNoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.PastoralNotesRecordedTable, user.PastoralNotesRecordedColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -3878,12 +4115,12 @@ func (c *VisitorClient) mutate(ctx context.Context, m *VisitorMutation) (Value, 
 type (
 	hooks struct {
 		Announcement, Attendance, Church, Contact, Department, Document, Event, Finance,
-		Group, Invitation, Pledge, PrayerRequest, ProgramEntry, Roster, RosterEntry,
-		Sermon, Session, User, Visitor []ent.Hook
+		Group, Invitation, PastoralNote, Pledge, PrayerRequest, ProgramEntry, Roster,
+		RosterEntry, Sermon, Session, User, Visitor []ent.Hook
 	}
 	inters struct {
 		Announcement, Attendance, Church, Contact, Department, Document, Event, Finance,
-		Group, Invitation, Pledge, PrayerRequest, ProgramEntry, Roster, RosterEntry,
-		Sermon, Session, User, Visitor []ent.Interceptor
+		Group, Invitation, PastoralNote, Pledge, PrayerRequest, ProgramEntry, Roster,
+		RosterEntry, Sermon, Session, User, Visitor []ent.Interceptor
 	}
 )

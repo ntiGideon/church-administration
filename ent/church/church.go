@@ -91,6 +91,8 @@ const (
 	EdgePrayerRequests = "prayer_requests"
 	// EdgeDocuments holds the string denoting the documents edge name in mutations.
 	EdgeDocuments = "documents"
+	// EdgePastoralNotes holds the string denoting the pastoral_notes edge name in mutations.
+	EdgePastoralNotes = "pastoral_notes"
 	// Table holds the table name of the church in the database.
 	Table = "churches"
 	// ParentTable is the table that holds the parent relation/edge.
@@ -206,6 +208,13 @@ const (
 	DocumentsInverseTable = "documents"
 	// DocumentsColumn is the table column denoting the documents relation/edge.
 	DocumentsColumn = "church_id"
+	// PastoralNotesTable is the table that holds the pastoral_notes relation/edge.
+	PastoralNotesTable = "pastoral_notes"
+	// PastoralNotesInverseTable is the table name for the PastoralNote entity.
+	// It exists in this package in order to avoid circular dependency with the "pastoralnote" package.
+	PastoralNotesInverseTable = "pastoral_notes"
+	// PastoralNotesColumn is the table column denoting the pastoral_notes relation/edge.
+	PastoralNotesColumn = "church_id"
 )
 
 // Columns holds all SQL columns for church fields.
@@ -631,6 +640,20 @@ func ByDocuments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDocumentsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPastoralNotesCount orders the results by pastoral_notes count.
+func ByPastoralNotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPastoralNotesStep(), opts...)
+	}
+}
+
+// ByPastoralNotes orders the results by pastoral_notes terms.
+func ByPastoralNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -748,5 +771,12 @@ func newDocumentsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DocumentsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, DocumentsTable, DocumentsColumn),
+	)
+}
+func newPastoralNotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PastoralNotesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesTable, PastoralNotesColumn),
 	)
 }
