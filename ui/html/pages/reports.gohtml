@@ -8,6 +8,16 @@
             <h1 class="page-title-text">Reports & Analytics</h1>
             <p class="page-subtitle-text">Overview of church activity, finances, and membership</p>
         </div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <a href="/members/export" class="button is-light export-btn">
+                <span class="icon"><i class="fas fa-file-csv"></i></span>
+                <span>Members CSV</span>
+            </a>
+            <a href="/giving/export" class="button is-light export-btn">
+                <span class="icon"><i class="fas fa-file-csv"></i></span>
+                <span>Finance CSV</span>
+            </a>
+        </div>
     </div>
 
     {{if .Flash}}
@@ -179,7 +189,9 @@
 
 <style>
 .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-.page-header-bar { margin-bottom: 2rem; }
+.page-header-bar { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
+.export-btn { border-color: var(--light-gray) !important; color: var(--text-medium) !important; font-weight: 600 !important; }
+.export-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: rgba(80,34,45,0.04) !important; }
 .page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 .page-subtitle-text { color: var(--text-light); font-size: 0.9rem; margin-top: 4px; }
 

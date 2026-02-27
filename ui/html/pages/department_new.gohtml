@@ -1,0 +1,120 @@
+{{define "title"}}New Department | FaithConnect{{end}}
+{{define "description"}}Create a new ministry department{{end}}
+
+{{define "main"}}
+{{$members := index .Data "members"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <a href="/departments" class="back-link"><i class="fas fa-arrow-left"></i> Departments</a>
+            <h1 class="page-title-text">New Department</h1>
+        </div>
+    </div>
+
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{$form := .Form}}
+
+    <div class="form-card">
+        <form action="/departments/new" method="POST" novalidate>
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+
+            <div class="two-col">
+                <div class="field-group">
+                    <label class="field-label" for="name">Department Name <span class="req">*</span></label>
+                    {{with $form.FieldErrors.name}}<p class="field-error">{{.}}</p>{{end}}
+                    <input class="field-input {{with $form.FieldErrors.name}}is-danger{{end}}"
+                           type="text" id="name" name="name"
+                           value="{{$form.Name}}" placeholder="e.g. Worship Team">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="department_type">Type <span class="req">*</span></label>
+                    {{with $form.FieldErrors.department_type}}<p class="field-error">{{.}}</p>{{end}}
+                    <div class="select-wrap">
+                        <select class="field-select {{with $form.FieldErrors.department_type}}is-danger{{end}}"
+                                id="department_type" name="department_type">
+                            <option value="">— select type —</option>
+                            {{range deptTypeOptions}}
+                            <option value="{{index . 0}}" {{if eq $form.DepartmentType (index . 0)}}selected{{end}}>
+                                {{index . 1}}
+                            </option>
+                            {{end}}
+                        </select>
+                        <i class="fas fa-chevron-down sel-arrow"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="description">Description</label>
+                <textarea class="field-input field-textarea" id="description" name="description"
+                          rows="3" placeholder="Optional: purpose, goals, meeting times…">{{$form.Description}}</textarea>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="leader_id">Department Leader</label>
+                <div class="select-wrap">
+                    <select class="field-select" id="leader_id" name="leader_id">
+                        <option value="0">— none —</option>
+                        {{range $members}}
+                        <option value="{{.ID}}" {{if eq $form.LeaderID .ID}}selected{{end}}>
+                            {{.FirstName}} {{.LastName}}
+                        </option>
+                        {{end}}
+                    </select>
+                    <i class="fas fa-chevron-down sel-arrow"></i>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/departments" class="button is-light">Cancel</a>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-save"></i></span>
+                    <span>Create Department</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { margin-bottom: 1.75rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-light); text-decoration: none; margin-bottom: 4px; }
+.back-link:hover { color: var(--primary); }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.mb-4 { margin-bottom: 1.5rem; }
+.form-card { background: white; border: 1px solid var(--light-gray); border-radius: 16px; padding: 2rem; }
+.field-group { margin-bottom: 1.3rem; }
+.field-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+.req { color: #EF4444; }
+.field-error { font-size: 0.78rem; color: #EF4444; margin-bottom: 4px; }
+.field-input { width: 100%; padding: 10px 13px; border: 1px solid var(--light-gray); border-radius: 9px; font-size: 0.9rem; color: var(--text-dark); background: white; font-family: inherit; box-sizing: border-box; transition: border-color 0.15s; }
+.field-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(80,34,45,0.1); }
+.field-input.is-danger { border-color: #EF4444; }
+.field-textarea { resize: vertical; min-height: 80px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.select-wrap { position: relative; }
+.field-select { appearance: none; width: 100%; padding: 10px 2.2rem 10px 13px; border: 1px solid var(--light-gray); border-radius: 9px; font-size: 0.9rem; color: var(--text-dark); background: white; cursor: pointer; font-family: inherit; }
+.field-select:focus { outline: none; border-color: var(--primary); }
+.field-select.is-danger { border-color: #EF4444; }
+.sel-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.65rem; color: var(--text-light); pointer-events: none; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 1rem; border-top: 1px solid var(--light-gray); margin-top: 0.5rem; }
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .form-card { padding: 1.25rem; }
+    .two-col { grid-template-columns: 1fr; }
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions .button { width: 100%; justify-content: center; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

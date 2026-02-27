@@ -59,6 +59,16 @@ func (m *AttendanceModel) CountByEvent(ctx context.Context, eventID int) (int, e
 		Count(ctx)
 }
 
+// ListByContact returns all attendance records for a contact, with event edges loaded,
+// ordered by check-in time descending (most recent first).
+func (m *AttendanceModel) ListByContact(ctx context.Context, contactID int) ([]*ent.Attendance, error) {
+	return m.Db.Attendance.Query().
+		Where(attendance.HasContactWith(contact.IDEQ(contactID))).
+		WithEvent().
+		Order(ent.Desc(attendance.FieldCheckInTime)).
+		All(ctx)
+}
+
 // IsCheckedIn reports whether a contact already has an attendance record for an event.
 func (m *AttendanceModel) IsCheckedIn(ctx context.Context, eventID, contactID int) (bool, error) {
 	return m.Db.Attendance.Query().

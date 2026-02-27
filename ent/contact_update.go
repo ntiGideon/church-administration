@@ -14,12 +14,15 @@ import (
 	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/predicate"
+	"github.com/ntiGideon/ent/relationship"
 	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/user"
 )
@@ -902,6 +905,81 @@ func (_u *ContactUpdate) AddPastoralNotes(v ...*PastoralNote) *ContactUpdate {
 	return _u.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_u *ContactUpdate) AddMilestoneIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddMilestoneIDs(ids...)
+	return _u
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_u *ContactUpdate) AddMilestones(v ...*Milestone) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMilestoneIDs(ids...)
+}
+
+// AddDepartmentIDs adds the "departments" edge to the Department entity by IDs.
+func (_u *ContactUpdate) AddDepartmentIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddDepartmentIDs(ids...)
+	return _u
+}
+
+// AddDepartments adds the "departments" edges to the Department entity.
+func (_u *ContactUpdate) AddDepartments(v ...*Department) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDepartmentIDs(ids...)
+}
+
+// AddLeadingDepartmentIDs adds the "leading_departments" edge to the Department entity by IDs.
+func (_u *ContactUpdate) AddLeadingDepartmentIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddLeadingDepartmentIDs(ids...)
+	return _u
+}
+
+// AddLeadingDepartments adds the "leading_departments" edges to the Department entity.
+func (_u *ContactUpdate) AddLeadingDepartments(v ...*Department) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddLeadingDepartmentIDs(ids...)
+}
+
+// AddRelationshipsFromIDs adds the "relationships_from" edge to the Relationship entity by IDs.
+func (_u *ContactUpdate) AddRelationshipsFromIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddRelationshipsFromIDs(ids...)
+	return _u
+}
+
+// AddRelationshipsFrom adds the "relationships_from" edges to the Relationship entity.
+func (_u *ContactUpdate) AddRelationshipsFrom(v ...*Relationship) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRelationshipsFromIDs(ids...)
+}
+
+// AddRelationshipsToIDs adds the "relationships_to" edge to the Relationship entity by IDs.
+func (_u *ContactUpdate) AddRelationshipsToIDs(ids ...int) *ContactUpdate {
+	_u.mutation.AddRelationshipsToIDs(ids...)
+	return _u
+}
+
+// AddRelationshipsTo adds the "relationships_to" edges to the Relationship entity.
+func (_u *ContactUpdate) AddRelationshipsTo(v ...*Relationship) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRelationshipsToIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdate) Mutation() *ContactMutation {
 	return _u.mutation
@@ -1097,6 +1175,111 @@ func (_u *ContactUpdate) RemovePastoralNotes(v ...*PastoralNote) *ContactUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNoteIDs(ids...)
+}
+
+// ClearMilestones clears all "milestones" edges to the Milestone entity.
+func (_u *ContactUpdate) ClearMilestones() *ContactUpdate {
+	_u.mutation.ClearMilestones()
+	return _u
+}
+
+// RemoveMilestoneIDs removes the "milestones" edge to Milestone entities by IDs.
+func (_u *ContactUpdate) RemoveMilestoneIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveMilestones removes "milestones" edges to Milestone entities.
+func (_u *ContactUpdate) RemoveMilestones(v ...*Milestone) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMilestoneIDs(ids...)
+}
+
+// ClearDepartments clears all "departments" edges to the Department entity.
+func (_u *ContactUpdate) ClearDepartments() *ContactUpdate {
+	_u.mutation.ClearDepartments()
+	return _u
+}
+
+// RemoveDepartmentIDs removes the "departments" edge to Department entities by IDs.
+func (_u *ContactUpdate) RemoveDepartmentIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveDepartmentIDs(ids...)
+	return _u
+}
+
+// RemoveDepartments removes "departments" edges to Department entities.
+func (_u *ContactUpdate) RemoveDepartments(v ...*Department) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDepartmentIDs(ids...)
+}
+
+// ClearLeadingDepartments clears all "leading_departments" edges to the Department entity.
+func (_u *ContactUpdate) ClearLeadingDepartments() *ContactUpdate {
+	_u.mutation.ClearLeadingDepartments()
+	return _u
+}
+
+// RemoveLeadingDepartmentIDs removes the "leading_departments" edge to Department entities by IDs.
+func (_u *ContactUpdate) RemoveLeadingDepartmentIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveLeadingDepartmentIDs(ids...)
+	return _u
+}
+
+// RemoveLeadingDepartments removes "leading_departments" edges to Department entities.
+func (_u *ContactUpdate) RemoveLeadingDepartments(v ...*Department) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveLeadingDepartmentIDs(ids...)
+}
+
+// ClearRelationshipsFrom clears all "relationships_from" edges to the Relationship entity.
+func (_u *ContactUpdate) ClearRelationshipsFrom() *ContactUpdate {
+	_u.mutation.ClearRelationshipsFrom()
+	return _u
+}
+
+// RemoveRelationshipsFromIDs removes the "relationships_from" edge to Relationship entities by IDs.
+func (_u *ContactUpdate) RemoveRelationshipsFromIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveRelationshipsFromIDs(ids...)
+	return _u
+}
+
+// RemoveRelationshipsFrom removes "relationships_from" edges to Relationship entities.
+func (_u *ContactUpdate) RemoveRelationshipsFrom(v ...*Relationship) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRelationshipsFromIDs(ids...)
+}
+
+// ClearRelationshipsTo clears all "relationships_to" edges to the Relationship entity.
+func (_u *ContactUpdate) ClearRelationshipsTo() *ContactUpdate {
+	_u.mutation.ClearRelationshipsTo()
+	return _u
+}
+
+// RemoveRelationshipsToIDs removes the "relationships_to" edge to Relationship entities by IDs.
+func (_u *ContactUpdate) RemoveRelationshipsToIDs(ids ...int) *ContactUpdate {
+	_u.mutation.RemoveRelationshipsToIDs(ids...)
+	return _u
+}
+
+// RemoveRelationshipsTo removes "relationships_to" edges to Relationship entities.
+func (_u *ContactUpdate) RemoveRelationshipsTo(v ...*Relationship) *ContactUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRelationshipsToIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1825,6 +2008,231 @@ func (_u *ContactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMilestonesIDs(); len(nodes) > 0 && !_u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDepartmentsIDs(); len(nodes) > 0 && !_u.mutation.DepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeadingDepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedLeadingDepartmentsIDs(); len(nodes) > 0 && !_u.mutation.LeadingDepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeadingDepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RelationshipsFromCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRelationshipsFromIDs(); len(nodes) > 0 && !_u.mutation.RelationshipsFromCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RelationshipsFromIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RelationshipsToCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRelationshipsToIDs(); len(nodes) > 0 && !_u.mutation.RelationshipsToCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RelationshipsToIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2717,6 +3125,81 @@ func (_u *ContactUpdateOne) AddPastoralNotes(v ...*PastoralNote) *ContactUpdateO
 	return _u.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_u *ContactUpdateOne) AddMilestoneIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddMilestoneIDs(ids...)
+	return _u
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_u *ContactUpdateOne) AddMilestones(v ...*Milestone) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMilestoneIDs(ids...)
+}
+
+// AddDepartmentIDs adds the "departments" edge to the Department entity by IDs.
+func (_u *ContactUpdateOne) AddDepartmentIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddDepartmentIDs(ids...)
+	return _u
+}
+
+// AddDepartments adds the "departments" edges to the Department entity.
+func (_u *ContactUpdateOne) AddDepartments(v ...*Department) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDepartmentIDs(ids...)
+}
+
+// AddLeadingDepartmentIDs adds the "leading_departments" edge to the Department entity by IDs.
+func (_u *ContactUpdateOne) AddLeadingDepartmentIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddLeadingDepartmentIDs(ids...)
+	return _u
+}
+
+// AddLeadingDepartments adds the "leading_departments" edges to the Department entity.
+func (_u *ContactUpdateOne) AddLeadingDepartments(v ...*Department) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddLeadingDepartmentIDs(ids...)
+}
+
+// AddRelationshipsFromIDs adds the "relationships_from" edge to the Relationship entity by IDs.
+func (_u *ContactUpdateOne) AddRelationshipsFromIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddRelationshipsFromIDs(ids...)
+	return _u
+}
+
+// AddRelationshipsFrom adds the "relationships_from" edges to the Relationship entity.
+func (_u *ContactUpdateOne) AddRelationshipsFrom(v ...*Relationship) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRelationshipsFromIDs(ids...)
+}
+
+// AddRelationshipsToIDs adds the "relationships_to" edge to the Relationship entity by IDs.
+func (_u *ContactUpdateOne) AddRelationshipsToIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.AddRelationshipsToIDs(ids...)
+	return _u
+}
+
+// AddRelationshipsTo adds the "relationships_to" edges to the Relationship entity.
+func (_u *ContactUpdateOne) AddRelationshipsTo(v ...*Relationship) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRelationshipsToIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_u *ContactUpdateOne) Mutation() *ContactMutation {
 	return _u.mutation
@@ -2912,6 +3395,111 @@ func (_u *ContactUpdateOne) RemovePastoralNotes(v ...*PastoralNote) *ContactUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNoteIDs(ids...)
+}
+
+// ClearMilestones clears all "milestones" edges to the Milestone entity.
+func (_u *ContactUpdateOne) ClearMilestones() *ContactUpdateOne {
+	_u.mutation.ClearMilestones()
+	return _u
+}
+
+// RemoveMilestoneIDs removes the "milestones" edge to Milestone entities by IDs.
+func (_u *ContactUpdateOne) RemoveMilestoneIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveMilestones removes "milestones" edges to Milestone entities.
+func (_u *ContactUpdateOne) RemoveMilestones(v ...*Milestone) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMilestoneIDs(ids...)
+}
+
+// ClearDepartments clears all "departments" edges to the Department entity.
+func (_u *ContactUpdateOne) ClearDepartments() *ContactUpdateOne {
+	_u.mutation.ClearDepartments()
+	return _u
+}
+
+// RemoveDepartmentIDs removes the "departments" edge to Department entities by IDs.
+func (_u *ContactUpdateOne) RemoveDepartmentIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveDepartmentIDs(ids...)
+	return _u
+}
+
+// RemoveDepartments removes "departments" edges to Department entities.
+func (_u *ContactUpdateOne) RemoveDepartments(v ...*Department) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDepartmentIDs(ids...)
+}
+
+// ClearLeadingDepartments clears all "leading_departments" edges to the Department entity.
+func (_u *ContactUpdateOne) ClearLeadingDepartments() *ContactUpdateOne {
+	_u.mutation.ClearLeadingDepartments()
+	return _u
+}
+
+// RemoveLeadingDepartmentIDs removes the "leading_departments" edge to Department entities by IDs.
+func (_u *ContactUpdateOne) RemoveLeadingDepartmentIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveLeadingDepartmentIDs(ids...)
+	return _u
+}
+
+// RemoveLeadingDepartments removes "leading_departments" edges to Department entities.
+func (_u *ContactUpdateOne) RemoveLeadingDepartments(v ...*Department) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveLeadingDepartmentIDs(ids...)
+}
+
+// ClearRelationshipsFrom clears all "relationships_from" edges to the Relationship entity.
+func (_u *ContactUpdateOne) ClearRelationshipsFrom() *ContactUpdateOne {
+	_u.mutation.ClearRelationshipsFrom()
+	return _u
+}
+
+// RemoveRelationshipsFromIDs removes the "relationships_from" edge to Relationship entities by IDs.
+func (_u *ContactUpdateOne) RemoveRelationshipsFromIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveRelationshipsFromIDs(ids...)
+	return _u
+}
+
+// RemoveRelationshipsFrom removes "relationships_from" edges to Relationship entities.
+func (_u *ContactUpdateOne) RemoveRelationshipsFrom(v ...*Relationship) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRelationshipsFromIDs(ids...)
+}
+
+// ClearRelationshipsTo clears all "relationships_to" edges to the Relationship entity.
+func (_u *ContactUpdateOne) ClearRelationshipsTo() *ContactUpdateOne {
+	_u.mutation.ClearRelationshipsTo()
+	return _u
+}
+
+// RemoveRelationshipsToIDs removes the "relationships_to" edge to Relationship entities by IDs.
+func (_u *ContactUpdateOne) RemoveRelationshipsToIDs(ids ...int) *ContactUpdateOne {
+	_u.mutation.RemoveRelationshipsToIDs(ids...)
+	return _u
+}
+
+// RemoveRelationshipsTo removes "relationships_to" edges to Relationship entities.
+func (_u *ContactUpdateOne) RemoveRelationshipsTo(v ...*Relationship) *ContactUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRelationshipsToIDs(ids...)
 }
 
 // Where appends a list predicates to the ContactUpdate builder.
@@ -3670,6 +4258,231 @@ func (_u *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMilestonesIDs(); len(nodes) > 0 && !_u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDepartmentsIDs(); len(nodes) > 0 && !_u.mutation.DepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeadingDepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedLeadingDepartmentsIDs(); len(nodes) > 0 && !_u.mutation.LeadingDepartmentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeadingDepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RelationshipsFromCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRelationshipsFromIDs(); len(nodes) > 0 && !_u.mutation.RelationshipsFromCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RelationshipsFromIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RelationshipsToCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRelationshipsToIDs(); len(nodes) > 0 && !_u.mutation.RelationshipsToCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RelationshipsToIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

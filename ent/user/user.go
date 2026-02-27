@@ -43,6 +43,8 @@ const (
 	EdgeAcceptedInvitation = "accepted_invitation"
 	// EdgePastoralNotesRecorded holds the string denoting the pastoral_notes_recorded edge name in mutations.
 	EdgePastoralNotesRecorded = "pastoral_notes_recorded"
+	// EdgeSentCommunications holds the string denoting the sent_communications edge name in mutations.
+	EdgeSentCommunications = "sent_communications"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -94,6 +96,13 @@ const (
 	PastoralNotesRecordedInverseTable = "pastoral_notes"
 	// PastoralNotesRecordedColumn is the table column denoting the pastoral_notes_recorded relation/edge.
 	PastoralNotesRecordedColumn = "recorded_by_id"
+	// SentCommunicationsTable is the table that holds the sent_communications relation/edge.
+	SentCommunicationsTable = "communications"
+	// SentCommunicationsInverseTable is the table name for the Communication entity.
+	// It exists in this package in order to avoid circular dependency with the "communication" package.
+	SentCommunicationsInverseTable = "communications"
+	// SentCommunicationsColumn is the table column denoting the sent_communications relation/edge.
+	SentCommunicationsColumn = "user_sent_communications"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -292,6 +301,20 @@ func ByPastoralNotesRecorded(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesRecordedStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySentCommunicationsCount orders the results by sent_communications count.
+func BySentCommunicationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSentCommunicationsStep(), opts...)
+	}
+}
+
+// BySentCommunications orders the results by sent_communications terms.
+func BySentCommunications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSentCommunicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newChurchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -339,5 +362,12 @@ func newPastoralNotesRecordedStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PastoralNotesRecordedInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesRecordedTable, PastoralNotesRecordedColumn),
+	)
+}
+func newSentCommunicationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SentCommunicationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SentCommunicationsTable, SentCommunicationsColumn),
 	)
 }

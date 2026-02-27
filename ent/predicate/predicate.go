@@ -15,6 +15,9 @@ type Attendance func(*sql.Selector)
 // Church is the predicate function for church builders.
 type Church func(*sql.Selector)
 
+// Communication is the predicate function for communication builders.
+type Communication func(*sql.Selector)
+
 // Contact is the predicate function for contact builders.
 type Contact func(*sql.Selector)
 
@@ -36,6 +39,9 @@ type Group func(*sql.Selector)
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 
+// Milestone is the predicate function for milestone builders.
+type Milestone func(*sql.Selector)
+
 // PastoralNote is the predicate function for pastoralnote builders.
 type PastoralNote func(*sql.Selector)
 
@@ -47,6 +53,9 @@ type PrayerRequest func(*sql.Selector)
 
 // ProgramEntry is the predicate function for programentry builders.
 type ProgramEntry func(*sql.Selector)
+
+// Relationship is the predicate function for relationship builders.
+type Relationship func(*sql.Selector)
 
 // Roster is the predicate function for roster builders.
 type Roster func(*sql.Selector)

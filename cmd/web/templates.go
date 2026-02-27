@@ -263,6 +263,117 @@ var functions = template.FuncMap{
 			{"other", "Other"},
 		}
 	},
+	"deptTypeLabel": func(s string) string {
+		switch s {
+		case "worship":
+			return "Worship & Music"
+		case "youth":
+			return "Youth Ministry"
+		case "children":
+			return "Children's Ministry"
+		case "outreach":
+			return "Outreach & Evangelism"
+		case "administration":
+			return "Administration"
+		case "finance":
+			return "Finance & Stewardship"
+		case "media":
+			return "Media & Communications"
+		default:
+			return "Other"
+		}
+	},
+	"deptTypeIcon": func(s string) string {
+		switch s {
+		case "worship":
+			return "fa-music"
+		case "youth":
+			return "fa-person-running"
+		case "children":
+			return "fa-child"
+		case "outreach":
+			return "fa-earth-africa"
+		case "administration":
+			return "fa-building"
+		case "finance":
+			return "fa-coins"
+		case "media":
+			return "fa-video"
+		default:
+			return "fa-layer-group"
+		}
+	},
+	"deptTypeOptions": func() [][2]string {
+		return [][2]string{
+			{"worship", "Worship & Music"},
+			{"youth", "Youth Ministry"},
+			{"children", "Children's Ministry"},
+			{"outreach", "Outreach & Evangelism"},
+			{"administration", "Administration"},
+			{"finance", "Finance & Stewardship"},
+			{"media", "Media & Communications"},
+			{"other", "Other"},
+		}
+	},
+	"milestoneTypeLabel": func(s string) string {
+		switch s {
+		case "baby_dedication":
+			return "Baby Dedication"
+		case "confirmation":
+			return "Confirmation"
+		case "membership":
+			return "Church Membership"
+		case "marriage":
+			return "Marriage"
+		case "ordination":
+			return "Ordination"
+		default:
+			return "Other"
+		}
+	},
+	"milestoneTypeIcon": func(s string) string {
+		switch s {
+		case "baby_dedication":
+			return "fa-baby"
+		case "confirmation":
+			return "fa-hands-praying"
+		case "membership":
+			return "fa-id-card"
+		case "marriage":
+			return "fa-rings-wedding"
+		case "ordination":
+			return "fa-cross"
+		default:
+			return "fa-star"
+		}
+	},
+	"milestoneTypeOptions": func() [][2]string {
+		return [][2]string{
+			{"baby_dedication", "Baby Dedication"},
+			{"confirmation", "Confirmation"},
+			{"membership", "Church Membership"},
+			{"marriage", "Marriage"},
+			{"ordination", "Ordination"},
+			{"other", "Other"},
+		}
+	},
+	"relationTypeOptions": func() [][2]string {
+		return [][2]string{
+			{"wife", "Wife"}, {"husband", "Husband"},
+			{"mother", "Mother"}, {"father", "Father"},
+			{"daughter", "Daughter"}, {"son", "Son"},
+			{"sister", "Sister"}, {"brother", "Brother"},
+			{"grandmother", "Grandmother"}, {"grandfather", "Grandfather"},
+			{"granddaughter", "Granddaughter"}, {"grandson", "Grandson"},
+			{"aunt", "Aunt"}, {"uncle", "Uncle"},
+			{"niece", "Niece"}, {"nephew", "Nephew"},
+			{"cousin", "Cousin"},
+			{"friend", "Friend"},
+			{"godmother", "Godmother"}, {"godfather", "Godfather"},
+			{"goddaughter", "Goddaughter"}, {"godson", "Godson"},
+			{"other", "Other"},
+		}
+	},
 	"statusLabel": func(s string) string {
 		switch s {
 		case "new":

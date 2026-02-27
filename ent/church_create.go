@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
@@ -19,6 +20,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
@@ -566,6 +568,36 @@ func (_c *ChurchCreate) AddPastoralNotes(v ...*PastoralNote) *ChurchCreate {
 	return _c.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_c *ChurchCreate) AddMilestoneIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddMilestoneIDs(ids...)
+	return _c
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_c *ChurchCreate) AddMilestones(v ...*Milestone) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddMilestoneIDs(ids...)
+}
+
+// AddCommunicationIDs adds the "communications" edge to the Communication entity by IDs.
+func (_c *ChurchCreate) AddCommunicationIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddCommunicationIDs(ids...)
+	return _c
+}
+
+// AddCommunications adds the "communications" edges to the Communication entity.
+func (_c *ChurchCreate) AddCommunications(v ...*Communication) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCommunicationIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_c *ChurchCreate) Mutation() *ChurchMutation {
 	return _c.mutation
@@ -1056,6 +1088,38 @@ func (_c *ChurchCreate) createSpec() (*Church, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CommunicationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

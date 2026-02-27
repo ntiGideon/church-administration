@@ -1749,6 +1749,52 @@ func HasPastoralNotesWith(preds ...predicate.PastoralNote) predicate.Church {
 	})
 }
 
+// HasMilestones applies the HasEdge predicate on the "milestones" edge.
+func HasMilestones() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MilestonesTable, MilestonesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMilestonesWith applies the HasEdge predicate on the "milestones" edge with a given conditions (other predicates).
+func HasMilestonesWith(preds ...predicate.Milestone) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newMilestonesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCommunications applies the HasEdge predicate on the "communications" edge.
+func HasCommunications() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CommunicationsTable, CommunicationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCommunicationsWith applies the HasEdge predicate on the "communications" edge with a given conditions (other predicates).
+func HasCommunicationsWith(preds ...predicate.Communication) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newCommunicationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Church) predicate.Church {
 	return predicate.Church(sql.AndPredicates(predicates...))

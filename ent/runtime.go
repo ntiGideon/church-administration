@@ -8,6 +8,7 @@ import (
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
@@ -15,10 +16,12 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/relationship"
 	"github.com/ntiGideon/ent/roster"
 	"github.com/ntiGideon/ent/schema"
 	"github.com/ntiGideon/ent/sermon"
@@ -81,6 +84,32 @@ func init() {
 	church.DefaultUpdatedAt = churchDescUpdatedAt.Default.(func() time.Time)
 	// church.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	church.UpdateDefaultUpdatedAt = churchDescUpdatedAt.UpdateDefault.(func() time.Time)
+	communicationFields := schema.Communication{}.Fields()
+	_ = communicationFields
+	// communicationDescRecipientFilter is the schema descriptor for recipient_filter field.
+	communicationDescRecipientFilter := communicationFields[2].Descriptor()
+	// communication.DefaultRecipientFilter holds the default value on creation for the recipient_filter field.
+	communication.DefaultRecipientFilter = communicationDescRecipientFilter.Default.(string)
+	// communicationDescRecipientFilterLabel is the schema descriptor for recipient_filter_label field.
+	communicationDescRecipientFilterLabel := communicationFields[3].Descriptor()
+	// communication.DefaultRecipientFilterLabel holds the default value on creation for the recipient_filter_label field.
+	communication.DefaultRecipientFilterLabel = communicationDescRecipientFilterLabel.Default.(string)
+	// communicationDescRecipientCount is the schema descriptor for recipient_count field.
+	communicationDescRecipientCount := communicationFields[4].Descriptor()
+	// communication.DefaultRecipientCount holds the default value on creation for the recipient_count field.
+	communication.DefaultRecipientCount = communicationDescRecipientCount.Default.(int)
+	// communicationDescSentCount is the schema descriptor for sent_count field.
+	communicationDescSentCount := communicationFields[5].Descriptor()
+	// communication.DefaultSentCount holds the default value on creation for the sent_count field.
+	communication.DefaultSentCount = communicationDescSentCount.Default.(int)
+	// communicationDescFailCount is the schema descriptor for fail_count field.
+	communicationDescFailCount := communicationFields[6].Descriptor()
+	// communication.DefaultFailCount holds the default value on creation for the fail_count field.
+	communication.DefaultFailCount = communicationDescFailCount.Default.(int)
+	// communicationDescSentAt is the schema descriptor for sent_at field.
+	communicationDescSentAt := communicationFields[7].Descriptor()
+	// communication.DefaultSentAt holds the default value on creation for the sent_at field.
+	communication.DefaultSentAt = communicationDescSentAt.Default.(func() time.Time)
 	contactFields := schema.Contact{}.Fields()
 	_ = contactFields
 	// contactDescHasSpouse is the schema descriptor for has_spouse field.
@@ -107,6 +136,16 @@ func init() {
 	departmentDescIsActive := departmentFields[3].Descriptor()
 	// department.DefaultIsActive holds the default value on creation for the is_active field.
 	department.DefaultIsActive = departmentDescIsActive.Default.(bool)
+	// departmentDescCreatedAt is the schema descriptor for created_at field.
+	departmentDescCreatedAt := departmentFields[6].Descriptor()
+	// department.DefaultCreatedAt holds the default value on creation for the created_at field.
+	department.DefaultCreatedAt = departmentDescCreatedAt.Default.(func() time.Time)
+	// departmentDescUpdatedAt is the schema descriptor for updated_at field.
+	departmentDescUpdatedAt := departmentFields[7].Descriptor()
+	// department.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	department.DefaultUpdatedAt = departmentDescUpdatedAt.Default.(func() time.Time)
+	// department.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	department.UpdateDefaultUpdatedAt = departmentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	documentFields := schema.Document{}.Fields()
 	_ = documentFields
 	// documentDescIsPublic is the schema descriptor for is_public field.
@@ -161,6 +200,12 @@ func init() {
 	invitation.DefaultUpdatedAt = invitationDescUpdatedAt.Default.(func() time.Time)
 	// invitation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	invitation.UpdateDefaultUpdatedAt = invitationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	milestoneFields := schema.Milestone{}.Fields()
+	_ = milestoneFields
+	// milestoneDescCreatedAt is the schema descriptor for created_at field.
+	milestoneDescCreatedAt := milestoneFields[6].Descriptor()
+	// milestone.DefaultCreatedAt holds the default value on creation for the created_at field.
+	milestone.DefaultCreatedAt = milestoneDescCreatedAt.Default.(func() time.Time)
 	pastoralnoteFields := schema.PastoralNote{}.Fields()
 	_ = pastoralnoteFields
 	// pastoralnoteDescNeedsFollowUp is the schema descriptor for needs_follow_up field.
@@ -225,6 +270,12 @@ func init() {
 	programentryDescCreatedAt := programentryFields[13].Descriptor()
 	// programentry.DefaultCreatedAt holds the default value on creation for the created_at field.
 	programentry.DefaultCreatedAt = programentryDescCreatedAt.Default.(func() time.Time)
+	relationshipFields := schema.Relationship{}.Fields()
+	_ = relationshipFields
+	// relationshipDescCreatedAt is the schema descriptor for created_at field.
+	relationshipDescCreatedAt := relationshipFields[4].Descriptor()
+	// relationship.DefaultCreatedAt holds the default value on creation for the created_at field.
+	relationship.DefaultCreatedAt = relationshipDescCreatedAt.Default.(func() time.Time)
 	rosterFields := schema.Roster{}.Fields()
 	_ = rosterFields
 	// rosterDescCreatedAt is the schema descriptor for created_at field.

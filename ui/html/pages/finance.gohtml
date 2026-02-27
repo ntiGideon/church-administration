@@ -26,10 +26,16 @@
             <p class="page-subtitle-text">Track donations, tithes, offerings and expenses</p>
         </div>
         {{if $.IsAuthenticated}}
-        <a href="/giving/new" class="button is-primary btn-record">
-            <span class="icon"><i class="fas fa-plus"></i></span>
-            <span>Record Transaction</span>
-        </a>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+            <a href="/giving/export" class="button is-light export-btn">
+                <span class="icon"><i class="fas fa-file-csv"></i></span>
+                <span>Export CSV</span>
+            </a>
+            <a href="/giving/new" class="button is-primary btn-record">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                <span>Record Transaction</span>
+            </a>
+        </div>
         {{end}}
     </div>
 
@@ -313,6 +319,8 @@
 
 /* Header */
 .page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.export-btn { border-color: var(--light-gray) !important; color: var(--text-medium) !important; font-weight: 600 !important; }
+.export-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: rgba(80,34,45,0.04) !important; }
 .page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; display: flex; align-items: center; gap: 10px; }
 .title-icon { width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), #6B2F3D); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; flex-shrink: 0; }
 .page-subtitle-text { color: var(--text-light); margin: 4px 0 0; font-size: 0.9rem; }

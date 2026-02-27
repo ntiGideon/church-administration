@@ -3,6 +3,8 @@
 package department
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ntiGideon/ent/predicate"
@@ -66,6 +68,26 @@ func Description(v string) predicate.Department {
 // IsActive applies equality check predicate on the "is_active" field. It's identical to IsActiveEQ.
 func IsActive(v bool) predicate.Department {
 	return predicate.Department(sql.FieldEQ(FieldIsActive, v))
+}
+
+// ChurchID applies equality check predicate on the "church_id" field. It's identical to ChurchIDEQ.
+func ChurchID(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldChurchID, v))
+}
+
+// LeaderID applies equality check predicate on the "leader_id" field. It's identical to LeaderIDEQ.
+func LeaderID(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldLeaderID, v))
+}
+
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -188,6 +210,16 @@ func DescriptionHasSuffix(v string) predicate.Department {
 	return predicate.Department(sql.FieldHasSuffix(FieldDescription, v))
 }
 
+// DescriptionIsNil applies the IsNil predicate on the "description" field.
+func DescriptionIsNil() predicate.Department {
+	return predicate.Department(sql.FieldIsNull(FieldDescription))
+}
+
+// DescriptionNotNil applies the NotNil predicate on the "description" field.
+func DescriptionNotNil() predicate.Department {
+	return predicate.Department(sql.FieldNotNull(FieldDescription))
+}
+
 // DescriptionEqualFold applies the EqualFold predicate on the "description" field.
 func DescriptionEqualFold(v string) predicate.Department {
 	return predicate.Department(sql.FieldEqualFold(FieldDescription, v))
@@ -228,6 +260,136 @@ func IsActiveNEQ(v bool) predicate.Department {
 	return predicate.Department(sql.FieldNEQ(FieldIsActive, v))
 }
 
+// ChurchIDEQ applies the EQ predicate on the "church_id" field.
+func ChurchIDEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldChurchID, v))
+}
+
+// ChurchIDNEQ applies the NEQ predicate on the "church_id" field.
+func ChurchIDNEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldChurchID, v))
+}
+
+// ChurchIDIn applies the In predicate on the "church_id" field.
+func ChurchIDIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldChurchID, vs...))
+}
+
+// ChurchIDNotIn applies the NotIn predicate on the "church_id" field.
+func ChurchIDNotIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldChurchID, vs...))
+}
+
+// LeaderIDEQ applies the EQ predicate on the "leader_id" field.
+func LeaderIDEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldLeaderID, v))
+}
+
+// LeaderIDNEQ applies the NEQ predicate on the "leader_id" field.
+func LeaderIDNEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldLeaderID, v))
+}
+
+// LeaderIDIn applies the In predicate on the "leader_id" field.
+func LeaderIDIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldLeaderID, vs...))
+}
+
+// LeaderIDNotIn applies the NotIn predicate on the "leader_id" field.
+func LeaderIDNotIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldLeaderID, vs...))
+}
+
+// LeaderIDIsNil applies the IsNil predicate on the "leader_id" field.
+func LeaderIDIsNil() predicate.Department {
+	return predicate.Department(sql.FieldIsNull(FieldLeaderID))
+}
+
+// LeaderIDNotNil applies the NotNil predicate on the "leader_id" field.
+func LeaderIDNotNil() predicate.Department {
+	return predicate.Department(sql.FieldNotNull(FieldLeaderID))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
 // HasChurch applies the HasEdge predicate on the "church" edge.
 func HasChurch() predicate.Department {
 	return predicate.Department(func(s *sql.Selector) {
@@ -243,6 +405,52 @@ func HasChurch() predicate.Department {
 func HasChurchWith(preds ...predicate.Church) predicate.Department {
 	return predicate.Department(func(s *sql.Selector) {
 		step := newChurchStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasLeader applies the HasEdge predicate on the "leader" edge.
+func HasLeader() predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, LeaderTable, LeaderColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLeaderWith applies the HasEdge predicate on the "leader" edge with a given conditions (other predicates).
+func HasLeaderWith(preds ...predicate.Contact) predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := newLeaderStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasMembers applies the HasEdge predicate on the "members" edge.
+func HasMembers() predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MembersTable, MembersPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMembersWith applies the HasEdge predicate on the "members" edge with a given conditions (other predicates).
+func HasMembersWith(preds ...predicate.Contact) predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := newMembersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

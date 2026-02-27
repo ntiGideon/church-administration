@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
@@ -22,10 +23,12 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
 	"github.com/ntiGideon/ent/programentry"
+	"github.com/ntiGideon/ent/relationship"
 	"github.com/ntiGideon/ent/roster"
 	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/sermon"
@@ -95,6 +98,7 @@ func checkColumn(t, c string) error {
 			announcement.Table:  announcement.ValidColumn,
 			attendance.Table:    attendance.ValidColumn,
 			church.Table:        church.ValidColumn,
+			communication.Table: communication.ValidColumn,
 			contact.Table:       contact.ValidColumn,
 			department.Table:    department.ValidColumn,
 			document.Table:      document.ValidColumn,
@@ -102,10 +106,12 @@ func checkColumn(t, c string) error {
 			finance.Table:       finance.ValidColumn,
 			group.Table:         group.ValidColumn,
 			invitation.Table:    invitation.ValidColumn,
+			milestone.Table:     milestone.ValidColumn,
 			pastoralnote.Table:  pastoralnote.ValidColumn,
 			pledge.Table:        pledge.ValidColumn,
 			prayerrequest.Table: prayerrequest.ValidColumn,
 			programentry.Table:  programentry.ValidColumn,
+			relationship.Table:  relationship.ValidColumn,
 			roster.Table:        roster.ValidColumn,
 			rosterentry.Table:   rosterentry.ValidColumn,
 			sermon.Table:        sermon.ValidColumn,

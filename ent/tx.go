@@ -18,6 +18,8 @@ type Tx struct {
 	Attendance *AttendanceClient
 	// Church is the client for interacting with the Church builders.
 	Church *ChurchClient
+	// Communication is the client for interacting with the Communication builders.
+	Communication *CommunicationClient
 	// Contact is the client for interacting with the Contact builders.
 	Contact *ContactClient
 	// Department is the client for interacting with the Department builders.
@@ -32,6 +34,8 @@ type Tx struct {
 	Group *GroupClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// Milestone is the client for interacting with the Milestone builders.
+	Milestone *MilestoneClient
 	// PastoralNote is the client for interacting with the PastoralNote builders.
 	PastoralNote *PastoralNoteClient
 	// Pledge is the client for interacting with the Pledge builders.
@@ -40,6 +44,8 @@ type Tx struct {
 	PrayerRequest *PrayerRequestClient
 	// ProgramEntry is the client for interacting with the ProgramEntry builders.
 	ProgramEntry *ProgramEntryClient
+	// Relationship is the client for interacting with the Relationship builders.
+	Relationship *RelationshipClient
 	// Roster is the client for interacting with the Roster builders.
 	Roster *RosterClient
 	// RosterEntry is the client for interacting with the RosterEntry builders.
@@ -186,6 +192,7 @@ func (tx *Tx) init() {
 	tx.Announcement = NewAnnouncementClient(tx.config)
 	tx.Attendance = NewAttendanceClient(tx.config)
 	tx.Church = NewChurchClient(tx.config)
+	tx.Communication = NewCommunicationClient(tx.config)
 	tx.Contact = NewContactClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.Document = NewDocumentClient(tx.config)
@@ -193,10 +200,12 @@ func (tx *Tx) init() {
 	tx.Finance = NewFinanceClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
+	tx.Milestone = NewMilestoneClient(tx.config)
 	tx.PastoralNote = NewPastoralNoteClient(tx.config)
 	tx.Pledge = NewPledgeClient(tx.config)
 	tx.PrayerRequest = NewPrayerRequestClient(tx.config)
 	tx.ProgramEntry = NewProgramEntryClient(tx.config)
+	tx.Relationship = NewRelationshipClient(tx.config)
 	tx.Roster = NewRosterClient(tx.config)
 	tx.RosterEntry = NewRosterEntryClient(tx.config)
 	tx.Sermon = NewSermonClient(tx.config)

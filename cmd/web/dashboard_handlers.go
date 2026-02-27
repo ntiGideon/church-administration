@@ -69,6 +69,9 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 		}
 		stats["recentAnnouncements"] = recentAnnounce
 
+		allContacts, _ := app.memberModel.ListContactsByChurch(r.Context(), 0)
+		stats["upcomingBirthdays"] = upcomingBirthdays(allContacts, 7)
+
 		// Chart data
 		trend, _ := app.financeModel.MonthlyTrend(r.Context(), 0, 6)
 		trendJSON, _ := json.Marshal(trend)
@@ -116,6 +119,9 @@ func (app *application) dashboard(w http.ResponseWriter, r *http.Request) {
 				recentAnnounce = recentAnnounce[:4]
 			}
 			stats["recentAnnouncements"] = recentAnnounce
+
+			churchContacts, _ := app.memberModel.ListContactsByChurch(r.Context(), churchID)
+			stats["upcomingBirthdays"] = upcomingBirthdays(churchContacts, 7)
 
 			// Chart data
 			trend, _ := app.financeModel.MonthlyTrend(r.Context(), churchID, 6)

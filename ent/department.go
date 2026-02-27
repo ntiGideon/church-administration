@@ -5,10 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 )
 
@@ -25,20 +27,31 @@ type Department struct {
 	DepartmentType department.DepartmentType `json:"department_type,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
+	// ChurchID holds the value of the "church_id" field.
+	ChurchID int `json:"church_id,omitempty"`
+	// LeaderID holds the value of the "leader_id" field.
+	LeaderID int `json:"leader_id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepartmentQuery when eager-loading is set.
-	Edges              DepartmentEdges `json:"edges"`
-	church_departments *int
-	selectValues       sql.SelectValues
+	Edges        DepartmentEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // DepartmentEdges holds the relations/edges for other nodes in the graph.
 type DepartmentEdges struct {
 	// Church holds the value of the church edge.
 	Church *Church `json:"church,omitempty"`
+	// Leader holds the value of the leader edge.
+	Leader *Contact `json:"leader,omitempty"`
+	// Members holds the value of the members edge.
+	Members []*Contact `json:"members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // ChurchOrErr returns the Church value or an error if the edge
@@ -52,6 +65,26 @@ func (e DepartmentEdges) ChurchOrErr() (*Church, error) {
 	return nil, &NotLoadedError{edge: "church"}
 }
 
+// LeaderOrErr returns the Leader value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DepartmentEdges) LeaderOrErr() (*Contact, error) {
+	if e.Leader != nil {
+		return e.Leader, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: contact.Label}
+	}
+	return nil, &NotLoadedError{edge: "leader"}
+}
+
+// MembersOrErr returns the Members value or an error if the edge
+// was not loaded in eager-loading.
+func (e DepartmentEdges) MembersOrErr() ([]*Contact, error) {
+	if e.loadedTypes[2] {
+		return e.Members, nil
+	}
+	return nil, &NotLoadedError{edge: "members"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Department) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -59,12 +92,12 @@ func (*Department) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case department.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case department.FieldID:
+		case department.FieldID, department.FieldChurchID, department.FieldLeaderID:
 			values[i] = new(sql.NullInt64)
 		case department.FieldName, department.FieldDescription, department.FieldDepartmentType:
 			values[i] = new(sql.NullString)
-		case department.ForeignKeys[0]: // church_departments
-			values[i] = new(sql.NullInt64)
+		case department.FieldCreatedAt, department.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -110,12 +143,29 @@ func (_m *Department) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.IsActive = value.Bool
 			}
-		case department.ForeignKeys[0]:
+		case department.FieldChurchID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field church_departments", value)
+				return fmt.Errorf("unexpected type %T for field church_id", values[i])
 			} else if value.Valid {
-				_m.church_departments = new(int)
-				*_m.church_departments = int(value.Int64)
+				_m.ChurchID = int(value.Int64)
+			}
+		case department.FieldLeaderID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field leader_id", values[i])
+			} else if value.Valid {
+				_m.LeaderID = int(value.Int64)
+			}
+		case department.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				_m.CreatedAt = value.Time
+			}
+		case department.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				_m.UpdatedAt = value.Time
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -133,6 +183,16 @@ func (_m *Department) Value(name string) (ent.Value, error) {
 // QueryChurch queries the "church" edge of the Department entity.
 func (_m *Department) QueryChurch() *ChurchQuery {
 	return NewDepartmentClient(_m.config).QueryChurch(_m)
+}
+
+// QueryLeader queries the "leader" edge of the Department entity.
+func (_m *Department) QueryLeader() *ContactQuery {
+	return NewDepartmentClient(_m.config).QueryLeader(_m)
+}
+
+// QueryMembers queries the "members" edge of the Department entity.
+func (_m *Department) QueryMembers() *ContactQuery {
+	return NewDepartmentClient(_m.config).QueryMembers(_m)
 }
 
 // Update returns a builder for updating this Department.
@@ -169,6 +229,18 @@ func (_m *Department) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("is_active=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsActive))
+	builder.WriteString(", ")
+	builder.WriteString("church_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ChurchID))
+	builder.WriteString(", ")
+	builder.WriteString("leader_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LeaderID))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

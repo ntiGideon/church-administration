@@ -108,5 +108,12 @@ func (Contact) Edges() []ent.Edge {
 		edge.To("roster_entries", RosterEntry.Type),
 		edge.To("prayer_requests", PrayerRequest.Type),
 		edge.To("pastoral_notes", PastoralNote.Type),
+		edge.To("milestones", Milestone.Type),
+		edge.From("departments", Department.Type).
+			Ref("members"),
+		edge.From("leading_departments", Department.Type).
+			Ref("leader"),
+		edge.To("relationships_from", Relationship.Type),
+		edge.To("relationships_to", Relationship.Type),
 	}
 }

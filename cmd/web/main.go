@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -21,10 +20,8 @@ import (
 func main() {
 	gob.Register(map[string]interface{}{})
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// Load .env if present (dev only). On Railway/Render env vars are injected directly.
+	_ = godotenv.Load(".env")
 
 	logger := slog.New(NewColoredHandler(os.Stdout, &slog.HandlerOptions{
 		Level:     slog.LevelDebug,
@@ -70,7 +67,7 @@ func main() {
 
 	sessionManager := scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
-	sessionManager.Cookie.Secure = false // set true behind HTTPS
+	sessionManager.Cookie.Secure = true
 	sessionManager.Cookie.Persist = true
 	sessionManager.Store = postgresstore.New(dbDriver)
 
@@ -113,6 +110,10 @@ func main() {
 		prayerModel:       &models.PrayerRequestModel{Db: db},
 		documentModel:     &models.DocumentModel{Db: db},
 		pastoralModel:     &models.PastoralNoteModel{Db: db},
+		milestoneModel:    &models.MilestoneModel{Db: db},
+		departmentModel:   &models.DepartmentModel{Db: db},
+		relationshipModel:  &models.RelationshipModel{Db: db},
+		communicationModel: &models.CommunicationModel{Db: db},
 	}
 
 	server := &http.Server{

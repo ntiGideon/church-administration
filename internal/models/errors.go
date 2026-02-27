@@ -15,5 +15,6 @@ var (
 	ErrInvitationNotFound  = errors.New("models: invitation not found")
 	ErrInvitationExpired   = errors.New("models: invitation has expired")
 	ErrInvitationAccepted  = errors.New("models: invitation already accepted")
-	ErrRecordNotFound      = errors.New("models: record not found")
+	ErrRecordNotFound         = errors.New("models: record not found")
+	ErrDuplicateRelationship  = errors.New("models: relationship already exists for this pair")
 )

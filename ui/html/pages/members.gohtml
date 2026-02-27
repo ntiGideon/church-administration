@@ -9,6 +9,14 @@
             <p class="page-subtitle-text">View and manage your church congregation records</p>
         </div>
         <div class="header-actions">
+            <a href="/members/export" class="button is-light export-btn">
+                <span class="icon"><i class="fas fa-file-csv"></i></span>
+                <span>Export CSV</span>
+            </a>
+            <a href="/members/import" class="button is-light export-btn">
+                <span class="icon"><i class="fas fa-file-import"></i></span>
+                <span>Import CSV</span>
+            </a>
             <a href="/members/new" class="button is-primary">
                 <span class="icon"><i class="fas fa-user-plus"></i></span>
                 <span>Add Member</span>
@@ -85,6 +93,9 @@
     flex-wrap: wrap;
     gap: 1rem;
 }
+.header-actions { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.export-btn { border-color: var(--light-gray) !important; color: var(--text-medium) !important; font-weight: 600 !important; }
+.export-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: rgba(80,34,45,0.04) !important; }
 
 .page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 .page-subtitle-text { color: var(--text-light); margin: 4px 0 0; font-size: 0.9rem; }

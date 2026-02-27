@@ -1,0 +1,124 @@
+{{define "title"}}Departments | FaithConnect{{end}}
+{{define "description"}}Church ministry departments{{end}}
+
+{{define "main"}}
+{{$depts := index .Data "departments"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">Departments</h1>
+            <p class="page-subtitle">Ministry departments and their members</p>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+        <a href="/departments/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Department</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    {{if $depts}}
+    <div class="dept-grid">
+        {{range $depts}}
+        <a href="/departments/{{.ID}}" class="dept-card {{if not .IsActive}}dept-inactive{{end}}">
+            <div class="dept-card-top">
+                <div class="dept-icon dt-{{.DepartmentType}}">
+                    <i class="fas {{deptTypeIcon (enumStr .DepartmentType)}}"></i>
+                </div>
+                <div class="dept-status-badge {{if .IsActive}}active{{else}}inactive{{end}}">
+                    {{if .IsActive}}Active{{else}}Inactive{{end}}
+                </div>
+            </div>
+            <div class="dept-name">{{.Name}}</div>
+            <div class="dept-type-label">{{deptTypeLabel (enumStr .DepartmentType)}}</div>
+            {{if .Edges.Leader}}
+            <div class="dept-leader">
+                <i class="fas fa-user-tie"></i>
+                {{.Edges.Leader.FirstName}} {{.Edges.Leader.LastName}}
+            </div>
+            {{end}}
+            <div class="dept-count">
+                <i class="fas fa-users"></i>
+                {{len .Edges.Members}} member{{if ne (len .Edges.Members) 1}}s{{end}}
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-layer-group"></i></div>
+        <h2 class="empty-title">No departments yet</h2>
+        <p class="empty-sub">Create your first ministry department to start organising your team.</p>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+        <a href="/departments/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Department</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+.dept-card {
+    background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.25rem;
+    text-decoration: none; display: flex; flex-direction: column; gap: 6px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+.dept-card:hover { box-shadow: 0 4px 16px rgba(80,34,45,0.1); border-color: rgba(80,34,45,0.2); }
+.dept-inactive { opacity: 0.6; }
+
+.dept-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.dept-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.dt-worship        { background: #FFF7ED; color: #F97316; }
+.dt-youth          { background: #EFF6FF; color: #3B82F6; }
+.dt-children       { background: #FDF4FF; color: #A855F7; }
+.dt-outreach       { background: #F0FDF4; color: #16A34A; }
+.dt-administration { background: rgba(80,34,45,0.08); color: var(--primary); }
+.dt-finance        { background: #FFFBEB; color: #D97706; }
+.dt-media          { background: #F0FDFA; color: #0D9488; }
+.dt-other          { background: #F9FAFB; color: #6B7280; }
+
+.dept-status-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.dept-status-badge.active   { background: #ECFDF5; color: #10B981; }
+.dept-status-badge.inactive { background: #F3F4F6; color: #9CA3AF; }
+
+.dept-name       { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
+.dept-type-label { font-size: 0.75rem; color: var(--text-light); }
+.dept-leader     { font-size: 0.78rem; color: var(--primary); display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+.dept-count      { font-size: 0.78rem; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
+
+.empty-state { text-align: center; padding: 5rem 2rem; }
+.empty-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(80,34,45,0.07); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem; color: var(--primary); }
+.empty-title { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-sub { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .dept-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

@@ -13,6 +13,10 @@
             <h1 class="page-title-text">Member Profile</h1>
         </div>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/members/{{$member.ID}}/attendance" class="button is-outlined">
+                <span class="icon"><i class="fas fa-calendar-check"></i></span>
+                <span>Attendance</span>
+            </a>
             <a href="/members/{{$member.ID}}/giving" class="button is-outlined">
                 <span class="icon"><i class="fas fa-hand-holding-heart"></i></span>
                 <span>Giving</span>
@@ -179,6 +183,203 @@
                 </div>
             </div>
 
+            <!-- ─── Family & Relationships ─────────────────────────────── -->
+            {{$familyGroups := index $.Data "familyGroups"}}
+            {{$allContacts  := index $.Data "allContacts"}}
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-sitemap"></i> Family &amp; Relationships</div>
+                <div style="padding:0.75rem 2rem 1.5rem">
+
+                    {{/* Check if any group has members */}}
+                    {{$hasRelatives := false}}
+                    {{range $familyGroups}}{{if .Members}}{{$hasRelatives = true}}{{end}}{{end}}
+
+                    {{if $hasRelatives}}
+                    <!-- Tree layout: center node + groups -->
+                    <div class="ft-wrap">
+                        <!-- Center card: this member -->
+                        <div class="ft-center-node">
+                            <div class="ft-center-avatar">
+                                {{if $member.ProfilePictureURL}}
+                                <img src="{{$member.ProfilePictureURL}}" alt="">
+                                {{else}}
+                                {{slice $member.FirstName 0 1}}{{slice $member.LastName 0 1}}
+                                {{end}}
+                            </div>
+                            <div class="ft-center-name">{{$member.FirstName}} {{$member.LastName}}</div>
+                            <div class="ft-center-badge">This Member</div>
+                        </div>
+
+                        <!-- Relationship groups -->
+                        <div class="ft-groups">
+                            {{range $familyGroups}}
+                            {{if .Members}}
+                            <div class="ft-group">
+                                <div class="ft-group-header" style="color:{{.Color}}">
+                                    <span class="ft-group-icon" style="background:{{.Bg}};color:{{.Color}}">
+                                        <i class="fas {{.Icon}}"></i>
+                                    </span>
+                                    {{.Label}}
+                                    <span class="ft-group-count">{{len .Members}}</span>
+                                </div>
+                                <div class="ft-cards">
+                                    {{range .Members}}
+                                    <div class="ft-card">
+                                        <a href="/members/{{.RelativeID}}" class="ft-card-link">
+                                            <div class="ft-avatar" {{if $.IsAuthenticated}}style="margin-bottom:0"{{end}}>
+                                                {{if .PhotoURL}}
+                                                <img src="{{.PhotoURL}}" alt="">
+                                                {{else}}
+                                                {{.Initials}}
+                                                {{end}}
+                                            </div>
+                                            <div class="ft-card-info">
+                                                <div class="ft-card-name">{{.FirstName}} {{.LastName}}</div>
+                                                <div class="ft-card-role">{{.RelationLabel}}</div>
+                                                {{if .Notes}}<div class="ft-card-notes">{{.Notes}}</div>{{end}}
+                                            </div>
+                                        </a>
+                                        {{if $.IsAuthenticated}}
+                                        <form action="/members/{{$member.ID}}/relationships/{{.RelationshipID}}/delete" method="POST"
+                                              class="ft-del-form"
+                                              onsubmit="return confirm('Remove this relationship?')">
+                                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                            <button type="submit" class="ft-del-btn" title="Remove"><i class="fas fa-times"></i></button>
+                                        </form>
+                                        {{end}}
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                            {{end}}
+                            {{end}}
+                        </div>
+                    </div>
+                    {{else}}
+                    <p class="ms-empty">No relationships recorded yet.</p>
+                    {{end}}
+
+                    {{if $.IsAuthenticated}}
+                    <details class="ms-add-details" style="margin-top:1rem">
+                        <summary class="ms-add-toggle"><i class="fas fa-plus"></i> Add Relationship</summary>
+                        <form action="/members/{{$member.ID}}/relationships/new" method="POST" class="ms-add-form">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <div class="ft-add-row">
+                                <div class="ms-field" style="flex:2">
+                                    <label class="ms-label">Relative <span class="req">*</span></label>
+                                    <div class="ms-select-wrap">
+                                        <select name="relative_id" class="ms-select" required>
+                                            <option value="">— select member —</option>
+                                            {{range $allContacts}}
+                                            {{if ne .ID $member.ID}}
+                                            <option value="{{.ID}}">{{.FirstName}} {{.LastName}}</option>
+                                            {{end}}
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="ms-field" style="flex:1.5">
+                                    <label class="ms-label">Relationship <span class="req">*</span></label>
+                                    <div class="ms-select-wrap">
+                                        <select name="relation_type" class="ms-select" required>
+                                            <option value="">— type —</option>
+                                            {{range relationTypeOptions}}
+                                            <option value="{{index . 0}}">{{index . 1}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="ms-field" style="flex:1.5">
+                                    <label class="ms-label">Notes</label>
+                                    <input type="text" name="notes" class="ms-input" placeholder="Optional…">
+                                </div>
+                            </div>
+                            <div style="text-align:right;margin-top:0.75rem">
+                                <button type="submit" class="button is-primary is-small">
+                                    <span class="icon"><i class="fas fa-link"></i></span>
+                                    <span>Add Relationship</span>
+                                </button>
+                            </div>
+                        </form>
+                    </details>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Milestones -->
+            {{$milestones := index $.Data "milestones"}}
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-star"></i> Spiritual Milestones</div>
+                <div style="padding: 0.75rem 2rem 1.5rem;">
+                    {{if $milestones}}
+                    <div class="ms-list">
+                        {{range $milestones}}
+                        <div class="ms-item">
+                            <div class="ms-icon ms-{{.MilestoneType}}">
+                                <i class="fas {{milestoneTypeIcon (enumStr .MilestoneType)}}"></i>
+                            </div>
+                            <div class="ms-body">
+                                <div class="ms-type">{{milestoneTypeLabel (enumStr .MilestoneType)}}</div>
+                                <div class="ms-date">{{.EventDate.Format "2 January 2006"}}</div>
+                                {{if .OfficiatedBy}}<div class="ms-by">By {{.OfficiatedBy}}</div>{{end}}
+                                {{if .Description}}<div class="ms-desc">{{.Description}}</div>{{end}}
+                            </div>
+                            {{if $.IsAuthenticated}}
+                            <form action="/members/{{$member.ID}}/milestones/{{.ID}}/delete" method="POST" class="ms-del-form"
+                                  onsubmit="return confirm('Remove this milestone?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="ms-del-btn" title="Remove"><i class="fas fa-times"></i></button>
+                            </form>
+                            {{end}}
+                        </div>
+                        {{end}}
+                    </div>
+                    {{else}}
+                    <p class="ms-empty">No milestones recorded yet.</p>
+                    {{end}}
+
+                    {{if $.IsAuthenticated}}
+                    <details class="ms-add-details">
+                        <summary class="ms-add-toggle"><i class="fas fa-plus"></i> Add Milestone</summary>
+                        <form action="/members/{{$member.ID}}/milestones/new" method="POST" class="ms-add-form">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <div class="ms-form-row">
+                                <div class="ms-field">
+                                    <label class="ms-label">Type <span class="req">*</span></label>
+                                    <div class="ms-select-wrap">
+                                        <select name="milestone_type" class="ms-select">
+                                            <option value="">— select —</option>
+                                            {{range milestoneTypeOptions}}
+                                            <option value="{{index . 0}}">{{index . 1}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="ms-field">
+                                    <label class="ms-label">Date <span class="req">*</span></label>
+                                    <input type="date" name="event_date" class="ms-input">
+                                </div>
+                                <div class="ms-field">
+                                    <label class="ms-label">Officiated By</label>
+                                    <input type="text" name="officiated_by" class="ms-input" placeholder="e.g. Rev. Mensah">
+                                </div>
+                            </div>
+                            <div class="ms-field">
+                                <label class="ms-label">Notes</label>
+                                <input type="text" name="description" class="ms-input" placeholder="Optional details…">
+                            </div>
+                            <div style="text-align:right;margin-top:0.75rem;">
+                                <button type="submit" class="button is-primary is-small">
+                                    <span class="icon"><i class="fas fa-save"></i></span>
+                                    <span>Save Milestone</span>
+                                </button>
+                            </div>
+                        </form>
+                    </details>
+                    {{end}}
+                </div>
+            </div>
+
             <div class="profile-status">
                 <div class="status-row">
                     {{if $.IsAuthenticated}}
@@ -268,9 +469,184 @@
 .profile-status { padding: 1rem 2rem; border-top: 1px solid var(--light-gray); background: rgba(248,249,250,0.5); }
 .status-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 
+/* Milestones */
+.ms-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+.ms-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--light-gray); background: #FAFAFA; }
+.ms-icon { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+.ms-baby_dedication  { background: #EFF6FF; color: #3B82F6; }
+.ms-confirmation     { background: #FFF7ED; color: #F97316; }
+.ms-membership       { background: rgba(80,34,45,0.08); color: var(--primary); }
+.ms-marriage         { background: #FDF4FF; color: #A855F7; }
+.ms-ordination       { background: #F0FDF4; color: #16A34A; }
+.ms-other            { background: #F9FAFB; color: #6B7280; }
+.ms-body { flex: 1; min-width: 0; }
+.ms-type { font-size: 0.87rem; font-weight: 700; color: var(--text-dark); }
+.ms-date { font-size: 0.78rem; color: var(--text-light); margin-top: 1px; }
+.ms-by   { font-size: 0.78rem; color: var(--primary); margin-top: 2px; }
+.ms-desc { font-size: 0.78rem; color: var(--text-medium); margin-top: 2px; }
+.ms-del-form { flex-shrink: 0; }
+.ms-del-btn { background: none; border: none; cursor: pointer; color: #CBD5E1; padding: 4px; border-radius: 6px; transition: color 0.15s; }
+.ms-del-btn:hover { color: #EF4444; }
+.ms-empty { font-size: 0.85rem; color: var(--text-light); font-style: italic; margin-bottom: 1rem; }
+.ms-add-details { margin-top: 0.5rem; }
+.ms-add-toggle { font-size: 0.83rem; font-weight: 600; color: var(--primary); cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 0; }
+.ms-add-toggle::-webkit-details-marker { display: none; }
+.ms-add-form { margin-top: 0.75rem; padding: 1rem; border: 1px dashed var(--light-gray); border-radius: 10px; background: white; }
+.ms-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+.ms-field { display: flex; flex-direction: column; gap: 4px; }
+.ms-label { font-size: 0.78rem; font-weight: 600; color: var(--text-dark); }
+.req { color: #EF4444; }
+.ms-input { width: 100%; padding: 7px 10px; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.85rem; color: var(--text-dark); font-family: inherit; box-sizing: border-box; }
+.ms-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(80,34,45,0.1); }
+.ms-select-wrap { position: relative; }
+.ms-select { appearance: none; width: 100%; padding: 7px 2rem 7px 10px; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.85rem; color: var(--text-dark); background: white; font-family: inherit; cursor: pointer; }
+.ms-select:focus { outline: none; border-color: var(--primary); }
+
+/* ─── Family Tree ─────────────────────────────────────────────────── */
+.ft-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+
+/* Center node */
+.ft-center-node {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(80,34,45,0.06), rgba(196,195,208,0.08));
+    border: 2px solid rgba(80,34,45,0.18);
+    border-radius: 16px;
+    position: relative;
+}
+.ft-center-node::after {
+    content: "";
+    position: absolute; bottom: -24px; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 24px;
+    background: rgba(80,34,45,0.2);
+}
+.ft-center-avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #6B2F3D);
+    color: white; font-weight: 700; font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; border: 3px solid white;
+    box-shadow: 0 2px 12px rgba(80,34,45,0.25);
+}
+.ft-center-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ft-center-name { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+.ft-center-badge {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--primary);
+    background: rgba(80,34,45,0.08); padding: 2px 8px; border-radius: 8px;
+}
+
+/* Groups container */
+.ft-groups {
+    width: 100%;
+    display: flex; flex-direction: column; gap: 1rem;
+    border-left: 2px solid rgba(80,34,45,0.15);
+    padding-left: 1.5rem;
+    margin-left: 0.5rem;
+    position: relative;
+}
+.ft-groups::before {
+    content: "";
+    position: absolute; top: 0; left: -2px; bottom: 0;
+    width: 2px;
+}
+
+/* Each group */
+.ft-group {
+    position: relative;
+}
+.ft-group::before {
+    content: "";
+    position: absolute; left: -1.5rem; top: 18px;
+    width: 1.5rem; height: 2px;
+    background: rgba(80,34,45,0.15);
+}
+.ft-group-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 10px;
+}
+.ft-group-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; flex-shrink: 0;
+}
+.ft-group-count {
+    margin-left: auto;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--text-light);
+    background: var(--light-gray);
+    padding: 1px 6px; border-radius: 8px;
+}
+
+/* Card grid */
+.ft-cards {
+    display: flex; flex-wrap: wrap; gap: 10px;
+}
+
+/* Individual relative card */
+.ft-card {
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex; align-items: stretch;
+    min-width: 160px; max-width: 220px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.ft-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-color: rgba(80,34,45,0.2); }
+
+.ft-card-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; flex: 1; text-decoration: none;
+}
+.ft-avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    color: #64748b; font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.ft-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ft-card-info { min-width: 0; }
+.ft-card-name {
+    font-size: 0.83rem; font-weight: 700; color: var(--text-dark);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ft-card-link:hover .ft-card-name { color: var(--primary); }
+.ft-card-role {
+    font-size: 0.7rem; font-weight: 600; color: var(--text-light);
+    text-transform: capitalize; margin-top: 1px;
+}
+.ft-card-notes {
+    font-size: 0.68rem; color: var(--text-light); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;
+    font-style: italic;
+}
+.ft-del-form { flex-shrink: 0; display: flex; align-items: center; padding-right: 6px; }
+.ft-del-btn {
+    background: none; border: none; cursor: pointer;
+    color: #CBD5E1; padding: 4px 6px; border-radius: 6px;
+    font-size: 0.75rem; transition: color 0.15s, background 0.15s;
+}
+.ft-del-btn:hover { color: #EF4444; background: rgba(239,68,68,0.08); }
+
+/* Add form row */
+.ft-add-row {
+    display: grid; grid-template-columns: 2fr 1.5fr 1.5fr;
+    gap: 0.75rem; margin-bottom: 0.5rem;
+}
+
 @media (max-width: 600px) {
     .profile-details-grid { grid-template-columns: repeat(2, 1fr); }
     .page-wrapper { padding: 1rem; }
+    .ms-form-row { grid-template-columns: 1fr; }
+    .ft-cards { flex-direction: column; }
+    .ft-card { max-width: 100%; }
+    .ft-add-row { grid-template-columns: 1fr; }
+    .ft-groups { padding-left: 1rem; }
 }
 </style>
 

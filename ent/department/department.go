@@ -4,6 +4,7 @@ package department
 
 import (
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,8 +23,20 @@ const (
 	FieldDepartmentType = "department_type"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
+	// FieldChurchID holds the string denoting the church_id field in the database.
+	FieldChurchID = "church_id"
+	// FieldLeaderID holds the string denoting the leader_id field in the database.
+	FieldLeaderID = "leader_id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// EdgeChurch holds the string denoting the church edge name in mutations.
 	EdgeChurch = "church"
+	// EdgeLeader holds the string denoting the leader edge name in mutations.
+	EdgeLeader = "leader"
+	// EdgeMembers holds the string denoting the members edge name in mutations.
+	EdgeMembers = "members"
 	// Table holds the table name of the department in the database.
 	Table = "departments"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -32,7 +45,19 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "church" package.
 	ChurchInverseTable = "churches"
 	// ChurchColumn is the table column denoting the church relation/edge.
-	ChurchColumn = "church_departments"
+	ChurchColumn = "church_id"
+	// LeaderTable is the table that holds the leader relation/edge.
+	LeaderTable = "departments"
+	// LeaderInverseTable is the table name for the Contact entity.
+	// It exists in this package in order to avoid circular dependency with the "contact" package.
+	LeaderInverseTable = "contacts"
+	// LeaderColumn is the table column denoting the leader relation/edge.
+	LeaderColumn = "leader_id"
+	// MembersTable is the table that holds the members relation/edge. The primary key declared below.
+	MembersTable = "department_members"
+	// MembersInverseTable is the table name for the Contact entity.
+	// It exists in this package in order to avoid circular dependency with the "contact" package.
+	MembersInverseTable = "contacts"
 )
 
 // Columns holds all SQL columns for department fields.
@@ -42,23 +67,22 @@ var Columns = []string{
 	FieldDescription,
 	FieldDepartmentType,
 	FieldIsActive,
+	FieldChurchID,
+	FieldLeaderID,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "departments"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"church_departments",
-}
+var (
+	// MembersPrimaryKey and MembersColumn2 are the table columns denoting the
+	// primary key for the members relation (M2M).
+	MembersPrimaryKey = []string{"department_id", "contact_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -68,6 +92,12 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 )
 
 // DepartmentType defines the type for the "department_type" enum field.
@@ -82,6 +112,7 @@ const (
 	DepartmentTypeAdministration DepartmentType = "administration"
 	DepartmentTypeFinance        DepartmentType = "finance"
 	DepartmentTypeMedia          DepartmentType = "media"
+	DepartmentTypeOther          DepartmentType = "other"
 )
 
 func (dt DepartmentType) String() string {
@@ -91,7 +122,7 @@ func (dt DepartmentType) String() string {
 // DepartmentTypeValidator is a validator for the "department_type" field enum values. It is called by the builders before save.
 func DepartmentTypeValidator(dt DepartmentType) error {
 	switch dt {
-	case DepartmentTypeWorship, DepartmentTypeYouth, DepartmentTypeChildren, DepartmentTypeOutreach, DepartmentTypeAdministration, DepartmentTypeFinance, DepartmentTypeMedia:
+	case DepartmentTypeWorship, DepartmentTypeYouth, DepartmentTypeChildren, DepartmentTypeOutreach, DepartmentTypeAdministration, DepartmentTypeFinance, DepartmentTypeMedia, DepartmentTypeOther:
 		return nil
 	default:
 		return fmt.Errorf("department: invalid enum value for department_type field: %q", dt)
@@ -126,10 +157,51 @@ func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
 }
 
+// ByChurchID orders the results by the church_id field.
+func ByChurchID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldChurchID, opts...).ToFunc()
+}
+
+// ByLeaderID orders the results by the leader_id field.
+func ByLeaderID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLeaderID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
 // ByChurchField orders the results by church field.
 func ByChurchField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newChurchStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByLeaderField orders the results by leader field.
+func ByLeaderField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLeaderStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByMembersCount orders the results by members count.
+func ByMembersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMembersStep(), opts...)
+	}
+}
+
+// ByMembers orders the results by members terms.
+func ByMembers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMembersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newChurchStep() *sqlgraph.Step {
@@ -137,5 +209,19 @@ func newChurchStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ChurchInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ChurchTable, ChurchColumn),
+	)
+}
+func newLeaderStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LeaderInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, LeaderTable, LeaderColumn),
+	)
+}
+func newMembersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MembersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, MembersTable, MembersPrimaryKey...),
 	)
 }

@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
@@ -36,6 +37,7 @@ type UserQuery struct {
 	withAnnouncements         *AnnouncementQuery
 	withAcceptedInvitation    *InvitationQuery
 	withPastoralNotesRecorded *PastoralNoteQuery
+	withSentCommunications    *CommunicationQuery
 	withFKs                   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -220,6 +222,28 @@ func (_q *UserQuery) QueryPastoralNotesRecorded() *PastoralNoteQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(pastoralnote.Table, pastoralnote.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.PastoralNotesRecordedTable, user.PastoralNotesRecordedColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySentCommunications chains the current query on the "sent_communications" edge.
+func (_q *UserQuery) QuerySentCommunications() *CommunicationQuery {
+	query := (&CommunicationClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(communication.Table, communication.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SentCommunicationsTable, user.SentCommunicationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -426,6 +450,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		withAnnouncements:         _q.withAnnouncements.Clone(),
 		withAcceptedInvitation:    _q.withAcceptedInvitation.Clone(),
 		withPastoralNotesRecorded: _q.withPastoralNotesRecorded.Clone(),
+		withSentCommunications:    _q.withSentCommunications.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -509,6 +534,17 @@ func (_q *UserQuery) WithPastoralNotesRecorded(opts ...func(*PastoralNoteQuery))
 	return _q
 }
 
+// WithSentCommunications tells the query-builder to eager-load the nodes that are connected to
+// the "sent_communications" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithSentCommunications(opts ...func(*CommunicationQuery)) *UserQuery {
+	query := (&CommunicationClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSentCommunications = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -588,7 +624,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [8]bool{
 			_q.withChurch != nil,
 			_q.withContact != nil,
 			_q.withFinanceRecords != nil,
@@ -596,6 +632,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withAnnouncements != nil,
 			_q.withAcceptedInvitation != nil,
 			_q.withPastoralNotesRecorded != nil,
+			_q.withSentCommunications != nil,
 		}
 	)
 	if _q.withChurch != nil || _q.withContact != nil || _q.withAcceptedInvitation != nil {
@@ -667,6 +704,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			func(n *User, e *PastoralNote) {
 				n.Edges.PastoralNotesRecorded = append(n.Edges.PastoralNotesRecorded, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSentCommunications; query != nil {
+		if err := _q.loadSentCommunications(ctx, query, nodes,
+			func(n *User) { n.Edges.SentCommunications = []*Communication{} },
+			func(n *User, e *Communication) { n.Edges.SentCommunications = append(n.Edges.SentCommunications, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -887,6 +931,37 @@ func (_q *UserQuery) loadPastoralNotesRecorded(ctx context.Context, query *Pasto
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "recorded_by_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadSentCommunications(ctx context.Context, query *CommunicationQuery, nodes []*User, init func(*User), assign func(*User, *Communication)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Communication(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.SentCommunicationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_sent_communications
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_sent_communications" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_sent_communications" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

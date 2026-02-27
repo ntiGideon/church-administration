@@ -1,0 +1,104 @@
+{{define "title"}}Method Not Allowed | FaithConnect{{end}}
+{{define "description"}}The request method is not allowed for this resource{{end}}
+
+{{define "main"}}
+<div class="err-wrapper">
+    <div class="err-card">
+        <div class="err-icon-wrap">
+            <i class="fas fa-ban err-icon"></i>
+        </div>
+        <div class="err-code">405</div>
+        <h1 class="err-title">Method Not Allowed</h1>
+        <p class="err-message">
+            The action you attempted is not permitted on this resource.<br>
+            Please use the application navigation to proceed.
+        </p>
+        <div class="err-actions">
+            <a href="/dashboard" class="button is-primary">
+                <span class="icon"><i class="fas fa-home"></i></span>
+                <span>Go to Dashboard</span>
+            </a>
+            <a href="javascript:history.back()" class="button is-light">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Go Back</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.err-wrapper {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.err-card {
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 20px;
+    padding: 3.5rem 3rem;
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(80,34,45,0.07);
+}
+
+.err-icon-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(220,53,69,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.err-icon {
+    font-size: 2.4rem;
+    color: #DC3545;
+}
+
+.err-code {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #DC3545;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -2px;
+    opacity: 0.15;
+}
+
+.err-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+}
+
+.err-message {
+    font-size: 0.92rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.err-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .err-card { padding: 2rem 1.25rem; }
+    .err-code { font-size: 3.5rem; }
+    .err-title { font-size: 1.3rem; }
+    .err-actions { flex-direction: column; }
+    .err-actions .button { width: 100%; justify-content: center; }
+}
+</style>
+{{end}}

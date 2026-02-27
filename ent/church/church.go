@@ -93,6 +93,10 @@ const (
 	EdgeDocuments = "documents"
 	// EdgePastoralNotes holds the string denoting the pastoral_notes edge name in mutations.
 	EdgePastoralNotes = "pastoral_notes"
+	// EdgeMilestones holds the string denoting the milestones edge name in mutations.
+	EdgeMilestones = "milestones"
+	// EdgeCommunications holds the string denoting the communications edge name in mutations.
+	EdgeCommunications = "communications"
 	// Table holds the table name of the church in the database.
 	Table = "churches"
 	// ParentTable is the table that holds the parent relation/edge.
@@ -116,7 +120,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "department" package.
 	DepartmentsInverseTable = "departments"
 	// DepartmentsColumn is the table column denoting the departments relation/edge.
-	DepartmentsColumn = "church_departments"
+	DepartmentsColumn = "church_id"
 	// EventsTable is the table that holds the events relation/edge.
 	EventsTable = "events"
 	// EventsInverseTable is the table name for the Event entity.
@@ -215,6 +219,20 @@ const (
 	PastoralNotesInverseTable = "pastoral_notes"
 	// PastoralNotesColumn is the table column denoting the pastoral_notes relation/edge.
 	PastoralNotesColumn = "church_id"
+	// MilestonesTable is the table that holds the milestones relation/edge.
+	MilestonesTable = "milestones"
+	// MilestonesInverseTable is the table name for the Milestone entity.
+	// It exists in this package in order to avoid circular dependency with the "milestone" package.
+	MilestonesInverseTable = "milestones"
+	// MilestonesColumn is the table column denoting the milestones relation/edge.
+	MilestonesColumn = "church_id"
+	// CommunicationsTable is the table that holds the communications relation/edge.
+	CommunicationsTable = "communications"
+	// CommunicationsInverseTable is the table name for the Communication entity.
+	// It exists in this package in order to avoid circular dependency with the "communication" package.
+	CommunicationsInverseTable = "communications"
+	// CommunicationsColumn is the table column denoting the communications relation/edge.
+	CommunicationsColumn = "church_communications"
 )
 
 // Columns holds all SQL columns for church fields.
@@ -654,6 +672,34 @@ func ByPastoralNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByMilestonesCount orders the results by milestones count.
+func ByMilestonesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMilestonesStep(), opts...)
+	}
+}
+
+// ByMilestones orders the results by milestones terms.
+func ByMilestones(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMilestonesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCommunicationsCount orders the results by communications count.
+func ByCommunicationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCommunicationsStep(), opts...)
+	}
+}
+
+// ByCommunications orders the results by communications terms.
+func ByCommunications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCommunicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -778,5 +824,19 @@ func newPastoralNotesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PastoralNotesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesTable, PastoralNotesColumn),
+	)
+}
+func newMilestonesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MilestonesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MilestonesTable, MilestonesColumn),
+	)
+}
+func newCommunicationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CommunicationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CommunicationsTable, CommunicationsColumn),
 	)
 }

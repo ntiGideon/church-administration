@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
@@ -239,6 +240,21 @@ func (_u *UserUpdate) AddPastoralNotesRecorded(v ...*PastoralNote) *UserUpdate {
 	return _u.AddPastoralNotesRecordedIDs(ids...)
 }
 
+// AddSentCommunicationIDs adds the "sent_communications" edge to the Communication entity by IDs.
+func (_u *UserUpdate) AddSentCommunicationIDs(ids ...int) *UserUpdate {
+	_u.mutation.AddSentCommunicationIDs(ids...)
+	return _u
+}
+
+// AddSentCommunications adds the "sent_communications" edges to the Communication entity.
+func (_u *UserUpdate) AddSentCommunications(v ...*Communication) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSentCommunicationIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
@@ -344,6 +360,27 @@ func (_u *UserUpdate) RemovePastoralNotesRecorded(v ...*PastoralNote) *UserUpdat
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNotesRecordedIDs(ids...)
+}
+
+// ClearSentCommunications clears all "sent_communications" edges to the Communication entity.
+func (_u *UserUpdate) ClearSentCommunications() *UserUpdate {
+	_u.mutation.ClearSentCommunications()
+	return _u
+}
+
+// RemoveSentCommunicationIDs removes the "sent_communications" edge to Communication entities by IDs.
+func (_u *UserUpdate) RemoveSentCommunicationIDs(ids ...int) *UserUpdate {
+	_u.mutation.RemoveSentCommunicationIDs(ids...)
+	return _u
+}
+
+// RemoveSentCommunications removes "sent_communications" edges to Communication entities.
+func (_u *UserUpdate) RemoveSentCommunications(v ...*Communication) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSentCommunicationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -698,6 +735,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.SentCommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSentCommunicationsIDs(); len(nodes) > 0 && !_u.mutation.SentCommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SentCommunicationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -923,6 +1005,21 @@ func (_u *UserUpdateOne) AddPastoralNotesRecorded(v ...*PastoralNote) *UserUpdat
 	return _u.AddPastoralNotesRecordedIDs(ids...)
 }
 
+// AddSentCommunicationIDs adds the "sent_communications" edge to the Communication entity by IDs.
+func (_u *UserUpdateOne) AddSentCommunicationIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.AddSentCommunicationIDs(ids...)
+	return _u
+}
+
+// AddSentCommunications adds the "sent_communications" edges to the Communication entity.
+func (_u *UserUpdateOne) AddSentCommunications(v ...*Communication) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSentCommunicationIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
@@ -1028,6 +1125,27 @@ func (_u *UserUpdateOne) RemovePastoralNotesRecorded(v ...*PastoralNote) *UserUp
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNotesRecordedIDs(ids...)
+}
+
+// ClearSentCommunications clears all "sent_communications" edges to the Communication entity.
+func (_u *UserUpdateOne) ClearSentCommunications() *UserUpdateOne {
+	_u.mutation.ClearSentCommunications()
+	return _u
+}
+
+// RemoveSentCommunicationIDs removes the "sent_communications" edge to Communication entities by IDs.
+func (_u *UserUpdateOne) RemoveSentCommunicationIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.RemoveSentCommunicationIDs(ids...)
+	return _u
+}
+
+// RemoveSentCommunications removes "sent_communications" edges to Communication entities.
+func (_u *UserUpdateOne) RemoveSentCommunications(v ...*Communication) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSentCommunicationIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -1405,6 +1523,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SentCommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSentCommunicationsIDs(); len(nodes) > 0 && !_u.mutation.SentCommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SentCommunicationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SentCommunicationsTable,
+			Columns: []string{user.SentCommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

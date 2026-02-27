@@ -1,0 +1,392 @@
+{{define "title"}}Import Members | FaithConnect{{end}}
+{{define "description"}}Bulk import congregation members from a CSV spreadsheet{{end}}
+
+{{define "main"}}
+{{$results  := index .Data "results"}}
+{{$imported := index .Data "imported"}}
+{{$skipped  := index .Data "skipped"}}
+{{$errored  := index .Data "errored"}}
+{{$total    := index .Data "total"}}
+
+<div class="imp-wrap">
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <div class="imp-header">
+        <div>
+            <h1 class="imp-title"><i class="fas fa-file-import"></i> Import Members</h1>
+            <p class="imp-sub">Bulk-add congregation members from a CSV spreadsheet</p>
+        </div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <a href="/members/import/template" class="imp-btn-outline">
+                <i class="fas fa-download"></i> Download Template
+            </a>
+            <a href="/members" class="imp-btn-outline">
+                <i class="fas fa-users"></i> All Members
+            </a>
+        </div>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-exclamation-circle mr-2"></i>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{if $results}}
+    <!-- ── Results Summary ──────────────────────────────────────────── -->
+    <div class="imp-summary">
+        <div class="imp-stat imp-stat--green">
+            <div class="iss-val">{{$imported}}</div>
+            <div class="iss-lbl"><i class="fas fa-check-circle"></i> Imported</div>
+        </div>
+        <div class="imp-stat imp-stat--amber">
+            <div class="iss-val">{{$skipped}}</div>
+            <div class="iss-lbl"><i class="fas fa-minus-circle"></i> Skipped</div>
+        </div>
+        <div class="imp-stat imp-stat--red">
+            <div class="iss-val">{{$errored}}</div>
+            <div class="iss-lbl"><i class="fas fa-times-circle"></i> Errors</div>
+        </div>
+        <div class="imp-stat imp-stat--gray">
+            <div class="iss-val">{{$total}}</div>
+            <div class="iss-lbl"><i class="fas fa-list"></i> Total Rows</div>
+        </div>
+    </div>
+
+    <!-- ── Results Table ────────────────────────────────────────────── -->
+    <div class="imp-card mt-4">
+        <div class="imp-card-head">
+            <span><i class="fas fa-table"></i> Import Results</span>
+            <a href="/members" class="imp-view-link">View Members <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="imp-table-wrap">
+            <table class="imp-table">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $results}}
+                    <tr class="imp-row-{{.Status}}">
+                        <td class="imp-rownum">{{.Row}}</td>
+                        <td class="imp-name">{{.Name}}</td>
+                        <td>
+                            {{if eq .Status "imported"}}
+                            <span class="imp-badge imp-badge--green"><i class="fas fa-check"></i> Imported</span>
+                            {{else if eq .Status "skipped"}}
+                            <span class="imp-badge imp-badge--amber"><i class="fas fa-minus"></i> Skipped</span>
+                            {{else}}
+                            <span class="imp-badge imp-badge--red"><i class="fas fa-times"></i> Error</span>
+                            {{end}}
+                        </td>
+                        <td class="imp-reason">{{.Reason}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Upload another file -->
+    <div class="imp-again">
+        <p>Want to import another file?</p>
+    </div>
+    {{end}}
+
+    <!-- ── Upload Form ──────────────────────────────────────────────── -->
+    <div class="imp-card {{if $results}}mt-0{{end}}">
+        <div class="imp-card-head">
+            <span><i class="fas fa-upload"></i> Upload CSV File</span>
+        </div>
+        <div class="imp-card-body">
+            <form action="/members/import" method="POST" enctype="multipart/form-data" id="importForm">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+                <!-- Drop zone -->
+                <label for="csv_file" class="drop-zone" id="dropZone">
+                    <div class="dz-icon"><i class="fas fa-file-csv"></i></div>
+                    <div class="dz-text" id="dropText">
+                        <strong>Click to choose a file</strong> or drag and drop here
+                    </div>
+                    <div class="dz-hint">CSV files only — max 5 MB</div>
+                    <input type="file" name="csv_file" id="csv_file" accept=".csv,text/csv" class="dz-input" required>
+                </label>
+
+                <div class="imp-actions">
+                    <a href="/members/import/template" class="imp-btn-outline">
+                        <i class="fas fa-download"></i> Download Template First
+                    </a>
+                    <button type="submit" class="imp-btn-primary" id="importBtn">
+                        <i class="fas fa-file-import"></i> Import Members
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Format Guide ─────────────────────────────────────────────── -->
+    <div class="imp-card mt-4">
+        <div class="imp-card-head">
+            <span><i class="fas fa-circle-info"></i> Format Guide</span>
+        </div>
+        <div class="imp-card-body">
+            <p class="imp-guide-intro">
+                The first row of your CSV must contain column headers. Only <strong>First Name</strong>
+                and <strong>Last Name</strong> are required — all other columns are optional.
+                Download the template above to start with the correct format.
+            </p>
+
+            <div class="imp-cols-grid">
+                <div class="imp-col-group">
+                    <div class="imp-col-group-title required-group">Required</div>
+                    <div class="imp-col-item"><code>First Name</code></div>
+                    <div class="imp-col-item"><code>Last Name</code></div>
+                </div>
+                <div class="imp-col-group">
+                    <div class="imp-col-group-title">Contact Info</div>
+                    <div class="imp-col-item"><code>Email</code></div>
+                    <div class="imp-col-item"><code>Phone</code></div>
+                    <div class="imp-col-item"><code>Middle Name</code></div>
+                </div>
+                <div class="imp-col-group">
+                    <div class="imp-col-group-title">Personal Details</div>
+                    <div class="imp-col-item"><code>Gender</code> <span class="imp-hint">male / female</span></div>
+                    <div class="imp-col-item"><code>Date of Birth</code> <span class="imp-hint">YYYY-MM-DD</span></div>
+                    <div class="imp-col-item"><code>Marital Status</code> <span class="imp-hint">single / married / divorced / widowed</span></div>
+                    <div class="imp-col-item"><code>Day Born</code> <span class="imp-hint">Monday … Sunday</span></div>
+                    <div class="imp-col-item"><code>Occupation</code></div>
+                </div>
+                <div class="imp-col-group">
+                    <div class="imp-col-group-title">Address</div>
+                    <div class="imp-col-item"><code>Address</code></div>
+                    <div class="imp-col-item"><code>City</code></div>
+                    <div class="imp-col-item"><code>Country</code></div>
+                    <div class="imp-col-item"><code>Region</code></div>
+                    <div class="imp-col-item"><code>Hometown</code></div>
+                </div>
+                <div class="imp-col-group">
+                    <div class="imp-col-group-title">Church & Baptism</div>
+                    <div class="imp-col-item"><code>Sunday School Class</code></div>
+                    <div class="imp-col-item"><code>Membership Year</code></div>
+                    <div class="imp-col-item"><code>Has Spouse</code> <span class="imp-hint">Yes / No</span></div>
+                    <div class="imp-col-item"><code>Is Baptized</code> <span class="imp-hint">Yes / No</span></div>
+                    <div class="imp-col-item"><code>Baptized By</code></div>
+                    <div class="imp-col-item"><code>Baptism Church</code></div>
+                    <div class="imp-col-item"><code>Baptism Cert No.</code></div>
+                    <div class="imp-col-item"><code>Baptism Date</code> <span class="imp-hint">YYYY-MM-DD</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.imp-wrap { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.imp-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
+}
+.imp-title {
+    font-size: 1.8rem; font-weight: 800; color: var(--text-dark);
+    margin: 0 0 4px; display: flex; align-items: center; gap: 10px;
+}
+.imp-title i { color: var(--primary); }
+.imp-sub { font-size: 0.875rem; color: var(--text-light); margin: 0; }
+.imp-btn-outline {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border: 1.5px solid var(--light-gray);
+    border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+    color: var(--text-dark); text-decoration: none; transition: all 0.15s;
+    background: white;
+}
+.imp-btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.imp-card {
+    background: white; border: 1px solid var(--light-gray);
+    border-radius: 14px; overflow: hidden; margin-bottom: 1.25rem;
+}
+.imp-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--light-gray);
+    font-size: 0.9rem; font-weight: 600; color: var(--text-dark);
+}
+.imp-card-head i { color: var(--primary); margin-right: 6px; }
+.imp-view-link { font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600; }
+.imp-card-body { padding: 1.5rem; }
+.mt-4 { margin-top: 1.25rem; }
+.mt-0 { margin-top: 0; }
+
+/* ── Summary stat chips ──────────────────────────────────────────────── */
+.imp-summary {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.imp-stat {
+    border-radius: 12px; padding: 1rem 1.25rem;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    border: 1px solid transparent;
+}
+.imp-stat--green { background: rgba(40,167,69,0.08); border-color: rgba(40,167,69,0.2); }
+.imp-stat--amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+.imp-stat--red   { background: rgba(220,53,69,0.08);  border-color: rgba(220,53,69,0.2); }
+.imp-stat--gray  { background: rgba(108,117,125,0.08); border-color: rgba(108,117,125,0.2); }
+.iss-val {
+    font-size: 2rem; font-weight: 800; line-height: 1;
+    margin-bottom: 4px;
+}
+.imp-stat--green .iss-val { color: #28A745; }
+.imp-stat--amber .iss-val { color: #D97706; }
+.imp-stat--red   .iss-val { color: #DC3545; }
+.imp-stat--gray  .iss-val { color: #6C757D; }
+.iss-lbl { font-size: 0.78rem; font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
+
+/* ── Results Table ───────────────────────────────────────────────────── */
+.imp-table-wrap { overflow-x: auto; }
+.imp-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.imp-table thead th {
+    padding: 10px 14px; text-align: left;
+    font-size: 0.73rem; font-weight: 600; color: var(--text-light);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--light-gray);
+    background: rgba(248,249,250,0.7);
+}
+.imp-table tbody tr { border-bottom: 1px solid var(--light-gray); }
+.imp-table tbody tr:last-child { border-bottom: none; }
+.imp-row-imported { background: rgba(40,167,69,0.03); }
+.imp-row-skipped  { background: rgba(245,158,11,0.04); }
+.imp-row-error    { background: rgba(220,53,69,0.04); }
+.imp-table td { padding: 9px 14px; }
+.imp-rownum { color: var(--text-light); font-size: 0.8rem; width: 50px; }
+.imp-name   { font-weight: 600; color: var(--text-dark); }
+.imp-reason { font-size: 0.8rem; color: var(--text-light); }
+.imp-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 10px; font-size: 0.73rem; font-weight: 700;
+}
+.imp-badge--green { background: rgba(40,167,69,0.12); color: #28A745; }
+.imp-badge--amber { background: rgba(245,158,11,0.15); color: #D97706; }
+.imp-badge--red   { background: rgba(220,53,69,0.1);  color: #DC3545; }
+
+/* ── Upload again nudge ──────────────────────────────────────────────── */
+.imp-again {
+    text-align: center; color: var(--text-light); font-size: 0.875rem;
+    margin: .75rem 0 1rem; font-weight: 500;
+}
+
+/* ── Drop Zone ───────────────────────────────────────────────────────── */
+.drop-zone {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px;
+    border: 2px dashed var(--light-gray); border-radius: 12px;
+    padding: 2.5rem 1rem; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s; text-align: center;
+    position: relative;
+}
+.drop-zone:hover,
+.drop-zone.dragging { border-color: var(--primary); background: rgba(80,34,45,0.03); }
+.drop-zone.has-file  { border-color: #28A745; background: rgba(40,167,69,0.04); }
+.dz-icon { font-size: 2.5rem; color: var(--text-light); line-height: 1; }
+.drop-zone.has-file .dz-icon { color: #28A745; }
+.dz-text { font-size: 0.9rem; color: var(--text-dark); }
+.dz-hint { font-size: 0.78rem; color: var(--text-light); }
+.dz-input {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.imp-actions {
+    display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.25rem;
+    flex-wrap: wrap;
+}
+.imp-btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; background: var(--primary); color: white;
+    border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+}
+.imp-btn-primary:hover { background: var(--primary-dark); }
+.imp-btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ── Format Guide ────────────────────────────────────────────────────── */
+.imp-guide-intro { font-size: 0.875rem; color: var(--text-medium); margin-bottom: 1.25rem; line-height: 1.6; }
+.imp-cols-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+}
+.imp-col-group-title {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-light);
+    padding-bottom: 6px; border-bottom: 1px solid var(--light-gray);
+    margin-bottom: 6px;
+}
+.imp-col-group-title.required-group { color: var(--primary); border-color: rgba(80,34,45,0.2); }
+.imp-col-item { font-size: 0.82rem; padding: 3px 0; color: var(--text-medium); }
+.imp-col-item code {
+    background: rgba(80,34,45,0.07); color: var(--primary);
+    padding: 1px 5px; border-radius: 4px; font-size: 0.8rem;
+}
+.imp-hint { color: var(--text-light); font-size: 0.73rem; }
+
+@media (max-width: 640px) {
+    .imp-wrap { padding: 1rem; }
+    .imp-summary { grid-template-columns: repeat(2, 1fr); }
+    .imp-cols-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<script>
+(function () {
+    const input    = document.getElementById('csv_file');
+    const dropZone = document.getElementById('dropZone');
+    const dropText = document.getElementById('dropText');
+    const btn      = document.getElementById('importBtn');
+
+    function setFile(name) {
+        dropText.innerHTML = '<strong>' + name + '</strong>';
+        dropZone.classList.add('has-file');
+        dropZone.querySelector('.dz-hint').textContent = 'File selected — click Import to proceed';
+    }
+
+    input.addEventListener('change', function () {
+        if (this.files[0]) setFile(this.files[0].name);
+    });
+
+    ['dragover', 'dragenter'].forEach(evt => {
+        dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragging'); });
+    });
+    dropZone.addEventListener('drop', function (e) {
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            // Transfer the dropped file to the input
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            setFile(file.name);
+        }
+    });
+
+    document.getElementById('importForm').addEventListener('submit', function () {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing…';
+    });
+})();
+</script>
+{{end}}

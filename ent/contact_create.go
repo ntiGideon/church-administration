@@ -13,11 +13,14 @@ import (
 	"github.com/ntiGideon/ent/attendance"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
+	"github.com/ntiGideon/ent/relationship"
 	"github.com/ntiGideon/ent/rosterentry"
 	"github.com/ntiGideon/ent/user"
 )
@@ -699,6 +702,81 @@ func (_c *ContactCreate) AddPastoralNotes(v ...*PastoralNote) *ContactCreate {
 	return _c.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_c *ContactCreate) AddMilestoneIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddMilestoneIDs(ids...)
+	return _c
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_c *ContactCreate) AddMilestones(v ...*Milestone) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddMilestoneIDs(ids...)
+}
+
+// AddDepartmentIDs adds the "departments" edge to the Department entity by IDs.
+func (_c *ContactCreate) AddDepartmentIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddDepartmentIDs(ids...)
+	return _c
+}
+
+// AddDepartments adds the "departments" edges to the Department entity.
+func (_c *ContactCreate) AddDepartments(v ...*Department) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDepartmentIDs(ids...)
+}
+
+// AddLeadingDepartmentIDs adds the "leading_departments" edge to the Department entity by IDs.
+func (_c *ContactCreate) AddLeadingDepartmentIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddLeadingDepartmentIDs(ids...)
+	return _c
+}
+
+// AddLeadingDepartments adds the "leading_departments" edges to the Department entity.
+func (_c *ContactCreate) AddLeadingDepartments(v ...*Department) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddLeadingDepartmentIDs(ids...)
+}
+
+// AddRelationshipsFromIDs adds the "relationships_from" edge to the Relationship entity by IDs.
+func (_c *ContactCreate) AddRelationshipsFromIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddRelationshipsFromIDs(ids...)
+	return _c
+}
+
+// AddRelationshipsFrom adds the "relationships_from" edges to the Relationship entity.
+func (_c *ContactCreate) AddRelationshipsFrom(v ...*Relationship) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRelationshipsFromIDs(ids...)
+}
+
+// AddRelationshipsToIDs adds the "relationships_to" edge to the Relationship entity by IDs.
+func (_c *ContactCreate) AddRelationshipsToIDs(ids ...int) *ContactCreate {
+	_c.mutation.AddRelationshipsToIDs(ids...)
+	return _c
+}
+
+// AddRelationshipsTo adds the "relationships_to" edges to the Relationship entity.
+func (_c *ContactCreate) AddRelationshipsTo(v ...*Relationship) *ContactCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRelationshipsToIDs(ids...)
+}
+
 // Mutation returns the ContactMutation object of the builder.
 func (_c *ContactCreate) Mutation() *ContactMutation {
 	return _c.mutation
@@ -1137,6 +1215,86 @@ func (_c *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.MilestonesTable,
+			Columns: []string{contact.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.DepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   contact.DepartmentsTable,
+			Columns: contact.DepartmentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.LeadingDepartmentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   contact.LeadingDepartmentsTable,
+			Columns: []string{contact.LeadingDepartmentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RelationshipsFromIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsFromTable,
+			Columns: []string{contact.RelationshipsFromColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RelationshipsToIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   contact.RelationshipsToTable,
+			Columns: []string{contact.RelationshipsToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(relationship.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

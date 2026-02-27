@@ -97,9 +97,26 @@ func (app *application) memberDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	milestones, _ := app.milestoneModel.ListByContact(r.Context(), id)
+
+	// Load relationships and build grouped family tree
+	rels, _ := app.relationshipModel.ListByContact(r.Context(), id)
+	familyGroups := buildFamilyTree(id, rels)
+
+	// All church contacts for the "add relationship" dropdown (exclude self)
+	u2 := app.getAuthenticatedUser(r)
+	churchIDForRel := 0
+	if u2 != nil && u2.Edges.Church != nil {
+		churchIDForRel = u2.Edges.Church.ID
+	}
+	allContacts, _ := app.memberModel.ListContactsByChurch(r.Context(), churchIDForRel)
+
 	data := app.newTemplateData(r)
 	data.Data = map[string]interface{}{
-		"member": member,
+		"member":       member,
+		"milestones":   milestones,
+		"familyGroups": familyGroups,
+		"allContacts":  allContacts,
 	}
 	app.render(w, r, http.StatusOK, "member_detail.gohtml", data)
 }
@@ -247,8 +264,8 @@ func (app *application) memberAvatarPost(w http.ResponseWriter, r *http.Request)
 
 	redirectURL := fmt.Sprintf("/members/%d", id)
 
-	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-		app.sessionManager.Put(r.Context(), "flash_error", "File too large — maximum size is 5 MB.")
+	if err := r.ParseMultipartForm(maxImageInputSize); err != nil {
+		app.sessionManager.Put(r.Context(), "flash_error", "File too large — maximum accepted size is 20 MB.")
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 		return
 	}
@@ -292,6 +309,58 @@ func (app *application) memberDelete(w http.ResponseWriter, r *http.Request) {
 
 	app.sessionManager.Put(r.Context(), "flash", "Member record has been removed.")
 	http.Redirect(w, r, "/members", http.StatusSeeOther)
+}
+
+// GET /members/{id}/attendance
+func (app *application) memberAttendanceGet(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	member, err := app.memberModel.GetContactByID(r.Context(), id)
+	if err != nil {
+		if err == models.ErrRecordNotFound {
+			app.clientError(w, http.StatusNotFound)
+			return
+		}
+		app.serverError(w, r, err)
+		return
+	}
+
+	records, err := app.attendanceModel.ListByContact(r.Context(), id)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	// Compute summary stats
+	totalPresent, totalLate := 0, 0
+	for _, a := range records {
+		switch string(a.Status) {
+		case "present":
+			totalPresent++
+		case "late":
+			totalLate++
+		}
+	}
+
+	onTimeRate := 0
+	if len(records) > 0 {
+		onTimeRate = totalPresent * 100 / len(records)
+	}
+
+	data := app.newTemplateData(r)
+	data.Data = map[string]interface{}{
+		"member":       member,
+		"records":      records,
+		"totalPresent": totalPresent,
+		"totalLate":    totalLate,
+		"totalEvents":  len(records),
+		"onTimeRate":   onTimeRate,
+	}
+	app.render(w, r, http.StatusOK, "member_attendance.gohtml", data)
 }
 
 // derefStr safely dereferences an optional string pointer.

@@ -100,8 +100,8 @@ func (app *application) churchLogoPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-		app.sessionManager.Put(r.Context(), "flash_error", "File too large — maximum size is 5 MB.")
+	if err := r.ParseMultipartForm(maxImageInputSize); err != nil {
+		app.sessionManager.Put(r.Context(), "flash_error", "File too large — maximum accepted size is 20 MB.")
 		http.Redirect(w, r, "/church/settings", http.StatusSeeOther)
 		return
 	}

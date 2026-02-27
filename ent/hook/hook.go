@@ -45,6 +45,18 @@ func (f ChurchFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChurchMutation", m)
 }
 
+// The CommunicationFunc type is an adapter to allow the use of ordinary
+// function as Communication mutator.
+type CommunicationFunc func(context.Context, *ent.CommunicationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CommunicationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CommunicationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CommunicationMutation", m)
+}
+
 // The ContactFunc type is an adapter to allow the use of ordinary
 // function as Contact mutator.
 type ContactFunc func(context.Context, *ent.ContactMutation) (ent.Value, error)
@@ -129,6 +141,18 @@ func (f InvitationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvitationMutation", m)
 }
 
+// The MilestoneFunc type is an adapter to allow the use of ordinary
+// function as Milestone mutator.
+type MilestoneFunc func(context.Context, *ent.MilestoneMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MilestoneFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MilestoneMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MilestoneMutation", m)
+}
+
 // The PastoralNoteFunc type is an adapter to allow the use of ordinary
 // function as PastoralNote mutator.
 type PastoralNoteFunc func(context.Context, *ent.PastoralNoteMutation) (ent.Value, error)
@@ -175,6 +199,18 @@ func (f ProgramEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProgramEntryMutation", m)
+}
+
+// The RelationshipFunc type is an adapter to allow the use of ordinary
+// function as Relationship mutator.
+type RelationshipFunc func(context.Context, *ent.RelationshipMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RelationshipFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RelationshipMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RelationshipMutation", m)
 }
 
 // The RosterFunc type is an adapter to allow the use of ordinary

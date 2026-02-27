@@ -48,6 +48,13 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /church/settings", protected.ThenFunc(app.churchSettingsPost))
 	mux.Handle("POST /church/settings/logo", adminOnly.ThenFunc(app.churchLogoPost))
 
+	// CSV Export & Import  (registered before wildcard /members/{id})
+	mux.Handle("GET /members/export",          protected.ThenFunc(app.memberExport))
+	mux.Handle("GET /giving/export",           protected.ThenFunc(app.financeExport))
+	mux.Handle("GET /members/import",          adminOnly.ThenFunc(app.memberImportGet))
+	mux.Handle("POST /members/import",         adminOnly.ThenFunc(app.memberImportPost))
+	mux.Handle("GET /members/import/template", adminOnly.ThenFunc(app.memberImportTemplate))
+
 	// Congregation members (Contact records — no system account required)
 	mux.Handle("GET /members", protected.ThenFunc(app.membersList))
 	mux.Handle("GET /members/new", protected.ThenFunc(app.memberNewGet))
@@ -58,6 +65,9 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /members/{id}/avatar", protected.ThenFunc(app.memberAvatarPost))
 	mux.Handle("POST /members/{id}/delete", protected.ThenFunc(app.memberDelete))
 	mux.Handle("GET /members/{id}/giving", protected.ThenFunc(app.memberGiving))
+	mux.Handle("GET /members/{id}/attendance", protected.ThenFunc(app.memberAttendanceGet))
+	mux.Handle("POST /members/{id}/relationships/new", adminOnly.ThenFunc(app.memberRelationshipNewPost))
+	mux.Handle("POST /members/{id}/relationships/{rid}/delete", adminOnly.ThenFunc(app.memberRelationshipDelete))
 	mux.Handle("POST /members/{id}/pledges/new", adminOnly.ThenFunc(app.memberPledgeNewPost))
 	mux.Handle("POST /members/{id}/pledges/{pid}/delete", adminOnly.ThenFunc(app.memberPledgeDelete))
 
@@ -108,6 +118,22 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /pastoral/{id}/followup", adminOnly.ThenFunc(app.pastoralMarkFollowUpDone))
 	mux.Handle("POST /pastoral/{id}/delete", adminOnly.ThenFunc(app.pastoralDelete))
 
+	// Departments
+	mux.Handle("GET /departments", protected.ThenFunc(app.departmentsList))
+	mux.Handle("GET /departments/new", adminOnly.ThenFunc(app.departmentNewGet))
+	mux.Handle("POST /departments/new", adminOnly.ThenFunc(app.departmentNewPost))
+	mux.Handle("GET /departments/{id}", protected.ThenFunc(app.departmentDetail))
+	mux.Handle("GET /departments/{id}/edit", adminOnly.ThenFunc(app.departmentEditGet))
+	mux.Handle("POST /departments/{id}/edit", adminOnly.ThenFunc(app.departmentEditPost))
+	mux.Handle("POST /departments/{id}/members/add", adminOnly.ThenFunc(app.departmentAddMember))
+	mux.Handle("POST /departments/{id}/members/{cid}/remove", adminOnly.ThenFunc(app.departmentRemoveMember))
+	mux.Handle("POST /departments/{id}/delete", adminOnly.ThenFunc(app.departmentDelete))
+
+	// Member Milestones
+	mux.Handle("GET /milestones", protected.ThenFunc(app.milestonesListGet))
+	mux.Handle("POST /members/{id}/milestones/new", adminOnly.ThenFunc(app.milestoneNewPost))
+	mux.Handle("POST /members/{id}/milestones/{mid}/delete", adminOnly.ThenFunc(app.milestoneDelete))
+
 	// Document Library
 	mux.Handle("GET /documents", protected.ThenFunc(app.documentsList))
 	mux.Handle("GET /documents/upload", adminOnly.ThenFunc(app.documentUploadGet))
@@ -154,6 +180,20 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /announcements", protected.ThenFunc(app.announcementsList))
 	mux.Handle("GET /announcements/new", adminOnly.ThenFunc(app.announcementNewGet))
 	mux.Handle("POST /announcements/new", adminOnly.ThenFunc(app.announcementNewPost))
+	mux.Handle("GET /announcements/{id}", protected.ThenFunc(app.announcementDetail))
+	mux.Handle("GET /announcements/{id}/edit", adminOnly.ThenFunc(app.announcementEditGet))
+	mux.Handle("POST /announcements/{id}/edit", adminOnly.ThenFunc(app.announcementEditPost))
+	mux.Handle("POST /announcements/{id}/publish", adminOnly.ThenFunc(app.announcementTogglePublish))
+	mux.Handle("POST /announcements/{id}/delete", adminOnly.ThenFunc(app.announcementDelete))
+
+	// Birthdays
+	mux.Handle("GET /birthdays", protected.ThenFunc(app.birthdaysPage))
+
+	// Communications (mass email)
+	mux.Handle("GET /communications",          adminOnly.ThenFunc(app.communicationsList))
+	mux.Handle("GET /communications/compose",  adminOnly.ThenFunc(app.communicationComposeGet))
+	mux.Handle("POST /communications/compose", adminOnly.ThenFunc(app.communicationComposePost))
+	mux.Handle("GET /communications/{id}",     adminOnly.ThenFunc(app.communicationDetail))
 
 	// Reports
 	mux.Handle("GET /reports", protected.ThenFunc(app.reports))
@@ -173,6 +213,6 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /admin/churches", superAdminOnly.ThenFunc(app.adminChurches))
 	mux.Handle("GET /admin/churches/{id}", superAdminOnly.ThenFunc(app.adminChurchDetail))
 
-	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders, app.errorPages)
 	return standard.Then(mux)
 }

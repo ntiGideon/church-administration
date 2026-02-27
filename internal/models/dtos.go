@@ -295,3 +295,38 @@ type MemberDto struct {
 
 	validator.Validator `form:"-"`
 }
+
+type DepartmentDto struct {
+	Name           string `form:"name"`
+	Description    string `form:"description"`
+	DepartmentType string `form:"department_type"`
+	LeaderID       int    `form:"leader_id"`
+	IsActive       bool   `form:"is_active"`
+
+	validator.Validator `form:"-"`
+}
+
+type MilestoneDto struct {
+	MilestoneType string `form:"milestone_type"`
+	EventDate     string `form:"event_date"`
+	Description   string `form:"description"`
+	OfficiatedBy  string `form:"officiated_by"`
+
+	validator.Validator `form:"-"`
+}
+
+type RelationshipDto struct {
+	RelativeID   int    `form:"relative_id"`
+	RelationType string `form:"relation_type"`
+	Notes        string `form:"notes"`
+
+	validator.Validator `form:"-"`
+}
+
+type CommunicationDto struct {
+	Subject         string `form:"subject"`
+	Body            string `form:"body"`
+	RecipientFilter string `form:"recipient_filter"`
+
+	validator.Validator `form:"-"`
+}

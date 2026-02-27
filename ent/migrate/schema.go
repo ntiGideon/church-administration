@@ -133,6 +133,40 @@ var (
 			},
 		},
 	}
+	// CommunicationsColumns holds the columns for the "communications" table.
+	CommunicationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "subject", Type: field.TypeString},
+		{Name: "body_html", Type: field.TypeString, Size: 2147483647},
+		{Name: "recipient_filter", Type: field.TypeString, Default: "all"},
+		{Name: "recipient_filter_label", Type: field.TypeString, Default: "All Members"},
+		{Name: "recipient_count", Type: field.TypeInt, Default: 0},
+		{Name: "sent_count", Type: field.TypeInt, Default: 0},
+		{Name: "fail_count", Type: field.TypeInt, Default: 0},
+		{Name: "sent_at", Type: field.TypeTime},
+		{Name: "church_communications", Type: field.TypeInt},
+		{Name: "user_sent_communications", Type: field.TypeInt, Nullable: true},
+	}
+	// CommunicationsTable holds the schema information for the "communications" table.
+	CommunicationsTable = &schema.Table{
+		Name:       "communications",
+		Columns:    CommunicationsColumns,
+		PrimaryKey: []*schema.Column{CommunicationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "communications_churches_communications",
+				Columns:    []*schema.Column{CommunicationsColumns[9]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "communications_users_sent_communications",
+				Columns:    []*schema.Column{CommunicationsColumns[10]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ContactsColumns holds the columns for the "contacts" table.
 	ContactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -197,10 +231,13 @@ var (
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString},
-		{Name: "department_type", Type: field.TypeEnum, Enums: []string{"worship", "youth", "children", "outreach", "administration", "finance", "media"}},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "department_type", Type: field.TypeEnum, Enums: []string{"worship", "youth", "children", "outreach", "administration", "finance", "media", "other"}},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
-		{Name: "church_departments", Type: field.TypeInt},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "leader_id", Type: field.TypeInt, Nullable: true},
 	}
 	// DepartmentsTable holds the schema information for the "departments" table.
 	DepartmentsTable = &schema.Table{
@@ -210,9 +247,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "departments_churches_departments",
-				Columns:    []*schema.Column{DepartmentsColumns[5]},
+				Columns:    []*schema.Column{DepartmentsColumns[7]},
 				RefColumns: []*schema.Column{ChurchesColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "departments_contacts_leader",
+				Columns:    []*schema.Column{DepartmentsColumns[8]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -390,6 +433,37 @@ var (
 			},
 		},
 	}
+	// MilestonesColumns holds the columns for the "milestones" table.
+	MilestonesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "milestone_type", Type: field.TypeEnum, Enums: []string{"baby_dedication", "confirmation", "membership", "marriage", "ordination", "other"}},
+		{Name: "event_date", Type: field.TypeTime},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "officiated_by", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt},
+	}
+	// MilestonesTable holds the schema information for the "milestones" table.
+	MilestonesTable = &schema.Table{
+		Name:       "milestones",
+		Columns:    MilestonesColumns,
+		PrimaryKey: []*schema.Column{MilestonesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "milestones_churches_milestones",
+				Columns:    []*schema.Column{MilestonesColumns[6]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "milestones_contacts_milestones",
+				Columns:    []*schema.Column{MilestonesColumns[7]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// PastoralNotesColumns holds the columns for the "pastoral_notes" table.
 	PastoralNotesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -549,6 +623,42 @@ var (
 				Name:    "programentry_date",
 				Unique:  false,
 				Columns: []*schema.Column{ProgramEntriesColumns[3]},
+			},
+		},
+	}
+	// RelationshipsColumns holds the columns for the "relationships" table.
+	RelationshipsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "relation_type", Type: field.TypeEnum, Enums: []string{"wife", "husband", "mother", "father", "daughter", "son", "sister", "brother", "grandmother", "grandfather", "granddaughter", "grandson", "aunt", "uncle", "niece", "nephew", "cousin", "friend", "godmother", "godfather", "goddaughter", "godson", "other"}},
+		{Name: "notes", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "from_contact_id", Type: field.TypeInt},
+		{Name: "to_contact_id", Type: field.TypeInt},
+	}
+	// RelationshipsTable holds the schema information for the "relationships" table.
+	RelationshipsTable = &schema.Table{
+		Name:       "relationships",
+		Columns:    RelationshipsColumns,
+		PrimaryKey: []*schema.Column{RelationshipsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "relationships_contacts_relationships_from",
+				Columns:    []*schema.Column{RelationshipsColumns[4]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "relationships_contacts_relationships_to",
+				Columns:    []*schema.Column{RelationshipsColumns[5]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "relationship_from_contact_id_to_contact_id",
+				Unique:  true,
+				Columns: []*schema.Column{RelationshipsColumns[4], RelationshipsColumns[5]},
 			},
 		},
 	}
@@ -765,6 +875,31 @@ var (
 			},
 		},
 	}
+	// DepartmentMembersColumns holds the columns for the "department_members" table.
+	DepartmentMembersColumns = []*schema.Column{
+		{Name: "department_id", Type: field.TypeInt},
+		{Name: "contact_id", Type: field.TypeInt},
+	}
+	// DepartmentMembersTable holds the schema information for the "department_members" table.
+	DepartmentMembersTable = &schema.Table{
+		Name:       "department_members",
+		Columns:    DepartmentMembersColumns,
+		PrimaryKey: []*schema.Column{DepartmentMembersColumns[0], DepartmentMembersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "department_members_department_id",
+				Columns:    []*schema.Column{DepartmentMembersColumns[0]},
+				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "department_members_contact_id",
+				Columns:    []*schema.Column{DepartmentMembersColumns[1]},
+				RefColumns: []*schema.Column{ContactsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// GroupMembersColumns holds the columns for the "group_members" table.
 	GroupMembersColumns = []*schema.Column{
 		{Name: "group_id", Type: field.TypeInt},
@@ -795,6 +930,7 @@ var (
 		AnnouncementsTable,
 		AttendancesTable,
 		ChurchesTable,
+		CommunicationsTable,
 		ContactsTable,
 		DepartmentsTable,
 		DocumentsTable,
@@ -802,16 +938,19 @@ var (
 		FinancesTable,
 		GroupsTable,
 		InvitationsTable,
+		MilestonesTable,
 		PastoralNotesTable,
 		PledgesTable,
 		PrayerRequestsTable,
 		ProgramEntriesTable,
+		RelationshipsTable,
 		RostersTable,
 		RosterEntriesTable,
 		SermonsTable,
 		SessionsTable,
 		UsersTable,
 		VisitorsTable,
+		DepartmentMembersTable,
 		GroupMembersTable,
 	}
 )
@@ -822,9 +961,12 @@ func init() {
 	AttendancesTable.ForeignKeys[0].RefTable = ContactsTable
 	AttendancesTable.ForeignKeys[1].RefTable = EventsTable
 	ChurchesTable.ForeignKeys[0].RefTable = ChurchesTable
+	CommunicationsTable.ForeignKeys[0].RefTable = ChurchesTable
+	CommunicationsTable.ForeignKeys[1].RefTable = UsersTable
 	ContactsTable.ForeignKeys[0].RefTable = ChurchesTable
 	ContactsTable.ForeignKeys[1].RefTable = ContactsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = ChurchesTable
+	DepartmentsTable.ForeignKeys[1].RefTable = ContactsTable
 	DocumentsTable.ForeignKeys[0].RefTable = ChurchesTable
 	EventsTable.ForeignKeys[0].RefTable = ChurchesTable
 	FinancesTable.ForeignKeys[0].RefTable = ChurchesTable
@@ -834,6 +976,8 @@ func init() {
 	GroupsTable.ForeignKeys[1].RefTable = ContactsTable
 	InvitationsTable.ForeignKeys[0].RefTable = ChurchesTable
 	InvitationsTable.ForeignKeys[1].RefTable = UsersTable
+	MilestonesTable.ForeignKeys[0].RefTable = ChurchesTable
+	MilestonesTable.ForeignKeys[1].RefTable = ContactsTable
 	PastoralNotesTable.ForeignKeys[0].RefTable = ChurchesTable
 	PastoralNotesTable.ForeignKeys[1].RefTable = ContactsTable
 	PastoralNotesTable.ForeignKeys[2].RefTable = UsersTable
@@ -842,6 +986,8 @@ func init() {
 	PrayerRequestsTable.ForeignKeys[0].RefTable = ChurchesTable
 	PrayerRequestsTable.ForeignKeys[1].RefTable = ContactsTable
 	ProgramEntriesTable.ForeignKeys[0].RefTable = ChurchesTable
+	RelationshipsTable.ForeignKeys[0].RefTable = ContactsTable
+	RelationshipsTable.ForeignKeys[1].RefTable = ContactsTable
 	RostersTable.ForeignKeys[0].RefTable = ChurchesTable
 	RosterEntriesTable.ForeignKeys[0].RefTable = ContactsTable
 	RosterEntriesTable.ForeignKeys[1].RefTable = RostersTable
@@ -850,6 +996,8 @@ func init() {
 	UsersTable.ForeignKeys[1].RefTable = ContactsTable
 	UsersTable.ForeignKeys[2].RefTable = InvitationsTable
 	VisitorsTable.ForeignKeys[0].RefTable = ChurchesTable
+	DepartmentMembersTable.ForeignKeys[0].RefTable = DepartmentsTable
+	DepartmentMembersTable.ForeignKeys[1].RefTable = ContactsTable
 	GroupMembersTable.ForeignKeys[0].RefTable = GroupsTable
 	GroupMembersTable.ForeignKeys[1].RefTable = ContactsTable
 }

@@ -110,6 +110,56 @@ func (app *application) requireSuperAdmin(next http.Handler) http.Handler {
 	})
 }
 
+// statusCapture wraps http.ResponseWriter to intercept 404 and 405 responses
+// (both from the ServeMux and from app.clientError calls inside handlers)
+// so we can replace the default plain-text body with styled HTML error pages.
+type statusCapture struct {
+	http.ResponseWriter
+	status int
+}
+
+func (sc *statusCapture) WriteHeader(status int) {
+	sc.status = status
+	// Intercept 404 and 405 — don't forward to the real writer yet.
+	if status != http.StatusNotFound && status != http.StatusMethodNotAllowed {
+		sc.ResponseWriter.WriteHeader(status)
+	}
+}
+
+func (sc *statusCapture) Write(b []byte) (int, error) {
+	// If an intercepted status was set, discard the default error body.
+	if sc.status == http.StatusNotFound || sc.status == http.StatusMethodNotAllowed {
+		return len(b), nil
+	}
+	// Implicit 200 — let the underlying writer handle it.
+	return sc.ResponseWriter.Write(b)
+}
+
+// errorPages intercepts 404 and 405 responses and renders styled HTML error
+// pages instead of the default plain-text ones. It is safe to add to the
+// outer "standard" middleware chain; any protected route that goes through
+// the "dynamic" chain will still have the correct auth / session context.
+func (app *application) errorPages(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sc := &statusCapture{ResponseWriter: w}
+		next.ServeHTTP(sc, r)
+
+		switch sc.status {
+		case http.StatusNotFound:
+			// Remove the text/plain content-type set by the mux before our HTML render.
+			w.Header().Del("Content-Type")
+			w.Header().Del("X-Content-Type-Options")
+			data := app.newTemplateData(r)
+			app.render(w, r, http.StatusNotFound, "404.gohtml", data)
+		case http.StatusMethodNotAllowed:
+			w.Header().Del("Content-Type")
+			w.Header().Del("X-Content-Type-Options")
+			data := app.newTemplateData(r)
+			app.render(w, r, http.StatusMethodNotAllowed, "405.gohtml", data)
+		}
+	})
+}
+
 // requireAdmin allows super_admin and branch_admin roles.
 func (app *application) requireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

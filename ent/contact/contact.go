@@ -111,6 +111,16 @@ const (
 	EdgePrayerRequests = "prayer_requests"
 	// EdgePastoralNotes holds the string denoting the pastoral_notes edge name in mutations.
 	EdgePastoralNotes = "pastoral_notes"
+	// EdgeMilestones holds the string denoting the milestones edge name in mutations.
+	EdgeMilestones = "milestones"
+	// EdgeDepartments holds the string denoting the departments edge name in mutations.
+	EdgeDepartments = "departments"
+	// EdgeLeadingDepartments holds the string denoting the leading_departments edge name in mutations.
+	EdgeLeadingDepartments = "leading_departments"
+	// EdgeRelationshipsFrom holds the string denoting the relationships_from edge name in mutations.
+	EdgeRelationshipsFrom = "relationships_from"
+	// EdgeRelationshipsTo holds the string denoting the relationships_to edge name in mutations.
+	EdgeRelationshipsTo = "relationships_to"
 	// Table holds the table name of the contact in the database.
 	Table = "contacts"
 	// UserTable is the table that holds the user relation/edge.
@@ -189,6 +199,39 @@ const (
 	PastoralNotesInverseTable = "pastoral_notes"
 	// PastoralNotesColumn is the table column denoting the pastoral_notes relation/edge.
 	PastoralNotesColumn = "contact_id"
+	// MilestonesTable is the table that holds the milestones relation/edge.
+	MilestonesTable = "milestones"
+	// MilestonesInverseTable is the table name for the Milestone entity.
+	// It exists in this package in order to avoid circular dependency with the "milestone" package.
+	MilestonesInverseTable = "milestones"
+	// MilestonesColumn is the table column denoting the milestones relation/edge.
+	MilestonesColumn = "contact_id"
+	// DepartmentsTable is the table that holds the departments relation/edge. The primary key declared below.
+	DepartmentsTable = "department_members"
+	// DepartmentsInverseTable is the table name for the Department entity.
+	// It exists in this package in order to avoid circular dependency with the "department" package.
+	DepartmentsInverseTable = "departments"
+	// LeadingDepartmentsTable is the table that holds the leading_departments relation/edge.
+	LeadingDepartmentsTable = "departments"
+	// LeadingDepartmentsInverseTable is the table name for the Department entity.
+	// It exists in this package in order to avoid circular dependency with the "department" package.
+	LeadingDepartmentsInverseTable = "departments"
+	// LeadingDepartmentsColumn is the table column denoting the leading_departments relation/edge.
+	LeadingDepartmentsColumn = "leader_id"
+	// RelationshipsFromTable is the table that holds the relationships_from relation/edge.
+	RelationshipsFromTable = "relationships"
+	// RelationshipsFromInverseTable is the table name for the Relationship entity.
+	// It exists in this package in order to avoid circular dependency with the "relationship" package.
+	RelationshipsFromInverseTable = "relationships"
+	// RelationshipsFromColumn is the table column denoting the relationships_from relation/edge.
+	RelationshipsFromColumn = "from_contact_id"
+	// RelationshipsToTable is the table that holds the relationships_to relation/edge.
+	RelationshipsToTable = "relationships"
+	// RelationshipsToInverseTable is the table name for the Relationship entity.
+	// It exists in this package in order to avoid circular dependency with the "relationship" package.
+	RelationshipsToInverseTable = "relationships"
+	// RelationshipsToColumn is the table column denoting the relationships_to relation/edge.
+	RelationshipsToColumn = "to_contact_id"
 )
 
 // Columns holds all SQL columns for contact fields.
@@ -236,6 +279,9 @@ var (
 	// GroupsPrimaryKey and GroupsColumn2 are the table columns denoting the
 	// primary key for the groups relation (M2M).
 	GroupsPrimaryKey = []string{"group_id", "contact_id"}
+	// DepartmentsPrimaryKey and DepartmentsColumn2 are the table columns denoting the
+	// primary key for the departments relation (M2M).
+	DepartmentsPrimaryKey = []string{"department_id", "contact_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -665,6 +711,76 @@ func ByPastoralNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPastoralNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByMilestonesCount orders the results by milestones count.
+func ByMilestonesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMilestonesStep(), opts...)
+	}
+}
+
+// ByMilestones orders the results by milestones terms.
+func ByMilestones(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMilestonesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDepartmentsCount orders the results by departments count.
+func ByDepartmentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDepartmentsStep(), opts...)
+	}
+}
+
+// ByDepartments orders the results by departments terms.
+func ByDepartments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDepartmentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByLeadingDepartmentsCount orders the results by leading_departments count.
+func ByLeadingDepartmentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLeadingDepartmentsStep(), opts...)
+	}
+}
+
+// ByLeadingDepartments orders the results by leading_departments terms.
+func ByLeadingDepartments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLeadingDepartmentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRelationshipsFromCount orders the results by relationships_from count.
+func ByRelationshipsFromCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRelationshipsFromStep(), opts...)
+	}
+}
+
+// ByRelationshipsFrom orders the results by relationships_from terms.
+func ByRelationshipsFrom(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRelationshipsFromStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRelationshipsToCount orders the results by relationships_to count.
+func ByRelationshipsToCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRelationshipsToStep(), opts...)
+	}
+}
+
+// ByRelationshipsTo orders the results by relationships_to terms.
+func ByRelationshipsTo(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRelationshipsToStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -747,5 +863,40 @@ func newPastoralNotesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PastoralNotesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PastoralNotesTable, PastoralNotesColumn),
+	)
+}
+func newMilestonesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MilestonesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MilestonesTable, MilestonesColumn),
+	)
+}
+func newDepartmentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DepartmentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, DepartmentsTable, DepartmentsPrimaryKey...),
+	)
+}
+func newLeadingDepartmentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LeadingDepartmentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, LeadingDepartmentsTable, LeadingDepartmentsColumn),
+	)
+}
+func newRelationshipsFromStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RelationshipsFromInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RelationshipsFromTable, RelationshipsFromColumn),
+	)
+}
+func newRelationshipsToStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RelationshipsToInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RelationshipsToTable, RelationshipsToColumn),
 	)
 }

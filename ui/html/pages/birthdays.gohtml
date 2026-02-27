@@ -1,0 +1,251 @@
+{{define "title"}}Upcoming Birthdays | FaithConnect{{end}}
+{{define "description"}}View and celebrate upcoming member birthdays{{end}}
+
+{{define "main"}}
+{{$window  := index .Data "window"}}
+{{$entries := index .Data "entries"}}
+
+<div class="bd-wrap">
+
+    <!-- ── Page Header ───────────────────────────────────────────────── -->
+    <div class="bd-header">
+        <div>
+            <h1 class="bd-title"><i class="fas fa-cake-candles"></i> Upcoming Birthdays</h1>
+            <p class="bd-sub">Celebrate the people in your congregation</p>
+        </div>
+        <a href="/members" class="bd-hdr-link">
+            <i class="fas fa-users"></i> All Members
+        </a>
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>
+        <i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+
+    <!-- ── Filter Pills ───────────────────────────────────────────────── -->
+    <div class="bd-filters">
+        <a href="/birthdays?window=7"   class="bd-pill {{if eq $window 7}}active{{end}}">
+            <i class="fas fa-calendar-week"></i> This Week
+        </a>
+        <a href="/birthdays?window=30"  class="bd-pill {{if eq $window 30}}active{{end}}">
+            <i class="fas fa-calendar-day"></i> This Month
+        </a>
+        <a href="/birthdays?window=60"  class="bd-pill {{if eq $window 60}}active{{end}}">
+            <i class="fas fa-calendar"></i> Next 60 Days
+        </a>
+        <a href="/birthdays?window=365" class="bd-pill {{if eq $window 365}}active{{end}}">
+            <i class="fas fa-calendar-alt"></i> All Year
+        </a>
+    </div>
+
+    <!-- ── Results Summary ────────────────────────────────────────────── -->
+    {{if $entries}}
+    <p class="bd-count">
+        <strong>{{len $entries}}</strong>
+        {{if eq (len $entries) 1}}birthday{{else}}birthdays{{end}}
+        {{if eq $window 7}}this week{{else if eq $window 30}}this month{{else if eq $window 60}}in the next 60 days{{else}}this year{{end}}
+    </p>
+    {{end}}
+
+    <!-- ── Birthday Cards ─────────────────────────────────────────────── -->
+    {{if $entries}}
+    <div class="bd-grid">
+        {{range $entries}}
+        <a href="/members/{{.ContactID}}" class="bd-card {{if .IsToday}}bd-today{{end}}">
+
+            {{if .IsToday}}
+            <div class="bd-today-ribbon"><i class="fas fa-star"></i> Today!</div>
+            {{end}}
+
+            <!-- Avatar -->
+            <div class="bd-avatar {{if .PhotoURL}}has-photo{{end}}">
+                {{if .PhotoURL}}
+                <img src="{{.PhotoURL}}" alt="{{.FirstName}} {{.LastName}}">
+                {{else}}
+                {{.Initials}}
+                {{end}}
+            </div>
+
+            <!-- Info -->
+            <div class="bd-info">
+                <div class="bd-name">{{.FirstName}} {{.LastName}}</div>
+                <div class="bd-date">
+                    <i class="fas fa-cake-candles"></i> {{.BirthdayStr}}
+                </div>
+                {{if gt .AgeTurning 0}}
+                <div class="bd-age">Turning {{.AgeTurning}}</div>
+                {{end}}
+            </div>
+
+            <!-- Days-until badge -->
+            <div class="bd-days-badge
+                {{- if .IsToday}} badge-today
+                {{- else if le .DaysUntil 3}} badge-soon
+                {{- else}} badge-normal
+                {{- end}}">
+                {{if .IsToday}}
+                    <i class="fas fa-birthday-cake"></i>
+                {{else if eq .DaysUntil 1}}
+                    Tomorrow
+                {{else}}
+                    {{.DaysUntil}}d
+                {{end}}
+            </div>
+
+        </a>
+        {{end}}
+    </div>
+
+    {{else}}
+    <!-- Empty state -->
+    <div class="bd-empty">
+        <div class="bd-empty-icon"><i class="fas fa-birthday-cake"></i></div>
+        <h3>No birthdays in this window</h3>
+        <p>Try a wider time range using the filter above.</p>
+        <a href="/birthdays?window=365" class="button is-primary mt-3">View All Year</a>
+    </div>
+    {{end}}
+
+</div>
+
+<style>
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.bd-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.bd-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;
+}
+.bd-title {
+    font-size: 1.8rem; font-weight: 800; color: var(--text-dark);
+    margin: 0 0 4px; display: flex; align-items: center; gap: 10px;
+}
+.bd-title i { color: var(--primary); }
+.bd-sub { font-size: 0.875rem; color: var(--text-light); margin: 0; }
+.bd-hdr-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 18px; border: 1.5px solid var(--light-gray);
+    border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+    color: var(--text-dark); text-decoration: none; transition: all 0.15s;
+}
+.bd-hdr-link:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Filters ─────────────────────────────────────────────────────────── */
+.bd-filters {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem;
+}
+.bd-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 20px; font-size: 0.83rem; font-weight: 500;
+    border: 1.5px solid var(--light-gray); color: var(--text-medium);
+    text-decoration: none; transition: all 0.15s; background: white;
+}
+.bd-pill i { font-size: 0.78rem; }
+.bd-pill:hover { border-color: var(--primary); color: var(--primary); background: rgba(80,34,45,0.04); }
+.bd-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+.bd-pill.active:hover { background: var(--primary-dark); }
+
+/* ── Count ───────────────────────────────────────────────────────────── */
+.bd-count {
+    font-size: 0.875rem; color: var(--text-light); margin-bottom: 1.25rem;
+}
+.bd-count strong { color: var(--text-dark); }
+
+/* ── Grid ────────────────────────────────────────────────────────────── */
+.bd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.bd-card {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.5rem 1rem 1.25rem;
+    background: white; border: 1px solid var(--light-gray);
+    border-radius: 14px; text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    overflow: hidden; text-align: center;
+}
+.bd-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(80,34,45,0.12);
+    border-color: rgba(80,34,45,0.25);
+}
+.bd-card.bd-today {
+    border-color: #EC4899;
+    background: linear-gradient(135deg, rgba(236,72,153,0.04), white);
+    box-shadow: 0 4px 20px rgba(236,72,153,0.15);
+}
+.bd-today-ribbon {
+    position: absolute; top: 10px; right: -24px;
+    background: linear-gradient(135deg, #EC4899, #F43F5E);
+    color: white; font-size: 0.68rem; font-weight: 700;
+    padding: 3px 28px; transform: rotate(35deg);
+    letter-spacing: 0.3px; text-transform: uppercase;
+}
+
+/* Avatar */
+.bd-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #6B2F3D);
+    color: white; font-size: 1.4rem; font-weight: 700; letter-spacing: -1px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.875rem; flex-shrink: 0; overflow: hidden;
+    box-shadow: 0 4px 12px rgba(80,34,45,0.2);
+}
+.bd-avatar.has-photo { background: none; }
+.bd-avatar.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Card info */
+.bd-info { width: 100%; }
+.bd-name {
+    font-size: 0.95rem; font-weight: 700; color: var(--text-dark);
+    margin-bottom: 4px; line-height: 1.3;
+}
+.bd-date {
+    font-size: 0.8rem; color: var(--text-light); margin-bottom: 3px;
+}
+.bd-date i { color: var(--primary); margin-right: 3px; }
+.bd-age {
+    font-size: 0.75rem; color: #9E8FB5; font-weight: 600;
+}
+
+/* Days badge */
+.bd-days-badge {
+    margin-top: 0.75rem;
+    padding: 4px 12px; border-radius: 12px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2px;
+    display: inline-flex; align-items: center; gap: 4px;
+}
+.badge-today {
+    background: linear-gradient(135deg, #EC4899, #F43F5E);
+    color: white; font-size: 1.1rem; padding: 6px 14px;
+}
+.badge-soon { background: rgba(245,158,11,0.15); color: #D97706; }
+.badge-normal { background: rgba(80,34,45,0.08); color: var(--primary); }
+
+/* ── Empty State ─────────────────────────────────────────────────────── */
+.bd-empty {
+    text-align: center; padding: 5rem 2rem;
+    color: var(--text-light);
+}
+.bd-empty-icon {
+    font-size: 3.5rem; color: var(--light-gray);
+    margin-bottom: 1rem;
+}
+.bd-empty h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-medium); margin-bottom: 0.5rem; }
+.bd-empty p { font-size: 0.875rem; }
+
+@media (max-width: 600px) {
+    .bd-wrap { padding: 1rem; }
+    .bd-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+    .bd-title { font-size: 1.4rem; }
+}
+</style>
+{{end}}

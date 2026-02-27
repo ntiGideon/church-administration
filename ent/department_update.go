@@ -6,11 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/predicate"
 )
@@ -56,6 +58,12 @@ func (_u *DepartmentUpdate) SetNillableDescription(v *string) *DepartmentUpdate 
 	return _u
 }
 
+// ClearDescription clears the value of the "description" field.
+func (_u *DepartmentUpdate) ClearDescription() *DepartmentUpdate {
+	_u.mutation.ClearDescription()
+	return _u
+}
+
 // SetDepartmentType sets the "department_type" field.
 func (_u *DepartmentUpdate) SetDepartmentType(v department.DepartmentType) *DepartmentUpdate {
 	_u.mutation.SetDepartmentType(v)
@@ -84,15 +92,83 @@ func (_u *DepartmentUpdate) SetNillableIsActive(v *bool) *DepartmentUpdate {
 	return _u
 }
 
-// SetChurchID sets the "church" edge to the Church entity by ID.
-func (_u *DepartmentUpdate) SetChurchID(id int) *DepartmentUpdate {
-	_u.mutation.SetChurchID(id)
+// SetChurchID sets the "church_id" field.
+func (_u *DepartmentUpdate) SetChurchID(v int) *DepartmentUpdate {
+	_u.mutation.SetChurchID(v)
+	return _u
+}
+
+// SetNillableChurchID sets the "church_id" field if the given value is not nil.
+func (_u *DepartmentUpdate) SetNillableChurchID(v *int) *DepartmentUpdate {
+	if v != nil {
+		_u.SetChurchID(*v)
+	}
+	return _u
+}
+
+// SetLeaderID sets the "leader_id" field.
+func (_u *DepartmentUpdate) SetLeaderID(v int) *DepartmentUpdate {
+	_u.mutation.SetLeaderID(v)
+	return _u
+}
+
+// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
+func (_u *DepartmentUpdate) SetNillableLeaderID(v *int) *DepartmentUpdate {
+	if v != nil {
+		_u.SetLeaderID(*v)
+	}
+	return _u
+}
+
+// ClearLeaderID clears the value of the "leader_id" field.
+func (_u *DepartmentUpdate) ClearLeaderID() *DepartmentUpdate {
+	_u.mutation.ClearLeaderID()
+	return _u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_u *DepartmentUpdate) SetCreatedAt(v time.Time) *DepartmentUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_u *DepartmentUpdate) SetNillableCreatedAt(v *time.Time) *DepartmentUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
+	}
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *DepartmentUpdate) SetUpdatedAt(v time.Time) *DepartmentUpdate {
+	_u.mutation.SetUpdatedAt(v)
 	return _u
 }
 
 // SetChurch sets the "church" edge to the Church entity.
 func (_u *DepartmentUpdate) SetChurch(v *Church) *DepartmentUpdate {
 	return _u.SetChurchID(v.ID)
+}
+
+// SetLeader sets the "leader" edge to the Contact entity.
+func (_u *DepartmentUpdate) SetLeader(v *Contact) *DepartmentUpdate {
+	return _u.SetLeaderID(v.ID)
+}
+
+// AddMemberIDs adds the "members" edge to the Contact entity by IDs.
+func (_u *DepartmentUpdate) AddMemberIDs(ids ...int) *DepartmentUpdate {
+	_u.mutation.AddMemberIDs(ids...)
+	return _u
+}
+
+// AddMembers adds the "members" edges to the Contact entity.
+func (_u *DepartmentUpdate) AddMembers(v ...*Contact) *DepartmentUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMemberIDs(ids...)
 }
 
 // Mutation returns the DepartmentMutation object of the builder.
@@ -106,8 +182,36 @@ func (_u *DepartmentUpdate) ClearChurch() *DepartmentUpdate {
 	return _u
 }
 
+// ClearLeader clears the "leader" edge to the Contact entity.
+func (_u *DepartmentUpdate) ClearLeader() *DepartmentUpdate {
+	_u.mutation.ClearLeader()
+	return _u
+}
+
+// ClearMembers clears all "members" edges to the Contact entity.
+func (_u *DepartmentUpdate) ClearMembers() *DepartmentUpdate {
+	_u.mutation.ClearMembers()
+	return _u
+}
+
+// RemoveMemberIDs removes the "members" edge to Contact entities by IDs.
+func (_u *DepartmentUpdate) RemoveMemberIDs(ids ...int) *DepartmentUpdate {
+	_u.mutation.RemoveMemberIDs(ids...)
+	return _u
+}
+
+// RemoveMembers removes "members" edges to Contact entities.
+func (_u *DepartmentUpdate) RemoveMembers(v ...*Contact) *DepartmentUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMemberIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *DepartmentUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -130,6 +234,14 @@ func (_u *DepartmentUpdate) Exec(ctx context.Context) error {
 func (_u *DepartmentUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *DepartmentUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		v := department.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -164,11 +276,20 @@ func (_u *DepartmentUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(department.FieldDescription, field.TypeString, value)
 	}
+	if _u.mutation.DescriptionCleared() {
+		_spec.ClearField(department.FieldDescription, field.TypeString)
+	}
 	if value, ok := _u.mutation.DepartmentType(); ok {
 		_spec.SetField(department.FieldDepartmentType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.IsActive(); ok {
 		_spec.SetField(department.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.CreatedAt(); ok {
+		_spec.SetField(department.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.ChurchCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -192,6 +313,80 @@ func (_u *DepartmentUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeaderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   department.LeaderTable,
+			Columns: []string{department.LeaderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeaderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   department.LeaderTable,
+			Columns: []string{department.LeaderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMembersIDs(); len(nodes) > 0 && !_u.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -247,6 +442,12 @@ func (_u *DepartmentUpdateOne) SetNillableDescription(v *string) *DepartmentUpda
 	return _u
 }
 
+// ClearDescription clears the value of the "description" field.
+func (_u *DepartmentUpdateOne) ClearDescription() *DepartmentUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
+}
+
 // SetDepartmentType sets the "department_type" field.
 func (_u *DepartmentUpdateOne) SetDepartmentType(v department.DepartmentType) *DepartmentUpdateOne {
 	_u.mutation.SetDepartmentType(v)
@@ -275,15 +476,83 @@ func (_u *DepartmentUpdateOne) SetNillableIsActive(v *bool) *DepartmentUpdateOne
 	return _u
 }
 
-// SetChurchID sets the "church" edge to the Church entity by ID.
-func (_u *DepartmentUpdateOne) SetChurchID(id int) *DepartmentUpdateOne {
-	_u.mutation.SetChurchID(id)
+// SetChurchID sets the "church_id" field.
+func (_u *DepartmentUpdateOne) SetChurchID(v int) *DepartmentUpdateOne {
+	_u.mutation.SetChurchID(v)
+	return _u
+}
+
+// SetNillableChurchID sets the "church_id" field if the given value is not nil.
+func (_u *DepartmentUpdateOne) SetNillableChurchID(v *int) *DepartmentUpdateOne {
+	if v != nil {
+		_u.SetChurchID(*v)
+	}
+	return _u
+}
+
+// SetLeaderID sets the "leader_id" field.
+func (_u *DepartmentUpdateOne) SetLeaderID(v int) *DepartmentUpdateOne {
+	_u.mutation.SetLeaderID(v)
+	return _u
+}
+
+// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
+func (_u *DepartmentUpdateOne) SetNillableLeaderID(v *int) *DepartmentUpdateOne {
+	if v != nil {
+		_u.SetLeaderID(*v)
+	}
+	return _u
+}
+
+// ClearLeaderID clears the value of the "leader_id" field.
+func (_u *DepartmentUpdateOne) ClearLeaderID() *DepartmentUpdateOne {
+	_u.mutation.ClearLeaderID()
+	return _u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_u *DepartmentUpdateOne) SetCreatedAt(v time.Time) *DepartmentUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_u *DepartmentUpdateOne) SetNillableCreatedAt(v *time.Time) *DepartmentUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
+	}
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *DepartmentUpdateOne) SetUpdatedAt(v time.Time) *DepartmentUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
 	return _u
 }
 
 // SetChurch sets the "church" edge to the Church entity.
 func (_u *DepartmentUpdateOne) SetChurch(v *Church) *DepartmentUpdateOne {
 	return _u.SetChurchID(v.ID)
+}
+
+// SetLeader sets the "leader" edge to the Contact entity.
+func (_u *DepartmentUpdateOne) SetLeader(v *Contact) *DepartmentUpdateOne {
+	return _u.SetLeaderID(v.ID)
+}
+
+// AddMemberIDs adds the "members" edge to the Contact entity by IDs.
+func (_u *DepartmentUpdateOne) AddMemberIDs(ids ...int) *DepartmentUpdateOne {
+	_u.mutation.AddMemberIDs(ids...)
+	return _u
+}
+
+// AddMembers adds the "members" edges to the Contact entity.
+func (_u *DepartmentUpdateOne) AddMembers(v ...*Contact) *DepartmentUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMemberIDs(ids...)
 }
 
 // Mutation returns the DepartmentMutation object of the builder.
@@ -295,6 +564,33 @@ func (_u *DepartmentUpdateOne) Mutation() *DepartmentMutation {
 func (_u *DepartmentUpdateOne) ClearChurch() *DepartmentUpdateOne {
 	_u.mutation.ClearChurch()
 	return _u
+}
+
+// ClearLeader clears the "leader" edge to the Contact entity.
+func (_u *DepartmentUpdateOne) ClearLeader() *DepartmentUpdateOne {
+	_u.mutation.ClearLeader()
+	return _u
+}
+
+// ClearMembers clears all "members" edges to the Contact entity.
+func (_u *DepartmentUpdateOne) ClearMembers() *DepartmentUpdateOne {
+	_u.mutation.ClearMembers()
+	return _u
+}
+
+// RemoveMemberIDs removes the "members" edge to Contact entities by IDs.
+func (_u *DepartmentUpdateOne) RemoveMemberIDs(ids ...int) *DepartmentUpdateOne {
+	_u.mutation.RemoveMemberIDs(ids...)
+	return _u
+}
+
+// RemoveMembers removes "members" edges to Contact entities.
+func (_u *DepartmentUpdateOne) RemoveMembers(v ...*Contact) *DepartmentUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMemberIDs(ids...)
 }
 
 // Where appends a list predicates to the DepartmentUpdate builder.
@@ -312,6 +608,7 @@ func (_u *DepartmentUpdateOne) Select(field string, fields ...string) *Departmen
 
 // Save executes the query and returns the updated Department entity.
 func (_u *DepartmentUpdateOne) Save(ctx context.Context) (*Department, error) {
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -334,6 +631,14 @@ func (_u *DepartmentUpdateOne) Exec(ctx context.Context) error {
 func (_u *DepartmentUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_u *DepartmentUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		v := department.UpdateDefaultUpdatedAt()
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -385,11 +690,20 @@ func (_u *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department, 
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(department.FieldDescription, field.TypeString, value)
 	}
+	if _u.mutation.DescriptionCleared() {
+		_spec.ClearField(department.FieldDescription, field.TypeString)
+	}
 	if value, ok := _u.mutation.DepartmentType(); ok {
 		_spec.SetField(department.FieldDepartmentType, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.IsActive(); ok {
 		_spec.SetField(department.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.CreatedAt(); ok {
+		_spec.SetField(department.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.ChurchCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -413,6 +727,80 @@ func (_u *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(church.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.LeaderCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   department.LeaderTable,
+			Columns: []string{department.LeaderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LeaderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   department.LeaderTable,
+			Columns: []string{department.LeaderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMembersIDs(); len(nodes) > 0 && !_u.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

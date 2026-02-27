@@ -59,9 +59,11 @@ type UserEdges struct {
 	AcceptedInvitation *Invitation `json:"accepted_invitation,omitempty"`
 	// PastoralNotesRecorded holds the value of the pastoral_notes_recorded edge.
 	PastoralNotesRecorded []*PastoralNote `json:"pastoral_notes_recorded,omitempty"`
+	// SentCommunications holds the value of the sent_communications edge.
+	SentCommunications []*Communication `json:"sent_communications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 }
 
 // ChurchOrErr returns the Church value or an error if the edge
@@ -131,6 +133,15 @@ func (e UserEdges) PastoralNotesRecordedOrErr() ([]*PastoralNote, error) {
 		return e.PastoralNotesRecorded, nil
 	}
 	return nil, &NotLoadedError{edge: "pastoral_notes_recorded"}
+}
+
+// SentCommunicationsOrErr returns the SentCommunications value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SentCommunicationsOrErr() ([]*Communication, error) {
+	if e.loadedTypes[7] {
+		return e.SentCommunications, nil
+	}
+	return nil, &NotLoadedError{edge: "sent_communications"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -282,6 +293,11 @@ func (_m *User) QueryAcceptedInvitation() *InvitationQuery {
 // QueryPastoralNotesRecorded queries the "pastoral_notes_recorded" edge of the User entity.
 func (_m *User) QueryPastoralNotesRecorded() *PastoralNoteQuery {
 	return NewUserClient(_m.config).QueryPastoralNotesRecorded(_m)
+}
+
+// QuerySentCommunications queries the "sent_communications" edge of the User entity.
+func (_m *User) QuerySentCommunications() *CommunicationQuery {
+	return NewUserClient(_m.config).QuerySentCommunications(_m)
 }
 
 // Update returns a builder for updating this User.

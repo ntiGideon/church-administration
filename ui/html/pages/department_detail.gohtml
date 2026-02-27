@@ -1,0 +1,228 @@
+{{define "title"}}Department | FaithConnect{{end}}
+{{define "description"}}Ministry department detail{{end}}
+
+{{define "main"}}
+{{$dept       := index .Data "department"}}
+{{$allMembers := index .Data "allMembers"}}
+{{$inDept     := index .Data "inDept"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <a href="/departments" class="back-link"><i class="fas fa-arrow-left"></i> Departments</a>
+            <h1 class="page-title-text">{{$dept.Name}}</h1>
+            <span class="dept-type-chip">{{deptTypeLabel (enumStr $dept.DepartmentType)}}</span>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+        <div class="action-btns">
+            <a href="/departments/{{$dept.ID}}/edit" class="button is-small is-warning is-light">
+                <span class="icon"><i class="fas fa-edit"></i></span><span>Edit</span>
+            </a>
+            <form action="/departments/{{$dept.ID}}/delete" method="POST"
+                  onsubmit="return confirm('Delete this department? Members will not be removed.')">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                </button>
+            </form>
+        </div>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button>{{.Flash}}
+    </div>
+    {{end}}
+
+    <div class="detail-layout">
+        <!-- Sidebar info -->
+        <aside class="sidebar-card">
+            <div class="dept-hero-icon dt-{{$dept.DepartmentType}}">
+                <i class="fas {{deptTypeIcon (enumStr $dept.DepartmentType)}}"></i>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Status</div>
+                <span class="status-pill {{if $dept.IsActive}}active{{else}}inactive{{end}}">
+                    {{if $dept.IsActive}}<i class="fas fa-circle"></i> Active{{else}}<i class="fas fa-circle"></i> Inactive{{end}}
+                </span>
+            </div>
+            {{if $dept.Description}}
+            <div class="sidebar-section">
+                <div class="sidebar-label">About</div>
+                <p class="sidebar-desc">{{$dept.Description}}</p>
+            </div>
+            {{end}}
+            {{if $dept.Edges.Leader}}
+            <div class="sidebar-section">
+                <div class="sidebar-label">Leader</div>
+                <a href="/members/{{$dept.Edges.Leader.ID}}" class="leader-link">
+                    <div class="leader-avatar">{{slice $dept.Edges.Leader.FirstName 0 1}}{{slice $dept.Edges.Leader.LastName 0 1}}</div>
+                    <span>{{$dept.Edges.Leader.FirstName}} {{$dept.Edges.Leader.LastName}}</span>
+                </a>
+            </div>
+            {{end}}
+            <div class="sidebar-section">
+                <div class="sidebar-label">Total Members</div>
+                <div class="sidebar-stat">{{len $dept.Edges.Members}}</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Created</div>
+                <div class="sidebar-meta">{{$dept.CreatedAt.Format "2 Jan 2006"}}</div>
+            </div>
+        </aside>
+
+        <!-- Main area: roster + add form -->
+        <div class="main-col">
+            <!-- Add member form -->
+            {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+            {{$role := $.LoggedInUser.Role.String}}
+            {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+            <div class="add-member-card">
+                <div class="add-member-title"><i class="fas fa-user-plus"></i> Add Member</div>
+                <form action="/departments/{{$dept.ID}}/members/add" method="POST" class="add-member-form">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                    <div class="add-member-row">
+                        <div class="select-wrap flex-1">
+                            <select name="contact_id" class="field-select" required>
+                                <option value="">— select a member —</option>
+                                {{range $allMembers}}
+                                {{if not (index $inDept .ID)}}
+                                <option value="{{.ID}}">{{.FirstName}} {{.LastName}}</option>
+                                {{end}}
+                                {{end}}
+                            </select>
+                            <i class="fas fa-chevron-down sel-arrow"></i>
+                        </div>
+                        <button type="submit" class="button is-primary is-small">
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                            <span>Add</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {{end}}{{end}}{{end}}
+
+            <!-- Member roster -->
+            <div class="roster-card">
+                <div class="roster-header">
+                    <span class="roster-title">Members <span class="roster-count">{{len $dept.Edges.Members}}</span></span>
+                </div>
+                {{if $dept.Edges.Members}}
+                <table class="roster-table">
+                    <thead>
+                        <tr><th>Name</th><th>Phone</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        {{range $dept.Edges.Members}}
+                        <tr>
+                            <td>
+                                <a href="/members/{{.ID}}" class="member-name-link">
+                                    <div class="member-avatar-sm">{{slice .FirstName 0 1}}{{slice .LastName 0 1}}</div>
+                                    {{.FirstName}} {{.LastName}}
+                                </a>
+                            </td>
+                            <td class="phone-cell">{{if .Phone}}{{.Phone}}{{else}}—{{end}}</td>
+                            <td class="action-cell">
+                                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+                                {{$role := $.LoggedInUser.Role.String}}
+                                {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+                                <form action="/departments/{{$dept.ID}}/members/{{.ID}}/remove" method="POST"
+                                      onsubmit="return confirm('Remove from department?')">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                    <button type="submit" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
+                                </form>
+                                {{end}}{{end}}{{end}}
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{else}}
+                <p class="roster-empty">No members yet. Add members using the form above.</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-light); text-decoration: none; margin-bottom: 4px; }
+.back-link:hover { color: var(--primary); }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.dept-type-chip { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 10px; background: rgba(80,34,45,0.08); color: var(--primary); margin-top: 4px; }
+.action-btns { display: flex; gap: 8px; align-items: center; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.detail-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; align-items: start; }
+
+/* Sidebar */
+.sidebar-card { background: white; border: 1px solid var(--light-gray); border-radius: 14px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.dept-hero-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 0.25rem; }
+.dt-worship        { background: #FFF7ED; color: #F97316; }
+.dt-youth          { background: #EFF6FF; color: #3B82F6; }
+.dt-children       { background: #FDF4FF; color: #A855F7; }
+.dt-outreach       { background: #F0FDF4; color: #16A34A; }
+.dt-administration { background: rgba(80,34,45,0.08); color: var(--primary); }
+.dt-finance        { background: #FFFBEB; color: #D97706; }
+.dt-media          { background: #F0FDFA; color: #0D9488; }
+.dt-other          { background: #F9FAFB; color: #6B7280; }
+.sidebar-section { border-top: 1px solid var(--light-gray); padding-top: 0.75rem; }
+.sidebar-label { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; }
+.status-pill.active   { color: #10B981; }
+.status-pill.inactive { color: #9CA3AF; }
+.status-pill i { font-size: 0.5rem; }
+.sidebar-desc { font-size: 0.82rem; color: var(--text-medium); line-height: 1.5; margin: 0; }
+.leader-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-dark); font-size: 0.85rem; font-weight: 600; }
+.leader-link:hover { color: var(--primary); }
+.leader-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #6B2F3D); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; flex-shrink: 0; }
+.sidebar-stat { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+.sidebar-meta { font-size: 0.82rem; color: var(--text-medium); }
+
+/* Main column */
+.main-col { display: flex; flex-direction: column; gap: 1rem; }
+.add-member-card { background: white; border: 1px solid var(--light-gray); border-radius: 12px; padding: 1rem 1.25rem; }
+.add-member-title { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
+.add-member-title i { color: var(--primary); }
+.add-member-form { }
+.add-member-row { display: flex; gap: 8px; align-items: center; }
+.flex-1 { flex: 1; }
+.select-wrap { position: relative; }
+.field-select { appearance: none; width: 100%; padding: 8px 2rem 8px 10px; border: 1px solid var(--light-gray); border-radius: 9px; font-size: 0.88rem; color: var(--text-dark); background: white; font-family: inherit; cursor: pointer; }
+.field-select:focus { outline: none; border-color: var(--primary); }
+.sel-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.62rem; color: var(--text-light); pointer-events: none; }
+
+.roster-card { background: white; border: 1px solid var(--light-gray); border-radius: 12px; overflow: hidden; }
+.roster-header { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--light-gray); }
+.roster-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+.roster-count { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(80,34,45,0.08); color: var(--primary); font-size: 0.72rem; font-weight: 700; margin-left: 6px; }
+.roster-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.roster-table th { padding: 8px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; background: #FAFAFA; border-bottom: 1px solid var(--light-gray); }
+.roster-table td { padding: 10px 14px; border-bottom: 1px solid var(--light-gray); vertical-align: middle; }
+.roster-table tr:last-child td { border-bottom: none; }
+.member-name-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-dark); font-weight: 600; }
+.member-name-link:hover { color: var(--primary); }
+.member-avatar-sm { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #6B2F3D); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; flex-shrink: 0; }
+.phone-cell { color: var(--text-light); font-size: 0.82rem; }
+.action-cell { width: 40px; }
+.remove-btn { background: none; border: none; cursor: pointer; color: #CBD5E1; padding: 4px 6px; border-radius: 6px; transition: color 0.15s; }
+.remove-btn:hover { color: #EF4444; }
+.roster-empty { padding: 1.5rem 1.25rem; font-size: 0.85rem; color: var(--text-light); font-style: italic; margin: 0; }
+
+@media (max-width: 700px) {
+    .page-wrapper { padding: 1rem; }
+    .detail-layout { grid-template-columns: 1fr; }
+    .sidebar-card { flex-direction: row; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+    .dept-hero-icon { margin: 0; }
+}
+</style>
+
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

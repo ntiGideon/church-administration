@@ -6,10 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 )
 
@@ -29,6 +31,14 @@ func (_c *DepartmentCreate) SetName(v string) *DepartmentCreate {
 // SetDescription sets the "description" field.
 func (_c *DepartmentCreate) SetDescription(v string) *DepartmentCreate {
 	_c.mutation.SetDescription(v)
+	return _c
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (_c *DepartmentCreate) SetNillableDescription(v *string) *DepartmentCreate {
+	if v != nil {
+		_c.SetDescription(*v)
+	}
 	return _c
 }
 
@@ -52,15 +62,77 @@ func (_c *DepartmentCreate) SetNillableIsActive(v *bool) *DepartmentCreate {
 	return _c
 }
 
-// SetChurchID sets the "church" edge to the Church entity by ID.
-func (_c *DepartmentCreate) SetChurchID(id int) *DepartmentCreate {
-	_c.mutation.SetChurchID(id)
+// SetChurchID sets the "church_id" field.
+func (_c *DepartmentCreate) SetChurchID(v int) *DepartmentCreate {
+	_c.mutation.SetChurchID(v)
+	return _c
+}
+
+// SetLeaderID sets the "leader_id" field.
+func (_c *DepartmentCreate) SetLeaderID(v int) *DepartmentCreate {
+	_c.mutation.SetLeaderID(v)
+	return _c
+}
+
+// SetNillableLeaderID sets the "leader_id" field if the given value is not nil.
+func (_c *DepartmentCreate) SetNillableLeaderID(v *int) *DepartmentCreate {
+	if v != nil {
+		_c.SetLeaderID(*v)
+	}
+	return _c
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_c *DepartmentCreate) SetCreatedAt(v time.Time) *DepartmentCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *DepartmentCreate) SetNillableCreatedAt(v *time.Time) *DepartmentCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *DepartmentCreate) SetUpdatedAt(v time.Time) *DepartmentCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *DepartmentCreate) SetNillableUpdatedAt(v *time.Time) *DepartmentCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
 	return _c
 }
 
 // SetChurch sets the "church" edge to the Church entity.
 func (_c *DepartmentCreate) SetChurch(v *Church) *DepartmentCreate {
 	return _c.SetChurchID(v.ID)
+}
+
+// SetLeader sets the "leader" edge to the Contact entity.
+func (_c *DepartmentCreate) SetLeader(v *Contact) *DepartmentCreate {
+	return _c.SetLeaderID(v.ID)
+}
+
+// AddMemberIDs adds the "members" edge to the Contact entity by IDs.
+func (_c *DepartmentCreate) AddMemberIDs(ids ...int) *DepartmentCreate {
+	_c.mutation.AddMemberIDs(ids...)
+	return _c
+}
+
+// AddMembers adds the "members" edges to the Contact entity.
+func (_c *DepartmentCreate) AddMembers(v ...*Contact) *DepartmentCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddMemberIDs(ids...)
 }
 
 // Mutation returns the DepartmentMutation object of the builder.
@@ -102,15 +174,20 @@ func (_c *DepartmentCreate) defaults() {
 		v := department.DefaultIsActive
 		_c.mutation.SetIsActive(v)
 	}
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		v := department.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		v := department.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *DepartmentCreate) check() error {
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Department.name"`)}
-	}
-	if _, ok := _c.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Department.description"`)}
 	}
 	if _, ok := _c.mutation.DepartmentType(); !ok {
 		return &ValidationError{Name: "department_type", err: errors.New(`ent: missing required field "Department.department_type"`)}
@@ -122,6 +199,15 @@ func (_c *DepartmentCreate) check() error {
 	}
 	if _, ok := _c.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Department.is_active"`)}
+	}
+	if _, ok := _c.mutation.ChurchID(); !ok {
+		return &ValidationError{Name: "church_id", err: errors.New(`ent: missing required field "Department.church_id"`)}
+	}
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Department.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Department.updated_at"`)}
 	}
 	if len(_c.mutation.ChurchIDs()) == 0 {
 		return &ValidationError{Name: "church", err: errors.New(`ent: missing required edge "Department.church"`)}
@@ -168,6 +254,14 @@ func (_c *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		_spec.SetField(department.FieldIsActive, field.TypeBool, value)
 		_node.IsActive = value
 	}
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(department.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
 	if nodes := _c.mutation.ChurchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -182,7 +276,40 @@ func (_c *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.church_departments = &nodes[0]
+		_node.ChurchID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.LeaderIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   department.LeaderTable,
+			Columns: []string{department.LeaderColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.LeaderID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MembersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   department.MembersTable,
+			Columns: department.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(contact.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

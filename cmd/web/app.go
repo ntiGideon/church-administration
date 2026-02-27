@@ -36,4 +36,8 @@ type application struct {
 	prayerModel       *models.PrayerRequestModel
 	documentModel     *models.DocumentModel
 	pastoralModel     *models.PastoralNoteModel
+	milestoneModel     *models.MilestoneModel
+	departmentModel    *models.DepartmentModel
+	relationshipModel    *models.RelationshipModel
+	communicationModel   *models.CommunicationModel
 }

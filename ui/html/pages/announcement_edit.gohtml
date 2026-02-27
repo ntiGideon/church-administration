@@ -1,0 +1,161 @@
+{{define "title"}}Edit Announcement | FaithConnect{{end}}
+{{define "description"}}Edit church announcement{{end}}
+
+{{define "main"}}
+{{$ann := index .Data "announcement"}}
+
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <nav class="breadcrumb-simple">
+                <a href="/announcements">Announcements</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="/announcements/{{$ann.ID}}">{{$ann.Title}}</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Edit</span>
+            </nav>
+            <h1 class="page-title-text">Edit Announcement</h1>
+        </div>
+        <a href="/announcements/{{$ann.ID}}" class="button is-outlined">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Back</span>
+        </a>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3><i class="fas fa-bullhorn mr-2"></i>Announcement Details</h3>
+            </div>
+
+            {{with .Form}}
+            {{if .NonFieldErrors}}
+            <div class="notification is-danger is-light" style="margin:1.5rem 1.5rem 0">
+                {{range .NonFieldErrors}}<p>{{.}}</p>{{end}}
+            </div>
+            {{end}}
+            {{end}}
+
+            <form action="/announcements/{{$ann.ID}}/edit" method="POST" class="form-body">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+                <div class="field">
+                    <label class="label">Title *</label>
+                    <div class="control">
+                        <input class="input {{with .Form}}{{if index .FieldErrors "title"}}is-danger{{end}}{{end}}"
+                               type="text" name="title" placeholder="Announcement title"
+                               value="{{with .Form}}{{.Title}}{{end}}" required>
+                    </div>
+                    {{with .Form}}{{with index .FieldErrors "title"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="label">Category *</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="general"   {{with .Form}}{{if eq .Category "general"}}selected{{end}}{{end}}>General</option>
+                                    <option value="prayer"    {{with .Form}}{{if eq .Category "prayer"}}selected{{end}}{{end}}>Prayer</option>
+                                    <option value="event"     {{with .Form}}{{if eq .Category "event"}}selected{{end}}{{end}}>Event</option>
+                                    <option value="urgent"    {{with .Form}}{{if eq .Category "urgent"}}selected{{end}}{{end}}>Urgent</option>
+                                    <option value="financial" {{with .Form}}{{if eq .Category "financial"}}selected{{end}}{{end}}>Financial</option>
+                                </select>
+                            </div>
+                        </div>
+                        {{with .Form}}{{with index .FieldErrors "category"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Visibility</label>
+                        <div class="control published-toggle">
+                            <label class="switch">
+                                <input type="checkbox" name="is_published" value="true"
+                                       {{with .Form}}{{if .IsPublished}}checked{{end}}{{end}}>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="toggle-label">Published</span>
+                        </div>
+                        <p class="help">Uncheck to save as draft.</p>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Content *</label>
+                    <div class="control">
+                        <textarea class="textarea {{with .Form}}{{if index .FieldErrors "content"}}is-danger{{end}}{{end}}"
+                                  name="content" rows="9" placeholder="Write your announcement here..."
+                                  required>{{with .Form}}{{.Content}}{{end}}</textarea>
+                    </div>
+                    {{with .Form}}{{with index .FieldErrors "content"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+                </div>
+
+                <div class="field mt-4">
+                    <div class="form-actions">
+                        <button type="submit" class="button is-primary">
+                            <span class="icon"><i class="fas fa-save"></i></span>
+                            <span>Save Changes</span>
+                        </button>
+                        <a href="/announcements/{{$ann.ID}}" class="button is-light">Cancel</a>
+
+                        <!-- Danger zone -->
+                        <form action="/announcements/{{$ann.ID}}/delete" method="POST" style="margin-left:auto"
+                              onsubmit="return confirm('Delete this announcement? This cannot be undone.')">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                            <button type="submit" class="button is-danger is-outlined">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                                <span>Delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper { max-width: 760px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 4px 0 0; }
+.breadcrumb-simple { font-size: 0.85rem; color: var(--text-light); }
+.breadcrumb-simple a { color: var(--primary); text-decoration: none; }
+.breadcrumb-simple i { margin: 0 6px; font-size: 0.7rem; }
+
+.form-container { }
+.form-card { background: white; border-radius: 14px; border: 1px solid var(--light-gray); overflow: hidden; }
+.form-card-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--light-gray); }
+.form-card-header h3 { font-size: 1rem; font-weight: 600; margin: 0; color: var(--text-dark); }
+.form-body { padding: 1.5rem; }
+
+.field { margin-bottom: 1.25rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+.mt-4 { margin-top: 0.5rem; }
+
+.form-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+/* Toggle switch */
+.published-toggle { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #CED4DA; border-radius: 24px; transition: 0.2s;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 18px; width: 18px; left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: 0.2s;
+}
+.switch input:checked + .slider { background: var(--primary); }
+.switch input:checked + .slider:before { transform: translateX(18px); }
+.toggle-label { font-size: 0.88rem; color: var(--text-medium); }
+
+@media (max-width: 600px) {
+    .field-row { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 1rem; }
+}
+</style>
+{{end}}

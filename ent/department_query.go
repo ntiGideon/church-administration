@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/predicate"
 )
@@ -19,12 +21,13 @@ import (
 // DepartmentQuery is the builder for querying Department entities.
 type DepartmentQuery struct {
 	config
-	ctx        *QueryContext
-	order      []department.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Department
-	withChurch *ChurchQuery
-	withFKs    bool
+	ctx         *QueryContext
+	order       []department.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Department
+	withChurch  *ChurchQuery
+	withLeader  *ContactQuery
+	withMembers *ContactQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +79,50 @@ func (_q *DepartmentQuery) QueryChurch() *ChurchQuery {
 			sqlgraph.From(department.Table, department.FieldID, selector),
 			sqlgraph.To(church.Table, church.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, department.ChurchTable, department.ChurchColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryLeader chains the current query on the "leader" edge.
+func (_q *DepartmentQuery) QueryLeader() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, department.LeaderTable, department.LeaderColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMembers chains the current query on the "members" edge.
+func (_q *DepartmentQuery) QueryMembers() *ContactQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, selector),
+			sqlgraph.To(contact.Table, contact.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, department.MembersTable, department.MembersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +317,14 @@ func (_q *DepartmentQuery) Clone() *DepartmentQuery {
 		return nil
 	}
 	return &DepartmentQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]department.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.Department{}, _q.predicates...),
-		withChurch: _q.withChurch.Clone(),
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]department.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.Department{}, _q.predicates...),
+		withChurch:  _q.withChurch.Clone(),
+		withLeader:  _q.withLeader.Clone(),
+		withMembers: _q.withMembers.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -290,6 +339,28 @@ func (_q *DepartmentQuery) WithChurch(opts ...func(*ChurchQuery)) *DepartmentQue
 		opt(query)
 	}
 	_q.withChurch = query
+	return _q
+}
+
+// WithLeader tells the query-builder to eager-load the nodes that are connected to
+// the "leader" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *DepartmentQuery) WithLeader(opts ...func(*ContactQuery)) *DepartmentQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withLeader = query
+	return _q
+}
+
+// WithMembers tells the query-builder to eager-load the nodes that are connected to
+// the "members" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *DepartmentQuery) WithMembers(opts ...func(*ContactQuery)) *DepartmentQuery {
+	query := (&ContactClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withMembers = query
 	return _q
 }
 
@@ -370,18 +441,13 @@ func (_q *DepartmentQuery) prepareQuery(ctx context.Context) error {
 func (_q *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Department, error) {
 	var (
 		nodes       = []*Department{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [3]bool{
 			_q.withChurch != nil,
+			_q.withLeader != nil,
+			_q.withMembers != nil,
 		}
 	)
-	if _q.withChurch != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, department.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Department).scanValues(nil, columns)
 	}
@@ -406,6 +472,19 @@ func (_q *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 			return nil, err
 		}
 	}
+	if query := _q.withLeader; query != nil {
+		if err := _q.loadLeader(ctx, query, nodes, nil,
+			func(n *Department, e *Contact) { n.Edges.Leader = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withMembers; query != nil {
+		if err := _q.loadMembers(ctx, query, nodes,
+			func(n *Department) { n.Edges.Members = []*Contact{} },
+			func(n *Department, e *Contact) { n.Edges.Members = append(n.Edges.Members, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -413,10 +492,7 @@ func (_q *DepartmentQuery) loadChurch(ctx context.Context, query *ChurchQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Department)
 	for i := range nodes {
-		if nodes[i].church_departments == nil {
-			continue
-		}
-		fk := *nodes[i].church_departments
+		fk := nodes[i].ChurchID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,10 +509,100 @@ func (_q *DepartmentQuery) loadChurch(ctx context.Context, query *ChurchQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "church_departments" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "church_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *DepartmentQuery) loadLeader(ctx context.Context, query *ContactQuery, nodes []*Department, init func(*Department), assign func(*Department, *Contact)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Department)
+	for i := range nodes {
+		fk := nodes[i].LeaderID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(contact.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "leader_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *DepartmentQuery) loadMembers(ctx context.Context, query *ContactQuery, nodes []*Department, init func(*Department), assign func(*Department, *Contact)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Department)
+	nids := make(map[int]map[*Department]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(department.MembersTable)
+		s.Join(joinT).On(s.C(contact.FieldID), joinT.C(department.MembersPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(department.MembersPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(department.MembersPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Department]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Contact](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "members" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -466,6 +632,12 @@ func (_q *DepartmentQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != department.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withChurch != nil {
+			_spec.Node.AddColumnOnce(department.FieldChurchID)
+		}
+		if _q.withLeader != nil {
+			_spec.Node.AddColumnOnce(department.FieldLeaderID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

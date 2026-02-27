@@ -72,3 +72,34 @@ func (m *AnnouncementModel) Publish(ctx context.Context, id int) error {
 		Save(ctx)
 	return err
 }
+
+// Unpublish reverts an announcement to draft status.
+func (m *AnnouncementModel) Unpublish(ctx context.Context, id int) error {
+	_, err := m.Db.Announcement.UpdateOneID(id).
+		SetIsPublished(false).
+		ClearPublishedAt().
+		Save(ctx)
+	return err
+}
+
+// Update saves changes to an existing announcement.
+func (m *AnnouncementModel) Update(ctx context.Context, id int, dto *AnnouncementDto) error {
+	b := m.Db.Announcement.UpdateOneID(id).
+		SetTitle(dto.Title).
+		SetContent(dto.Content).
+		SetCategory(announcement.Category(dto.Category))
+
+	if dto.IsPublished {
+		b = b.SetIsPublished(true).SetPublishedAt(time.Now())
+	} else {
+		b = b.SetIsPublished(false).ClearPublishedAt()
+	}
+
+	_, err := b.Save(ctx)
+	return err
+}
+
+// Delete removes an announcement by ID.
+func (m *AnnouncementModel) Delete(ctx context.Context, id int) error {
+	return m.Db.Announcement.DeleteOneID(id).Exec(ctx)
+}

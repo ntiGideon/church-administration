@@ -123,9 +123,19 @@ type ContactEdges struct {
 	PrayerRequests []*PrayerRequest `json:"prayer_requests,omitempty"`
 	// PastoralNotes holds the value of the pastoral_notes edge.
 	PastoralNotes []*PastoralNote `json:"pastoral_notes,omitempty"`
+	// Milestones holds the value of the milestones edge.
+	Milestones []*Milestone `json:"milestones,omitempty"`
+	// Departments holds the value of the departments edge.
+	Departments []*Department `json:"departments,omitempty"`
+	// LeadingDepartments holds the value of the leading_departments edge.
+	LeadingDepartments []*Department `json:"leading_departments,omitempty"`
+	// RelationshipsFrom holds the value of the relationships_from edge.
+	RelationshipsFrom []*Relationship `json:"relationships_from,omitempty"`
+	// RelationshipsTo holds the value of the relationships_to edge.
+	RelationshipsTo []*Relationship `json:"relationships_to,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [17]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -242,6 +252,51 @@ func (e ContactEdges) PastoralNotesOrErr() ([]*PastoralNote, error) {
 		return e.PastoralNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "pastoral_notes"}
+}
+
+// MilestonesOrErr returns the Milestones value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) MilestonesOrErr() ([]*Milestone, error) {
+	if e.loadedTypes[12] {
+		return e.Milestones, nil
+	}
+	return nil, &NotLoadedError{edge: "milestones"}
+}
+
+// DepartmentsOrErr returns the Departments value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) DepartmentsOrErr() ([]*Department, error) {
+	if e.loadedTypes[13] {
+		return e.Departments, nil
+	}
+	return nil, &NotLoadedError{edge: "departments"}
+}
+
+// LeadingDepartmentsOrErr returns the LeadingDepartments value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) LeadingDepartmentsOrErr() ([]*Department, error) {
+	if e.loadedTypes[14] {
+		return e.LeadingDepartments, nil
+	}
+	return nil, &NotLoadedError{edge: "leading_departments"}
+}
+
+// RelationshipsFromOrErr returns the RelationshipsFrom value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) RelationshipsFromOrErr() ([]*Relationship, error) {
+	if e.loadedTypes[15] {
+		return e.RelationshipsFrom, nil
+	}
+	return nil, &NotLoadedError{edge: "relationships_from"}
+}
+
+// RelationshipsToOrErr returns the RelationshipsTo value or an error if the edge
+// was not loaded in eager-loading.
+func (e ContactEdges) RelationshipsToOrErr() ([]*Relationship, error) {
+	if e.loadedTypes[16] {
+		return e.RelationshipsTo, nil
+	}
+	return nil, &NotLoadedError{edge: "relationships_to"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -565,6 +620,31 @@ func (_m *Contact) QueryPrayerRequests() *PrayerRequestQuery {
 // QueryPastoralNotes queries the "pastoral_notes" edge of the Contact entity.
 func (_m *Contact) QueryPastoralNotes() *PastoralNoteQuery {
 	return NewContactClient(_m.config).QueryPastoralNotes(_m)
+}
+
+// QueryMilestones queries the "milestones" edge of the Contact entity.
+func (_m *Contact) QueryMilestones() *MilestoneQuery {
+	return NewContactClient(_m.config).QueryMilestones(_m)
+}
+
+// QueryDepartments queries the "departments" edge of the Contact entity.
+func (_m *Contact) QueryDepartments() *DepartmentQuery {
+	return NewContactClient(_m.config).QueryDepartments(_m)
+}
+
+// QueryLeadingDepartments queries the "leading_departments" edge of the Contact entity.
+func (_m *Contact) QueryLeadingDepartments() *DepartmentQuery {
+	return NewContactClient(_m.config).QueryLeadingDepartments(_m)
+}
+
+// QueryRelationshipsFrom queries the "relationships_from" edge of the Contact entity.
+func (_m *Contact) QueryRelationshipsFrom() *RelationshipQuery {
+	return NewContactClient(_m.config).QueryRelationshipsFrom(_m)
+}
+
+// QueryRelationshipsTo queries the "relationships_to" edge of the Contact entity.
+func (_m *Contact) QueryRelationshipsTo() *RelationshipQuery {
+	return NewContactClient(_m.config).QueryRelationshipsTo(_m)
 }
 
 // Update returns a builder for updating this Contact.

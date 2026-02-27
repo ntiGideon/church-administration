@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
@@ -20,6 +21,7 @@ import (
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/group"
 	"github.com/ntiGideon/ent/invitation"
+	"github.com/ntiGideon/ent/milestone"
 	"github.com/ntiGideon/ent/pastoralnote"
 	"github.com/ntiGideon/ent/pledge"
 	"github.com/ntiGideon/ent/prayerrequest"
@@ -677,6 +679,36 @@ func (_u *ChurchUpdate) AddPastoralNotes(v ...*PastoralNote) *ChurchUpdate {
 	return _u.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_u *ChurchUpdate) AddMilestoneIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddMilestoneIDs(ids...)
+	return _u
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_u *ChurchUpdate) AddMilestones(v ...*Milestone) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMilestoneIDs(ids...)
+}
+
+// AddCommunicationIDs adds the "communications" edge to the Communication entity by IDs.
+func (_u *ChurchUpdate) AddCommunicationIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddCommunicationIDs(ids...)
+	return _u
+}
+
+// AddCommunications adds the "communications" edges to the Communication entity.
+func (_u *ChurchUpdate) AddCommunications(v ...*Communication) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCommunicationIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdate) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -1043,6 +1075,48 @@ func (_u *ChurchUpdate) RemovePastoralNotes(v ...*PastoralNote) *ChurchUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNoteIDs(ids...)
+}
+
+// ClearMilestones clears all "milestones" edges to the Milestone entity.
+func (_u *ChurchUpdate) ClearMilestones() *ChurchUpdate {
+	_u.mutation.ClearMilestones()
+	return _u
+}
+
+// RemoveMilestoneIDs removes the "milestones" edge to Milestone entities by IDs.
+func (_u *ChurchUpdate) RemoveMilestoneIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemoveMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveMilestones removes "milestones" edges to Milestone entities.
+func (_u *ChurchUpdate) RemoveMilestones(v ...*Milestone) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMilestoneIDs(ids...)
+}
+
+// ClearCommunications clears all "communications" edges to the Communication entity.
+func (_u *ChurchUpdate) ClearCommunications() *ChurchUpdate {
+	_u.mutation.ClearCommunications()
+	return _u
+}
+
+// RemoveCommunicationIDs removes the "communications" edge to Communication entities by IDs.
+func (_u *ChurchUpdate) RemoveCommunicationIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemoveCommunicationIDs(ids...)
+	return _u
+}
+
+// RemoveCommunications removes "communications" edges to Communication entities.
+func (_u *ChurchUpdate) RemoveCommunications(v ...*Communication) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCommunicationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1996,6 +2070,96 @@ func (_u *ChurchUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMilestonesIDs(); len(nodes) > 0 && !_u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCommunicationsIDs(); len(nodes) > 0 && !_u.mutation.CommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CommunicationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{church.Label}
@@ -2649,6 +2813,36 @@ func (_u *ChurchUpdateOne) AddPastoralNotes(v ...*PastoralNote) *ChurchUpdateOne
 	return _u.AddPastoralNoteIDs(ids...)
 }
 
+// AddMilestoneIDs adds the "milestones" edge to the Milestone entity by IDs.
+func (_u *ChurchUpdateOne) AddMilestoneIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddMilestoneIDs(ids...)
+	return _u
+}
+
+// AddMilestones adds the "milestones" edges to the Milestone entity.
+func (_u *ChurchUpdateOne) AddMilestones(v ...*Milestone) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddMilestoneIDs(ids...)
+}
+
+// AddCommunicationIDs adds the "communications" edge to the Communication entity by IDs.
+func (_u *ChurchUpdateOne) AddCommunicationIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddCommunicationIDs(ids...)
+	return _u
+}
+
+// AddCommunications adds the "communications" edges to the Communication entity.
+func (_u *ChurchUpdateOne) AddCommunications(v ...*Communication) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCommunicationIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdateOne) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -3015,6 +3209,48 @@ func (_u *ChurchUpdateOne) RemovePastoralNotes(v ...*PastoralNote) *ChurchUpdate
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePastoralNoteIDs(ids...)
+}
+
+// ClearMilestones clears all "milestones" edges to the Milestone entity.
+func (_u *ChurchUpdateOne) ClearMilestones() *ChurchUpdateOne {
+	_u.mutation.ClearMilestones()
+	return _u
+}
+
+// RemoveMilestoneIDs removes the "milestones" edge to Milestone entities by IDs.
+func (_u *ChurchUpdateOne) RemoveMilestoneIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemoveMilestoneIDs(ids...)
+	return _u
+}
+
+// RemoveMilestones removes "milestones" edges to Milestone entities.
+func (_u *ChurchUpdateOne) RemoveMilestones(v ...*Milestone) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveMilestoneIDs(ids...)
+}
+
+// ClearCommunications clears all "communications" edges to the Communication entity.
+func (_u *ChurchUpdateOne) ClearCommunications() *ChurchUpdateOne {
+	_u.mutation.ClearCommunications()
+	return _u
+}
+
+// RemoveCommunicationIDs removes the "communications" edge to Communication entities by IDs.
+func (_u *ChurchUpdateOne) RemoveCommunicationIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemoveCommunicationIDs(ids...)
+	return _u
+}
+
+// RemoveCommunications removes "communications" edges to Communication entities.
+func (_u *ChurchUpdateOne) RemoveCommunications(v ...*Communication) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCommunicationIDs(ids...)
 }
 
 // Where appends a list predicates to the ChurchUpdate builder.
@@ -3991,6 +4227,96 @@ func (_u *ChurchUpdateOne) sqlSave(ctx context.Context) (_node *Church, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(pastoralnote.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedMilestonesIDs(); len(nodes) > 0 && !_u.mutation.MilestonesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MilestonesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.MilestonesTable,
+			Columns: []string{church.MilestonesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(milestone.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCommunicationsIDs(); len(nodes) > 0 && !_u.mutation.CommunicationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CommunicationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CommunicationsTable,
+			Columns: []string{church.CommunicationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

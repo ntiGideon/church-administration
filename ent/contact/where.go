@@ -2676,6 +2676,121 @@ func HasPastoralNotesWith(preds ...predicate.PastoralNote) predicate.Contact {
 	})
 }
 
+// HasMilestones applies the HasEdge predicate on the "milestones" edge.
+func HasMilestones() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MilestonesTable, MilestonesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMilestonesWith applies the HasEdge predicate on the "milestones" edge with a given conditions (other predicates).
+func HasMilestonesWith(preds ...predicate.Milestone) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newMilestonesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDepartments applies the HasEdge predicate on the "departments" edge.
+func HasDepartments() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, DepartmentsTable, DepartmentsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDepartmentsWith applies the HasEdge predicate on the "departments" edge with a given conditions (other predicates).
+func HasDepartmentsWith(preds ...predicate.Department) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newDepartmentsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasLeadingDepartments applies the HasEdge predicate on the "leading_departments" edge.
+func HasLeadingDepartments() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, LeadingDepartmentsTable, LeadingDepartmentsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLeadingDepartmentsWith applies the HasEdge predicate on the "leading_departments" edge with a given conditions (other predicates).
+func HasLeadingDepartmentsWith(preds ...predicate.Department) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newLeadingDepartmentsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRelationshipsFrom applies the HasEdge predicate on the "relationships_from" edge.
+func HasRelationshipsFrom() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RelationshipsFromTable, RelationshipsFromColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRelationshipsFromWith applies the HasEdge predicate on the "relationships_from" edge with a given conditions (other predicates).
+func HasRelationshipsFromWith(preds ...predicate.Relationship) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newRelationshipsFromStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRelationshipsTo applies the HasEdge predicate on the "relationships_to" edge.
+func HasRelationshipsTo() predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RelationshipsToTable, RelationshipsToColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRelationshipsToWith applies the HasEdge predicate on the "relationships_to" edge with a given conditions (other predicates).
+func HasRelationshipsToWith(preds ...predicate.Relationship) predicate.Contact {
+	return predicate.Contact(func(s *sql.Selector) {
+		step := newRelationshipsToStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Contact) predicate.Contact {
 	return predicate.Contact(sql.AndPredicates(predicates...))

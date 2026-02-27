@@ -39,7 +39,8 @@
                     <a href="/rosters"  class="nd-item"><i class="fas fa-clipboard-list"></i>     Rosters</a>
                     <a href="/sermons"  class="nd-item"><i class="fas fa-bible"></i>              Sermons</a>
                     <a href="/prayer"   class="nd-item"><i class="fas fa-hands-praying"></i>      Prayer</a>
-                    <a href="/pastoral" class="nd-item"><i class="fas fa-hand-holding-heart"></i> Pastoral Care</a>
+                    <a href="/pastoral"     class="nd-item"><i class="fas fa-hand-holding-heart"></i> Pastoral Care</a>
+                    <a href="/departments" class="nd-item"><i class="fas fa-layer-group"></i>          Departments</a>
                 </div>
             </div>
 
@@ -50,10 +51,18 @@
                     <i class="fas fa-chevron-down nd-caret"></i>
                 </button>
                 <div class="nd-menu" id="communityMenu">
-                    <a href="/calendar"      class="nd-item"><i class="fas fa-calendar-days"></i> Calendar</a>
-                    <a href="/announcements" class="nd-item"><i class="fas fa-bullhorn"></i>       Notices</a>
+                    <a href="/calendar"      class="nd-item"><i class="fas fa-calendar-days"></i>  Calendar</a>
+                    <a href="/announcements" class="nd-item"><i class="fas fa-bullhorn"></i>        Notices</a>
+                    <a href="/birthdays"     class="nd-item"><i class="fas fa-cake-candles"></i>   Birthdays</a>
                     <a href="/visitors"      class="nd-item"><i class="fas fa-user-friends"></i>   Visitors</a>
                     <a href="/documents"     class="nd-item"><i class="fas fa-folder-open"></i>    Documents</a>
+                    <a href="/milestones"     class="nd-item"><i class="fas fa-star"></i>            Milestones</a>
+                    {{if .LoggedInUser}}
+                        {{$role := .LoggedInUser.Role.String}}
+                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                    <a href="/communications" class="nd-item"><i class="fas fa-envelope-bulk"></i>  Communications</a>
+                        {{end}}
+                    {{end}}
                 </div>
             </div>
 

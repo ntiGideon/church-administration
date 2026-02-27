@@ -103,9 +103,13 @@ type ChurchEdges struct {
 	Documents []*Document `json:"documents,omitempty"`
 	// PastoralNotes holds the value of the pastoral_notes edge.
 	PastoralNotes []*PastoralNote `json:"pastoral_notes,omitempty"`
+	// Milestones holds the value of the milestones edge.
+	Milestones []*Milestone `json:"milestones,omitempty"`
+	// Communications holds the value of the communications edge.
+	Communications []*Communication `json:"communications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [18]bool
+	loadedTypes [20]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -270,6 +274,24 @@ func (e ChurchEdges) PastoralNotesOrErr() ([]*PastoralNote, error) {
 		return e.PastoralNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "pastoral_notes"}
+}
+
+// MilestonesOrErr returns the Milestones value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) MilestonesOrErr() ([]*Milestone, error) {
+	if e.loadedTypes[18] {
+		return e.Milestones, nil
+	}
+	return nil, &NotLoadedError{edge: "milestones"}
+}
+
+// CommunicationsOrErr returns the Communications value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) CommunicationsOrErr() ([]*Communication, error) {
+	if e.loadedTypes[19] {
+		return e.Communications, nil
+	}
+	return nil, &NotLoadedError{edge: "communications"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -536,6 +558,16 @@ func (_m *Church) QueryDocuments() *DocumentQuery {
 // QueryPastoralNotes queries the "pastoral_notes" edge of the Church entity.
 func (_m *Church) QueryPastoralNotes() *PastoralNoteQuery {
 	return NewChurchClient(_m.config).QueryPastoralNotes(_m)
+}
+
+// QueryMilestones queries the "milestones" edge of the Church entity.
+func (_m *Church) QueryMilestones() *MilestoneQuery {
+	return NewChurchClient(_m.config).QueryMilestones(_m)
+}
+
+// QueryCommunications queries the "communications" edge of the Church entity.
+func (_m *Church) QueryCommunications() *CommunicationQuery {
+	return NewChurchClient(_m.config).QueryCommunications(_m)
 }
 
 // Update returns a builder for updating this Church.
