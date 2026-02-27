@@ -15,5 +15,5 @@ RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
 COPY --from=builder /app/faithconnect .
 
-EXPOSE 3000
+EXPOSE ${PORT:-3000}
 CMD ["./faithconnect"]
