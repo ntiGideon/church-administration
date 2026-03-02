@@ -1795,6 +1795,29 @@ func HasCommunicationsWith(preds ...predicate.Communication) predicate.Church {
 	})
 }
 
+// HasBudgets applies the HasEdge predicate on the "budgets" edge.
+func HasBudgets() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BudgetsTable, BudgetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBudgetsWith applies the HasEdge predicate on the "budgets" edge with a given conditions (other predicates).
+func HasBudgetsWith(preds ...predicate.Budget) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newBudgetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Church) predicate.Church {
 	return predicate.Church(sql.AndPredicates(predicates...))

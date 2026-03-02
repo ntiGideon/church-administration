@@ -27,6 +27,9 @@
             <a href="/giving/donations" class="nav-link">
                 <i class="fas fa-hand-holding-heart"></i><span>Giving</span>
             </a>
+            <a href="/budgets" class="nav-link">
+                <i class="fas fa-wallet"></i><span>Budgets</span>
+            </a>
 
             <!-- Ministry dropdown -->
             <div class="nav-dropdown" id="ministryDropdown">
@@ -66,9 +69,17 @@
                 </div>
             </div>
 
-            <a href="/reports" class="nav-link">
-                <i class="fas fa-chart-bar"></i><span>Reports</span>
-            </a>
+            <!-- Reports dropdown -->
+            <div class="nav-dropdown" id="reportsDropdown">
+                <button class="nav-link nav-dropdown-trigger" id="reportsTrigger" aria-expanded="false">
+                    <i class="fas fa-chart-bar"></i><span>Reports</span>
+                    <i class="fas fa-chevron-down nd-caret"></i>
+                </button>
+                <div class="nd-menu" id="reportsMenu">
+                    <a href="/reports"         class="nd-item"><i class="fas fa-th-large"></i>   Overview</a>
+                    <a href="/reports/finance" class="nd-item"><i class="fas fa-coins"></i>       Financial</a>
+                </div>
+            </div>
             {{if .LoggedInUser}}
                 {{$role := .LoggedInUser.Role.String}}
                 {{if eq $role "super_admin"}}

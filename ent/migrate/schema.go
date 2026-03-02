@@ -77,6 +77,57 @@ var (
 			},
 		},
 	}
+	// BudgetsColumns holds the columns for the "budgets" table.
+	BudgetsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "fiscal_year", Type: field.TypeInt},
+		{Name: "period", Type: field.TypeEnum, Enums: []string{"annual", "quarterly", "monthly"}, Default: "annual"},
+		{Name: "start_date", Type: field.TypeTime},
+		{Name: "end_date", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "active", "closed"}, Default: "draft"},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// BudgetsTable holds the schema information for the "budgets" table.
+	BudgetsTable = &schema.Table{
+		Name:       "budgets",
+		Columns:    BudgetsColumns,
+		PrimaryKey: []*schema.Column{BudgetsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "budgets_churches_budgets",
+				Columns:    []*schema.Column{BudgetsColumns[9]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// BudgetLinesColumns holds the columns for the "budget_lines" table.
+	BudgetLinesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "category", Type: field.TypeString},
+		{Name: "line_type", Type: field.TypeEnum, Enums: []string{"income", "expense"}, Default: "income"},
+		{Name: "allocated_amount", Type: field.TypeFloat64},
+		{Name: "currency", Type: field.TypeString, Default: "GHS"},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "budget_id", Type: field.TypeInt},
+	}
+	// BudgetLinesTable holds the schema information for the "budget_lines" table.
+	BudgetLinesTable = &schema.Table{
+		Name:       "budget_lines",
+		Columns:    BudgetLinesColumns,
+		PrimaryKey: []*schema.Column{BudgetLinesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "budget_lines_budgets_lines",
+				Columns:    []*schema.Column{BudgetLinesColumns[6]},
+				RefColumns: []*schema.Column{BudgetsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ChurchesColumns holds the columns for the "churches" table.
 	ChurchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -929,6 +980,8 @@ var (
 	Tables = []*schema.Table{
 		AnnouncementsTable,
 		AttendancesTable,
+		BudgetsTable,
+		BudgetLinesTable,
 		ChurchesTable,
 		CommunicationsTable,
 		ContactsTable,
@@ -960,6 +1013,8 @@ func init() {
 	AnnouncementsTable.ForeignKeys[1].RefTable = UsersTable
 	AttendancesTable.ForeignKeys[0].RefTable = ContactsTable
 	AttendancesTable.ForeignKeys[1].RefTable = EventsTable
+	BudgetsTable.ForeignKeys[0].RefTable = ChurchesTable
+	BudgetLinesTable.ForeignKeys[0].RefTable = BudgetsTable
 	ChurchesTable.ForeignKeys[0].RefTable = ChurchesTable
 	CommunicationsTable.ForeignKeys[0].RefTable = ChurchesTable
 	CommunicationsTable.ForeignKeys[1].RefTable = UsersTable

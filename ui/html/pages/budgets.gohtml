@@ -1,0 +1,137 @@
+{{define "title"}}Budgets | FaithConnect{{end}}
+{{define "description"}}Church budget planning and tracking{{end}}
+
+{{define "main"}}
+<div class="page-wrapper">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-title-text">Budgets</h1>
+            <p class="page-subtitle">Plan and track income &amp; expense targets by period</p>
+        </div>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <a href="/budgets/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Budget</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+
+    {{if .Flash}}
+    <div class="notification is-success is-light flash-notification mb-4">
+        <button class="delete"></button><i class="fas fa-check-circle mr-2"></i>{{.Flash}}
+    </div>
+    {{end}}
+    {{if .FlashError}}
+    <div class="notification is-danger is-light flash-notification mb-4">
+        <button class="delete"></button><i class="fas fa-exclamation-circle mr-2"></i>{{.FlashError}}
+    </div>
+    {{end}}
+
+    {{$budgets := index .Data "budgets"}}
+    {{if $budgets}}
+    <div class="budgets-grid">
+        {{range $budgets}}
+        {{$totalIncome := 0.0}}
+        {{$totalExpense := 0.0}}
+        {{range .Edges.Lines}}
+            {{if eq .LineType.String "income"}}{{$totalIncome = add $totalIncome .AllocatedAmount}}{{end}}
+            {{if eq .LineType.String "expense"}}{{$totalExpense = add $totalExpense .AllocatedAmount}}{{end}}
+        {{end}}
+        <a href="/budgets/{{.ID}}" class="budget-card">
+            <div class="budget-card-top">
+                <div class="budget-icon-wrap status-{{.Status}}">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <span class="budget-status-badge status-badge-{{.Status}}">{{.Status}}</span>
+            </div>
+            <div class="budget-card-body">
+                <h3 class="budget-name">{{.Name}}</h3>
+                <p class="budget-meta">FY {{.FiscalYear}} &bull; {{.Period}}</p>
+                <p class="budget-dates">{{formatDate .StartDate}} – {{formatDate .EndDate}}</p>
+            </div>
+            <div class="budget-card-footer">
+                <div class="budget-stat">
+                    <span class="stat-label">Income</span>
+                    <span class="stat-value income">GH₵ {{formatMoney $totalIncome}}</span>
+                </div>
+                <div class="budget-stat">
+                    <span class="stat-label">Expense</span>
+                    <span class="stat-value expense">GH₵ {{formatMoney $totalExpense}}</span>
+                </div>
+                <div class="budget-stat">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value">{{len .Edges.Lines}}</span>
+                </div>
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <i class="fas fa-wallet empty-icon"></i>
+        <h3>No budgets yet</h3>
+        <p>Create your first budget to start planning income and expense targets.</p>
+        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
+        {{$role := $.LoggedInUser.Role.String}}
+        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        <a href="/budgets/new" class="button is-primary mt-4">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Create Budget</span>
+        </a>
+        {{end}}{{end}}{{end}}
+    </div>
+    {{end}}
+</div>
+
+<style>
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.page-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-title-text { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.page-subtitle { font-size: 0.88rem; color: var(--text-light); margin-top: 2px; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+
+.budgets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+
+.budget-card {
+    background: white; border: 1px solid var(--light-gray); border-radius: 14px;
+    padding: 1.5rem; text-decoration: none; display: flex; flex-direction: column;
+    gap: 0.75rem; transition: box-shadow 0.2s, transform 0.15s; color: inherit;
+}
+.budget-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); transform: translateY(-2px); }
+
+.budget-card-top { display: flex; align-items: center; justify-content: space-between; }
+.budget-icon-wrap { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.status-draft   { background: rgba(108,117,125,0.12); color: #6c757d; }
+.status-active  { background: rgba(40,167,69,0.12);  color: #28a745; }
+.status-closed  { background: rgba(80,34,45,0.10);   color: var(--primary); }
+
+.budget-status-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; text-transform: capitalize; }
+.status-badge-draft  { background: rgba(108,117,125,0.1); color: #6c757d; }
+.status-badge-active { background: rgba(40,167,69,0.1);  color: #28a745; }
+.status-badge-closed { background: rgba(80,34,45,0.08);  color: var(--primary); }
+
+.budget-name { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.budget-meta { font-size: 0.82rem; color: var(--text-light); margin: 0; text-transform: capitalize; }
+.budget-dates { font-size: 0.8rem; color: var(--text-light); margin: 0; }
+.budget-card-body { display: flex; flex-direction: column; gap: 3px; }
+
+.budget-card-footer { display: flex; gap: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--light-gray); margin-top: auto; flex-wrap: wrap; }
+.budget-stat { display: flex; flex-direction: column; gap: 2px; }
+.stat-label { font-size: 0.7rem; color: var(--text-light); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); }
+.stat-value.income { color: #28a745; }
+.stat-value.expense { color: #dc3545; }
+
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); }
+.empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.25; }
+.empty-state h3 { font-size: 1.15rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.9rem; }
+</style>
+<script>
+document.querySelectorAll('.flash-notification .delete').forEach(b => b.addEventListener('click', () => b.closest('.notification').remove()));
+</script>
+{{end}}

@@ -93,15 +93,28 @@
                                     <div class="select is-fullwidth">
                                         <select name="category" required>
                                             <option value="">Select category...</option>
-                                            <option value="General Fund">General Fund</option>
-                                            <option value="Building Fund">Building Fund</option>
-                                            <option value="Missions">Missions</option>
-                                            <option value="Youth Ministry">Youth Ministry</option>
-                                            <option value="Welfare">Welfare</option>
-                                            <option value="Administration">Administration</option>
-                                            <option value="Utilities">Utilities</option>
-                                            <option value="Salaries">Salaries</option>
-                                            <option value="Other">Other</option>
+                                            <optgroup label="Income">
+                                                <option value="Tithes" {{with .Form}}{{if eq .Category "Tithes"}}selected{{end}}{{end}}>Tithes</option>
+                                                <option value="First Fruits" {{with .Form}}{{if eq .Category "First Fruits"}}selected{{end}}{{end}}>First Fruits</option>
+                                                <option value="Offerings" {{with .Form}}{{if eq .Category "Offerings"}}selected{{end}}{{end}}>Offerings</option>
+                                                <option value="Donations" {{with .Form}}{{if eq .Category "Donations"}}selected{{end}}{{end}}>Donations</option>
+                                                <option value="Special Collections" {{with .Form}}{{if eq .Category "Special Collections"}}selected{{end}}{{end}}>Special Collections</option>
+                                                <option value="Fundraising" {{with .Form}}{{if eq .Category "Fundraising"}}selected{{end}}{{end}}>Fundraising</option>
+                                                <option value="Other Income" {{with .Form}}{{if eq .Category "Other Income"}}selected{{end}}{{end}}>Other Income</option>
+                                            </optgroup>
+                                            <optgroup label="Expenses">
+                                                <option value="Salaries" {{with .Form}}{{if eq .Category "Salaries"}}selected{{end}}{{end}}>Salaries</option>
+                                                <option value="Utilities" {{with .Form}}{{if eq .Category "Utilities"}}selected{{end}}{{end}}>Utilities</option>
+                                                <option value="Rent/Mortgage" {{with .Form}}{{if eq .Category "Rent/Mortgage"}}selected{{end}}{{end}}>Rent/Mortgage</option>
+                                                <option value="Events" {{with .Form}}{{if eq .Category "Events"}}selected{{end}}{{end}}>Events</option>
+                                                <option value="Outreach/Missions" {{with .Form}}{{if eq .Category "Outreach/Missions"}}selected{{end}}{{end}}>Outreach/Missions</option>
+                                                <option value="Administration" {{with .Form}}{{if eq .Category "Administration"}}selected{{end}}{{end}}>Administration</option>
+                                                <option value="Maintenance" {{with .Form}}{{if eq .Category "Maintenance"}}selected{{end}}{{end}}>Maintenance</option>
+                                                <option value="Equipment" {{with .Form}}{{if eq .Category "Equipment"}}selected{{end}}{{end}}>Equipment</option>
+                                                <option value="Media/Technology" {{with .Form}}{{if eq .Category "Media/Technology"}}selected{{end}}{{end}}>Media/Technology</option>
+                                                <option value="Welfare/Assistance" {{with .Form}}{{if eq .Category "Welfare/Assistance"}}selected{{end}}{{end}}>Welfare/Assistance</option>
+                                                <option value="Other Expenses" {{with .Form}}{{if eq .Category "Other Expenses"}}selected{{end}}{{end}}>Other Expenses</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>

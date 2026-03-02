@@ -97,6 +97,8 @@ const (
 	EdgeMilestones = "milestones"
 	// EdgeCommunications holds the string denoting the communications edge name in mutations.
 	EdgeCommunications = "communications"
+	// EdgeBudgets holds the string denoting the budgets edge name in mutations.
+	EdgeBudgets = "budgets"
 	// Table holds the table name of the church in the database.
 	Table = "churches"
 	// ParentTable is the table that holds the parent relation/edge.
@@ -233,6 +235,13 @@ const (
 	CommunicationsInverseTable = "communications"
 	// CommunicationsColumn is the table column denoting the communications relation/edge.
 	CommunicationsColumn = "church_communications"
+	// BudgetsTable is the table that holds the budgets relation/edge.
+	BudgetsTable = "budgets"
+	// BudgetsInverseTable is the table name for the Budget entity.
+	// It exists in this package in order to avoid circular dependency with the "budget" package.
+	BudgetsInverseTable = "budgets"
+	// BudgetsColumn is the table column denoting the budgets relation/edge.
+	BudgetsColumn = "church_id"
 )
 
 // Columns holds all SQL columns for church fields.
@@ -700,6 +709,20 @@ func ByCommunications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCommunicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByBudgetsCount orders the results by budgets count.
+func ByBudgetsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBudgetsStep(), opts...)
+	}
+}
+
+// ByBudgets orders the results by budgets terms.
+func ByBudgets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBudgetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -838,5 +861,12 @@ func newCommunicationsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CommunicationsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CommunicationsTable, CommunicationsColumn),
+	)
+}
+func newBudgetsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BudgetsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BudgetsTable, BudgetsColumn),
 	)
 }

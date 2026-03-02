@@ -107,9 +107,11 @@ type ChurchEdges struct {
 	Milestones []*Milestone `json:"milestones,omitempty"`
 	// Communications holds the value of the communications edge.
 	Communications []*Communication `json:"communications,omitempty"`
+	// Budgets holds the value of the budgets edge.
+	Budgets []*Budget `json:"budgets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [20]bool
+	loadedTypes [21]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -292,6 +294,15 @@ func (e ChurchEdges) CommunicationsOrErr() ([]*Communication, error) {
 		return e.Communications, nil
 	}
 	return nil, &NotLoadedError{edge: "communications"}
+}
+
+// BudgetsOrErr returns the Budgets value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) BudgetsOrErr() ([]*Budget, error) {
+	if e.loadedTypes[20] {
+		return e.Budgets, nil
+	}
+	return nil, &NotLoadedError{edge: "budgets"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -568,6 +579,11 @@ func (_m *Church) QueryMilestones() *MilestoneQuery {
 // QueryCommunications queries the "communications" edge of the Church entity.
 func (_m *Church) QueryCommunications() *CommunicationQuery {
 	return NewChurchClient(_m.config).QueryCommunications(_m)
+}
+
+// QueryBudgets queries the "budgets" edge of the Church entity.
+func (_m *Church) QueryBudgets() *BudgetQuery {
+	return NewChurchClient(_m.config).QueryBudgets(_m)
 }
 
 // Update returns a builder for updating this Church.

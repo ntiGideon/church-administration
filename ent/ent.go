@@ -14,6 +14,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/attendance"
+	"github.com/ntiGideon/ent/budget"
+	"github.com/ntiGideon/ent/budgetline"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
@@ -97,6 +99,8 @@ func checkColumn(t, c string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			announcement.Table:  announcement.ValidColumn,
 			attendance.Table:    attendance.ValidColumn,
+			budget.Table:        budget.ValidColumn,
+			budgetline.Table:    budgetline.ValidColumn,
 			church.Table:        church.ValidColumn,
 			communication.Table: communication.ValidColumn,
 			contact.Table:       contact.ValidColumn,

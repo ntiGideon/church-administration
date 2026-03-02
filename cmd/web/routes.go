@@ -195,8 +195,20 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /communications/compose", adminOnly.ThenFunc(app.communicationComposePost))
 	mux.Handle("GET /communications/{id}",     adminOnly.ThenFunc(app.communicationDetail))
 
+	// Budget planning
+	mux.Handle("GET /budgets",                          protected.ThenFunc(app.budgetsList))
+	mux.Handle("GET /budgets/new",                      adminOnly.ThenFunc(app.budgetNewGet))
+	mux.Handle("POST /budgets/new",                     adminOnly.ThenFunc(app.budgetNewPost))
+	mux.Handle("GET /budgets/{id}",                     protected.ThenFunc(app.budgetDetail))
+	mux.Handle("GET /budgets/{id}/edit",                adminOnly.ThenFunc(app.budgetEditGet))
+	mux.Handle("POST /budgets/{id}/edit",               adminOnly.ThenFunc(app.budgetEditPost))
+	mux.Handle("POST /budgets/{id}/lines/add",          adminOnly.ThenFunc(app.budgetLineAdd))
+	mux.Handle("POST /budgets/{id}/lines/{lid}/delete", adminOnly.ThenFunc(app.budgetLineDelete))
+	mux.Handle("POST /budgets/{id}/delete",             adminOnly.ThenFunc(app.budgetDelete))
+
 	// Reports
 	mux.Handle("GET /reports", protected.ThenFunc(app.reports))
+	mux.Handle("GET /reports/finance", protected.ThenFunc(app.financeReports))
 
 	// Church Calendar
 	mux.Handle("GET /calendar", protected.ThenFunc(app.calendarList))

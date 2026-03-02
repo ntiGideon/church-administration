@@ -40,4 +40,5 @@ type application struct {
 	departmentModel    *models.DepartmentModel
 	relationshipModel    *models.RelationshipModel
 	communicationModel   *models.CommunicationModel
+	budgetModel          *models.BudgetModel
 }

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/announcement"
+	"github.com/ntiGideon/ent/budget"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
@@ -598,6 +599,21 @@ func (_c *ChurchCreate) AddCommunications(v ...*Communication) *ChurchCreate {
 	return _c.AddCommunicationIDs(ids...)
 }
 
+// AddBudgetIDs adds the "budgets" edge to the Budget entity by IDs.
+func (_c *ChurchCreate) AddBudgetIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddBudgetIDs(ids...)
+	return _c
+}
+
+// AddBudgets adds the "budgets" edges to the Budget entity.
+func (_c *ChurchCreate) AddBudgets(v ...*Budget) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddBudgetIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_c *ChurchCreate) Mutation() *ChurchMutation {
 	return _c.mutation
@@ -1120,6 +1136,22 @@ func (_c *ChurchCreate) createSpec() (*Church, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.BudgetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.BudgetsTable,
+			Columns: []string{church.BudgetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(budget.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

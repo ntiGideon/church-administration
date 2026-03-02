@@ -33,6 +33,30 @@ func (f AttendanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AttendanceMutation", m)
 }
 
+// The BudgetFunc type is an adapter to allow the use of ordinary
+// function as Budget mutator.
+type BudgetFunc func(context.Context, *ent.BudgetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BudgetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BudgetMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BudgetMutation", m)
+}
+
+// The BudgetLineFunc type is an adapter to allow the use of ordinary
+// function as BudgetLine mutator.
+type BudgetLineFunc func(context.Context, *ent.BudgetLineMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BudgetLineFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BudgetLineMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BudgetLineMutation", m)
+}
+
 // The ChurchFunc type is an adapter to allow the use of ordinary
 // function as Church mutator.
 type ChurchFunc func(context.Context, *ent.ChurchMutation) (ent.Value, error)

@@ -17,6 +17,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/attendance"
+	"github.com/ntiGideon/ent/budget"
+	"github.com/ntiGideon/ent/budgetline"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
@@ -49,6 +51,10 @@ type Client struct {
 	Announcement *AnnouncementClient
 	// Attendance is the client for interacting with the Attendance builders.
 	Attendance *AttendanceClient
+	// Budget is the client for interacting with the Budget builders.
+	Budget *BudgetClient
+	// BudgetLine is the client for interacting with the BudgetLine builders.
+	BudgetLine *BudgetLineClient
 	// Church is the client for interacting with the Church builders.
 	Church *ChurchClient
 	// Communication is the client for interacting with the Communication builders.
@@ -104,6 +110,8 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Announcement = NewAnnouncementClient(c.config)
 	c.Attendance = NewAttendanceClient(c.config)
+	c.Budget = NewBudgetClient(c.config)
+	c.BudgetLine = NewBudgetLineClient(c.config)
 	c.Church = NewChurchClient(c.config)
 	c.Communication = NewCommunicationClient(c.config)
 	c.Contact = NewContactClient(c.config)
@@ -219,6 +227,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:        cfg,
 		Announcement:  NewAnnouncementClient(cfg),
 		Attendance:    NewAttendanceClient(cfg),
+		Budget:        NewBudgetClient(cfg),
+		BudgetLine:    NewBudgetLineClient(cfg),
 		Church:        NewChurchClient(cfg),
 		Communication: NewCommunicationClient(cfg),
 		Contact:       NewContactClient(cfg),
@@ -261,6 +271,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:        cfg,
 		Announcement:  NewAnnouncementClient(cfg),
 		Attendance:    NewAttendanceClient(cfg),
+		Budget:        NewBudgetClient(cfg),
+		BudgetLine:    NewBudgetLineClient(cfg),
 		Church:        NewChurchClient(cfg),
 		Communication: NewCommunicationClient(cfg),
 		Contact:       NewContactClient(cfg),
@@ -311,8 +323,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Announcement, c.Attendance, c.Church, c.Communication, c.Contact,
-		c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
+		c.Announcement, c.Attendance, c.Budget, c.BudgetLine, c.Church, c.Communication,
+		c.Contact, c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
 		c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest, c.ProgramEntry,
 		c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
 		c.Visitor,
@@ -325,8 +337,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Announcement, c.Attendance, c.Church, c.Communication, c.Contact,
-		c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
+		c.Announcement, c.Attendance, c.Budget, c.BudgetLine, c.Church, c.Communication,
+		c.Contact, c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
 		c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest, c.ProgramEntry,
 		c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
 		c.Visitor,
@@ -342,6 +354,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Announcement.mutate(ctx, m)
 	case *AttendanceMutation:
 		return c.Attendance.mutate(ctx, m)
+	case *BudgetMutation:
+		return c.Budget.mutate(ctx, m)
+	case *BudgetLineMutation:
+		return c.BudgetLine.mutate(ctx, m)
 	case *ChurchMutation:
 		return c.Church.mutate(ctx, m)
 	case *CommunicationMutation:
@@ -716,6 +732,320 @@ func (c *AttendanceClient) mutate(ctx context.Context, m *AttendanceMutation) (V
 		return (&AttendanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Attendance mutation op: %q", m.Op())
+	}
+}
+
+// BudgetClient is a client for the Budget schema.
+type BudgetClient struct {
+	config
+}
+
+// NewBudgetClient returns a client for the Budget from the given config.
+func NewBudgetClient(c config) *BudgetClient {
+	return &BudgetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `budget.Hooks(f(g(h())))`.
+func (c *BudgetClient) Use(hooks ...Hook) {
+	c.hooks.Budget = append(c.hooks.Budget, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `budget.Intercept(f(g(h())))`.
+func (c *BudgetClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Budget = append(c.inters.Budget, interceptors...)
+}
+
+// Create returns a builder for creating a Budget entity.
+func (c *BudgetClient) Create() *BudgetCreate {
+	mutation := newBudgetMutation(c.config, OpCreate)
+	return &BudgetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Budget entities.
+func (c *BudgetClient) CreateBulk(builders ...*BudgetCreate) *BudgetCreateBulk {
+	return &BudgetCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BudgetClient) MapCreateBulk(slice any, setFunc func(*BudgetCreate, int)) *BudgetCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BudgetCreateBulk{err: fmt.Errorf("calling to BudgetClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BudgetCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BudgetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Budget.
+func (c *BudgetClient) Update() *BudgetUpdate {
+	mutation := newBudgetMutation(c.config, OpUpdate)
+	return &BudgetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BudgetClient) UpdateOne(_m *Budget) *BudgetUpdateOne {
+	mutation := newBudgetMutation(c.config, OpUpdateOne, withBudget(_m))
+	return &BudgetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BudgetClient) UpdateOneID(id int) *BudgetUpdateOne {
+	mutation := newBudgetMutation(c.config, OpUpdateOne, withBudgetID(id))
+	return &BudgetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Budget.
+func (c *BudgetClient) Delete() *BudgetDelete {
+	mutation := newBudgetMutation(c.config, OpDelete)
+	return &BudgetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BudgetClient) DeleteOne(_m *Budget) *BudgetDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BudgetClient) DeleteOneID(id int) *BudgetDeleteOne {
+	builder := c.Delete().Where(budget.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BudgetDeleteOne{builder}
+}
+
+// Query returns a query builder for Budget.
+func (c *BudgetClient) Query() *BudgetQuery {
+	return &BudgetQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBudget},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Budget entity by its id.
+func (c *BudgetClient) Get(ctx context.Context, id int) (*Budget, error) {
+	return c.Query().Where(budget.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BudgetClient) GetX(ctx context.Context, id int) *Budget {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChurch queries the church edge of a Budget.
+func (c *BudgetClient) QueryChurch(_m *Budget) *ChurchQuery {
+	query := (&ChurchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(budget.Table, budget.FieldID, id),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, budget.ChurchTable, budget.ChurchColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLines queries the lines edge of a Budget.
+func (c *BudgetClient) QueryLines(_m *Budget) *BudgetLineQuery {
+	query := (&BudgetLineClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(budget.Table, budget.FieldID, id),
+			sqlgraph.To(budgetline.Table, budgetline.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, budget.LinesTable, budget.LinesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BudgetClient) Hooks() []Hook {
+	return c.hooks.Budget
+}
+
+// Interceptors returns the client interceptors.
+func (c *BudgetClient) Interceptors() []Interceptor {
+	return c.inters.Budget
+}
+
+func (c *BudgetClient) mutate(ctx context.Context, m *BudgetMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BudgetCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BudgetUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BudgetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BudgetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Budget mutation op: %q", m.Op())
+	}
+}
+
+// BudgetLineClient is a client for the BudgetLine schema.
+type BudgetLineClient struct {
+	config
+}
+
+// NewBudgetLineClient returns a client for the BudgetLine from the given config.
+func NewBudgetLineClient(c config) *BudgetLineClient {
+	return &BudgetLineClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `budgetline.Hooks(f(g(h())))`.
+func (c *BudgetLineClient) Use(hooks ...Hook) {
+	c.hooks.BudgetLine = append(c.hooks.BudgetLine, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `budgetline.Intercept(f(g(h())))`.
+func (c *BudgetLineClient) Intercept(interceptors ...Interceptor) {
+	c.inters.BudgetLine = append(c.inters.BudgetLine, interceptors...)
+}
+
+// Create returns a builder for creating a BudgetLine entity.
+func (c *BudgetLineClient) Create() *BudgetLineCreate {
+	mutation := newBudgetLineMutation(c.config, OpCreate)
+	return &BudgetLineCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BudgetLine entities.
+func (c *BudgetLineClient) CreateBulk(builders ...*BudgetLineCreate) *BudgetLineCreateBulk {
+	return &BudgetLineCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BudgetLineClient) MapCreateBulk(slice any, setFunc func(*BudgetLineCreate, int)) *BudgetLineCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BudgetLineCreateBulk{err: fmt.Errorf("calling to BudgetLineClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BudgetLineCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BudgetLineCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BudgetLine.
+func (c *BudgetLineClient) Update() *BudgetLineUpdate {
+	mutation := newBudgetLineMutation(c.config, OpUpdate)
+	return &BudgetLineUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BudgetLineClient) UpdateOne(_m *BudgetLine) *BudgetLineUpdateOne {
+	mutation := newBudgetLineMutation(c.config, OpUpdateOne, withBudgetLine(_m))
+	return &BudgetLineUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BudgetLineClient) UpdateOneID(id int) *BudgetLineUpdateOne {
+	mutation := newBudgetLineMutation(c.config, OpUpdateOne, withBudgetLineID(id))
+	return &BudgetLineUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BudgetLine.
+func (c *BudgetLineClient) Delete() *BudgetLineDelete {
+	mutation := newBudgetLineMutation(c.config, OpDelete)
+	return &BudgetLineDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BudgetLineClient) DeleteOne(_m *BudgetLine) *BudgetLineDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BudgetLineClient) DeleteOneID(id int) *BudgetLineDeleteOne {
+	builder := c.Delete().Where(budgetline.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BudgetLineDeleteOne{builder}
+}
+
+// Query returns a query builder for BudgetLine.
+func (c *BudgetLineClient) Query() *BudgetLineQuery {
+	return &BudgetLineQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBudgetLine},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a BudgetLine entity by its id.
+func (c *BudgetLineClient) Get(ctx context.Context, id int) (*BudgetLine, error) {
+	return c.Query().Where(budgetline.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BudgetLineClient) GetX(ctx context.Context, id int) *BudgetLine {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBudget queries the budget edge of a BudgetLine.
+func (c *BudgetLineClient) QueryBudget(_m *BudgetLine) *BudgetQuery {
+	query := (&BudgetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(budgetline.Table, budgetline.FieldID, id),
+			sqlgraph.To(budget.Table, budget.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, budgetline.BudgetTable, budgetline.BudgetColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BudgetLineClient) Hooks() []Hook {
+	return c.hooks.BudgetLine
+}
+
+// Interceptors returns the client interceptors.
+func (c *BudgetLineClient) Interceptors() []Interceptor {
+	return c.inters.BudgetLine
+}
+
+func (c *BudgetLineClient) mutate(ctx context.Context, m *BudgetLineMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BudgetLineCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BudgetLineUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BudgetLineUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BudgetLineDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown BudgetLine mutation op: %q", m.Op())
 	}
 }
 
@@ -1140,6 +1470,22 @@ func (c *ChurchClient) QueryCommunications(_m *Church) *CommunicationQuery {
 			sqlgraph.From(church.Table, church.FieldID, id),
 			sqlgraph.To(communication.Table, communication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, church.CommunicationsTable, church.CommunicationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBudgets queries the budgets edge of a Church.
+func (c *ChurchClient) QueryBudgets(_m *Church) *BudgetQuery {
+	query := (&BudgetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, id),
+			sqlgraph.To(budget.Table, budget.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.BudgetsTable, church.BudgetsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4795,15 +5141,15 @@ func (c *VisitorClient) mutate(ctx context.Context, m *VisitorMutation) (Value, 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Announcement, Attendance, Church, Communication, Contact, Department, Document,
-		Event, Finance, Group, Invitation, Milestone, PastoralNote, Pledge,
-		PrayerRequest, ProgramEntry, Relationship, Roster, RosterEntry, Sermon,
-		Session, User, Visitor []ent.Hook
+		Announcement, Attendance, Budget, BudgetLine, Church, Communication, Contact,
+		Department, Document, Event, Finance, Group, Invitation, Milestone,
+		PastoralNote, Pledge, PrayerRequest, ProgramEntry, Relationship, Roster,
+		RosterEntry, Sermon, Session, User, Visitor []ent.Hook
 	}
 	inters struct {
-		Announcement, Attendance, Church, Communication, Contact, Department, Document,
-		Event, Finance, Group, Invitation, Milestone, PastoralNote, Pledge,
-		PrayerRequest, ProgramEntry, Relationship, Roster, RosterEntry, Sermon,
-		Session, User, Visitor []ent.Interceptor
+		Announcement, Attendance, Budget, BudgetLine, Church, Communication, Contact,
+		Department, Document, Event, Finance, Group, Invitation, Milestone,
+		PastoralNote, Pledge, PrayerRequest, ProgramEntry, Relationship, Roster,
+		RosterEntry, Sermon, Session, User, Visitor []ent.Interceptor
 	}
 )

@@ -16,6 +16,10 @@ type Tx struct {
 	Announcement *AnnouncementClient
 	// Attendance is the client for interacting with the Attendance builders.
 	Attendance *AttendanceClient
+	// Budget is the client for interacting with the Budget builders.
+	Budget *BudgetClient
+	// BudgetLine is the client for interacting with the BudgetLine builders.
+	BudgetLine *BudgetLineClient
 	// Church is the client for interacting with the Church builders.
 	Church *ChurchClient
 	// Communication is the client for interacting with the Communication builders.
@@ -191,6 +195,8 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Announcement = NewAnnouncementClient(tx.config)
 	tx.Attendance = NewAttendanceClient(tx.config)
+	tx.Budget = NewBudgetClient(tx.config)
+	tx.BudgetLine = NewBudgetLineClient(tx.config)
 	tx.Church = NewChurchClient(tx.config)
 	tx.Communication = NewCommunicationClient(tx.config)
 	tx.Contact = NewContactClient(tx.config)

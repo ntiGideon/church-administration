@@ -330,3 +330,27 @@ type CommunicationDto struct {
 
 	validator.Validator `form:"-"`
 }
+
+// BudgetDto is used to create or update a budget plan.
+type BudgetDto struct {
+	Name       string `form:"name"`
+	FiscalYear int    `form:"fiscal_year"`
+	Period     string `form:"period"`
+	StartDate  string `form:"start_date"`
+	EndDate    string `form:"end_date"`
+	Status     string `form:"status"`
+	Notes      string `form:"notes"`
+
+	validator.Validator `form:"-"`
+}
+
+// BudgetLineDto is used to add a line item to a budget.
+type BudgetLineDto struct {
+	Category        string  `form:"category"`
+	LineType        string  `form:"line_type"`
+	AllocatedAmount float64 `form:"allocated_amount"`
+	Currency        string  `form:"currency"`
+	Notes           string  `form:"notes"`
+
+	validator.Validator `form:"-"`
+}

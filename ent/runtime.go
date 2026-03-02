@@ -7,6 +7,8 @@ import (
 
 	"github.com/ntiGideon/ent/announcement"
 	"github.com/ntiGideon/ent/attendance"
+	"github.com/ntiGideon/ent/budget"
+	"github.com/ntiGideon/ent/budgetline"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
@@ -56,6 +58,18 @@ func init() {
 	attendanceDescCheckInTime := attendanceFields[4].Descriptor()
 	// attendance.DefaultCheckInTime holds the default value on creation for the check_in_time field.
 	attendance.DefaultCheckInTime = attendanceDescCheckInTime.Default.(func() time.Time)
+	budgetFields := schema.Budget{}.Fields()
+	_ = budgetFields
+	// budgetDescCreatedAt is the schema descriptor for created_at field.
+	budgetDescCreatedAt := budgetFields[8].Descriptor()
+	// budget.DefaultCreatedAt holds the default value on creation for the created_at field.
+	budget.DefaultCreatedAt = budgetDescCreatedAt.Default.(func() time.Time)
+	budgetlineFields := schema.BudgetLine{}.Fields()
+	_ = budgetlineFields
+	// budgetlineDescCurrency is the schema descriptor for currency field.
+	budgetlineDescCurrency := budgetlineFields[3].Descriptor()
+	// budgetline.DefaultCurrency holds the default value on creation for the currency field.
+	budgetline.DefaultCurrency = budgetlineDescCurrency.Default.(string)
 	churchFields := schema.Church{}.Fields()
 	_ = churchFields
 	// churchDescCity is the schema descriptor for city field.
