@@ -33,6 +33,8 @@ func (Invitation) Fields() []ent.Field {
 			"revoked",
 		).Default("pending"),
 
+		field.Int("custom_role_id").Optional(),
+
 		field.Time("expires_at"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
@@ -51,6 +53,11 @@ func (Invitation) Edges() []ent.Edge {
 			Unique(),
 
 		edge.To("accepted_user", User.Type).
+			Unique(),
+
+		edge.From("custom_role", CustomRole.Type).
+			Ref("invitations").
+			Field("custom_role_id").
 			Unique(),
 	}
 }

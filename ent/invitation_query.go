@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -28,6 +29,7 @@ type InvitationQuery struct {
 	withChurch       *ChurchQuery
 	withInviter      *UserQuery
 	withAcceptedUser *UserQuery
+	withCustomRole   *CustomRoleQuery
 	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -124,6 +126,28 @@ func (_q *InvitationQuery) QueryAcceptedUser() *UserQuery {
 			sqlgraph.From(invitation.Table, invitation.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, invitation.AcceptedUserTable, invitation.AcceptedUserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCustomRole chains the current query on the "custom_role" edge.
+func (_q *InvitationQuery) QueryCustomRole() *CustomRoleQuery {
+	query := (&CustomRoleClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitation.Table, invitation.FieldID, selector),
+			sqlgraph.To(customrole.Table, customrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitation.CustomRoleTable, invitation.CustomRoleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -326,6 +350,7 @@ func (_q *InvitationQuery) Clone() *InvitationQuery {
 		withChurch:       _q.withChurch.Clone(),
 		withInviter:      _q.withInviter.Clone(),
 		withAcceptedUser: _q.withAcceptedUser.Clone(),
+		withCustomRole:   _q.withCustomRole.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -362,6 +387,17 @@ func (_q *InvitationQuery) WithAcceptedUser(opts ...func(*UserQuery)) *Invitatio
 		opt(query)
 	}
 	_q.withAcceptedUser = query
+	return _q
+}
+
+// WithCustomRole tells the query-builder to eager-load the nodes that are connected to
+// the "custom_role" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *InvitationQuery) WithCustomRole(opts ...func(*CustomRoleQuery)) *InvitationQuery {
+	query := (&CustomRoleClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCustomRole = query
 	return _q
 }
 
@@ -444,10 +480,11 @@ func (_q *InvitationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*I
 		nodes       = []*Invitation{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withChurch != nil,
 			_q.withInviter != nil,
 			_q.withAcceptedUser != nil,
+			_q.withCustomRole != nil,
 		}
 	)
 	if _q.withChurch != nil || _q.withInviter != nil {
@@ -489,6 +526,12 @@ func (_q *InvitationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*I
 	if query := _q.withAcceptedUser; query != nil {
 		if err := _q.loadAcceptedUser(ctx, query, nodes, nil,
 			func(n *Invitation, e *User) { n.Edges.AcceptedUser = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCustomRole; query != nil {
+		if err := _q.loadCustomRole(ctx, query, nodes, nil,
+			func(n *Invitation, e *CustomRole) { n.Edges.CustomRole = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -587,6 +630,35 @@ func (_q *InvitationQuery) loadAcceptedUser(ctx context.Context, query *UserQuer
 	}
 	return nil
 }
+func (_q *InvitationQuery) loadCustomRole(ctx context.Context, query *CustomRoleQuery, nodes []*Invitation, init func(*Invitation), assign func(*Invitation, *CustomRole)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Invitation)
+	for i := range nodes {
+		fk := nodes[i].CustomRoleID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(customrole.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "custom_role_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *InvitationQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -612,6 +684,9 @@ func (_q *InvitationQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != invitation.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withCustomRole != nil {
+			_spec.Node.AddColumnOnce(invitation.FieldCustomRoleID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

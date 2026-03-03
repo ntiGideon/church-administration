@@ -24,9 +24,7 @@
                 {{if $s.Scripture}}<span class="hm-item"><i class="fas fa-book-open"></i> {{$s.Scripture}}</span>{{end}}
             </div>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <div class="ph-actions">
             <form action="/sermons/{{$s.ID}}/publish" method="POST">
                 <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
@@ -55,7 +53,7 @@
                 </button>
             </form>
         </div>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}

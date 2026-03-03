@@ -15,9 +15,7 @@
             <h1 class="page-title-text">{{$ann.Title}}</h1>
         </div>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
-            {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-            {{$role := $.LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+            {{if $.IsAdmin}}
             <!-- Toggle publish -->
             <form action="/announcements/{{$ann.ID}}/publish" method="POST" style="margin:0">
                 <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
@@ -47,7 +45,6 @@
                 </button>
             </form>
             {{end}}
-            {{end}}{{end}}
             <a href="/announcements" class="button is-light is-small">
                 <span class="icon"><i class="fas fa-arrow-left"></i></span>
                 <span>Back</span>

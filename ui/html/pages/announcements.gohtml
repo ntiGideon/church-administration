@@ -8,16 +8,11 @@
             <h1 class="page-title-text">Announcements</h1>
             <p class="page-subtitle-text">Church notices, prayer requests, and updates</p>
         </div>
-        {{if .IsAuthenticated}}
-        {{if .LoggedInUser}}
-            {{$role := .LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-            <a href="/announcements/new" class="button is-primary">
-                <span class="icon"><i class="fas fa-plus"></i></span>
-                <span>New Announcement</span>
-            </a>
-            {{end}}
-        {{end}}
+        {{if .IsAdmin}}
+        <a href="/announcements/new" class="button is-primary">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>New Announcement</span>
+        </a>
         {{end}}
     </div>
 
@@ -29,13 +24,7 @@
     {{end}}
 
     {{$announcements := index .Data "announcements"}}
-    {{$isAdmin := false}}
-    {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-            {{$isAdmin = true}}
-        {{end}}
-    {{end}}{{end}}
+    {{$isAdmin := $.IsAdmin}}
     {{if $announcements}}
     <div class="announcements-list">
         {{range $announcements}}
@@ -93,16 +82,11 @@
         </div>
         <h3>No announcements yet</h3>
         <p>Announcements from your church will appear here.</p>
-        {{if .IsAuthenticated}}
-        {{if .LoggedInUser}}
-            {{$role := .LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-            <a href="/announcements/new" class="button is-primary mt-2">
-                <span class="icon"><i class="fas fa-plus"></i></span>
-                <span>Create First Announcement</span>
-            </a>
-            {{end}}
-        {{end}}
+        {{if $.IsAdmin}}
+        <a href="/announcements/new" class="button is-primary mt-2">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Create First Announcement</span>
+        </a>
         {{end}}
     </div>
     {{end}}

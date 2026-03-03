@@ -15,9 +15,7 @@
                 {{if $v.HowHeard}}<span class="hm-item"><i class="fas fa-map-signs"></i> {{howHeardLabel (enumStr $v.HowHeard)}}</span>{{end}}
             </div>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <div class="ph-actions">
             <a href="/visitors/{{$v.ID}}/edit" class="button is-light">
                 <span class="icon"><i class="fas fa-edit"></i></span>
@@ -32,7 +30,7 @@
                 </button>
             </form>
         </div>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}

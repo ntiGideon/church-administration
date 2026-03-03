@@ -41,9 +41,20 @@ type InviteDto struct {
 
 // MemberInviteDto is used by branch admin to invite staff/members
 type MemberInviteDto struct {
-	Email string `form:"email"`
-	Name  string `form:"name"`
-	Role  string `form:"role"`
+	Email        string `form:"email"`
+	Name         string `form:"name"`
+	Role         string `form:"role"`
+	CustomRoleID int    `form:"custom_role_id"`
+
+	validator.Validator `form:"-"`
+}
+
+// CustomRoleDto is used to create or update a custom role.
+type CustomRoleDto struct {
+	Name        string   `form:"name"`
+	Description string   `form:"description"`
+	Permissions []string `form:"permissions"`
+	IsActive    bool     `form:"is_active"`
 
 	validator.Validator `form:"-"`
 }

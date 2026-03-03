@@ -8,14 +8,12 @@
             <h1 class="page-title-text">Groups</h1>
             <p class="page-subtitle">Small groups, cell groups, and ministry teams</p>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/groups/new" class="button is-primary">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>New Group</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -70,14 +68,12 @@
         <i class="fas fa-users empty-icon"></i>
         <h3>No groups yet</h3>
         <p>Create your first small group or cell group to get started.</p>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/groups/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Create Group</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
     {{end}}
 </div>

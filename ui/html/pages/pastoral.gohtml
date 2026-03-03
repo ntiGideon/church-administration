@@ -11,14 +11,12 @@
             <h1 class="page-title-text">Pastoral Care</h1>
             <p class="page-subtitle">Member visit records, counseling notes, and follow-ups</p>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/pastoral/new" class="button is-primary">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>New Record</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -80,14 +78,12 @@
         <i class="fas fa-hand-holding-heart empty-icon"></i>
         <h3>No pastoral records yet</h3>
         <p>Start recording visits, counseling sessions, and pastoral interactions.</p>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/pastoral/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Add First Record</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
     {{end}}
 </div>

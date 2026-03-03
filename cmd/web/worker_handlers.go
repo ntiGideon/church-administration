@@ -32,8 +32,17 @@ func (app *application) workersGet(w http.ResponseWriter, r *http.Request) {
 
 // GET /workers/new
 func (app *application) workerInviteGet(w http.ResponseWriter, r *http.Request) {
+	churchID := app.churchID(r)
+	customRoles, err := app.customRoleModel.ListByChurch(r.Context(), churchID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 	data := app.newTemplateData(r)
 	data.Form = models.MemberInviteDto{}
+	data.Data = map[string]interface{}{
+		"customRoles": customRoles,
+	}
 	app.render(w, r, http.StatusOK, "invite_member.gohtml", data)
 }
 
@@ -47,14 +56,8 @@ func (app *application) workerInvitePost(w http.ResponseWriter, r *http.Request)
 
 	dto.CheckField(validator.NotBlank(dto.Email), "email", "Email is required")
 	dto.CheckField(validator.Matches(dto.Email, validator.EmailRX), "email", "Must be a valid email address")
-	dto.CheckField(validator.NotBlank(dto.Role), "role", "Role is required")
-
-	if !dto.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = dto
-		app.render(w, r, http.StatusUnprocessableEntity, "invite_member.gohtml", data)
-		return
-	}
+	// Either a built-in role or a custom role must be selected
+	dto.CheckField(dto.Role != "" || dto.CustomRoleID > 0, "role", "Please select a role")
 
 	u := app.getAuthenticatedUser(r)
 	churchID := 0
@@ -66,10 +69,25 @@ func (app *application) workerInvitePost(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	if !dto.Valid() {
+		customRoles, _ := app.customRoleModel.ListByChurch(r.Context(), churchID)
+		data := app.newTemplateData(r)
+		data.Form = dto
+		data.Data = map[string]interface{}{
+			"customRoles": customRoles,
+		}
+		app.render(w, r, http.StatusUnprocessableEntity, "invite_member.gohtml", data)
+		return
+	}
+
 	if churchID == 0 {
+		customRoles, _ := app.customRoleModel.ListByChurch(r.Context(), 0)
 		dto.AddNonFieldError("Cannot determine church — please contact support.")
 		data := app.newTemplateData(r)
 		data.Form = dto
+		data.Data = map[string]interface{}{
+			"customRoles": customRoles,
+		}
 		app.render(w, r, http.StatusUnprocessableEntity, "invite_member.gohtml", data)
 		return
 	}

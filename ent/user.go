@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/user"
 )
@@ -30,6 +31,8 @@ type User struct {
 	IsActive bool `json:"is_active,omitempty"`
 	// LastLogin holds the value of the "last_login" field.
 	LastLogin time.Time `json:"last_login,omitempty"`
+	// CustomRoleID holds the value of the "custom_role_id" field.
+	CustomRoleID int `json:"custom_role_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -61,9 +64,11 @@ type UserEdges struct {
 	PastoralNotesRecorded []*PastoralNote `json:"pastoral_notes_recorded,omitempty"`
 	// SentCommunications holds the value of the sent_communications edge.
 	SentCommunications []*Communication `json:"sent_communications,omitempty"`
+	// CustomRole holds the value of the custom_role edge.
+	CustomRole *CustomRole `json:"custom_role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [9]bool
 }
 
 // ChurchOrErr returns the Church value or an error if the edge
@@ -144,6 +149,17 @@ func (e UserEdges) SentCommunicationsOrErr() ([]*Communication, error) {
 	return nil, &NotLoadedError{edge: "sent_communications"}
 }
 
+// CustomRoleOrErr returns the CustomRole value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) CustomRoleOrErr() (*CustomRole, error) {
+	if e.CustomRole != nil {
+		return e.CustomRole, nil
+	} else if e.loadedTypes[8] {
+		return nil, &NotFoundError{label: customrole.Label}
+	}
+	return nil, &NotLoadedError{edge: "custom_role"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -151,7 +167,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case user.FieldID:
+		case user.FieldID, user.FieldCustomRoleID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldEmail, user.FieldPasswordHash, user.FieldRole:
 			values[i] = new(sql.NullString)
@@ -213,6 +229,12 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field last_login", values[i])
 			} else if value.Valid {
 				_m.LastLogin = value.Time
+			}
+		case user.FieldCustomRoleID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field custom_role_id", values[i])
+			} else if value.Valid {
+				_m.CustomRoleID = int(value.Int64)
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -300,6 +322,11 @@ func (_m *User) QuerySentCommunications() *CommunicationQuery {
 	return NewUserClient(_m.config).QuerySentCommunications(_m)
 }
 
+// QueryCustomRole queries the "custom_role" edge of the User entity.
+func (_m *User) QueryCustomRole() *CustomRoleQuery {
+	return NewUserClient(_m.config).QueryCustomRole(_m)
+}
+
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -337,6 +364,9 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("last_login=")
 	builder.WriteString(_m.LastLogin.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("custom_role_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.CustomRoleID))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

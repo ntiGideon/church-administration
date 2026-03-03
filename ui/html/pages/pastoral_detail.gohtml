@@ -10,9 +10,7 @@
             <a href="/pastoral" class="back-link"><i class="fas fa-arrow-left"></i> Pastoral Care</a>
             <h1 class="page-title-text">Pastoral Record</h1>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <div class="action-btns">
             <a href="/pastoral/{{$note.ID}}/edit" class="button is-small is-warning is-light">
                 <span class="icon"><i class="fas fa-edit"></i></span>
@@ -26,7 +24,7 @@
                 </button>
             </form>
         </div>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -88,9 +86,7 @@
                     </div>
                 </div>
                 {{if and $note.NeedsFollowUp (not $note.FollowUpDone)}}
-                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                {{$role := $.LoggedInUser.Role.String}}
-                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "pastor")}}
+                {{if $.IsAdmin}}
                 <form action="/pastoral/{{$note.ID}}/followup" method="POST">
                     <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                     <button type="submit" class="button is-small is-success is-light">
@@ -98,7 +94,7 @@
                         <span>Mark Done</span>
                     </button>
                 </form>
-                {{end}}{{end}}{{end}}
+                {{end}}
                 {{end}}
             </div>
         </div>

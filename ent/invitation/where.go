@@ -70,6 +70,11 @@ func Token(v string) predicate.Invitation {
 	return predicate.Invitation(sql.FieldEQ(FieldToken, v))
 }
 
+// CustomRoleID applies equality check predicate on the "custom_role_id" field. It's identical to CustomRoleIDEQ.
+func CustomRoleID(v int) predicate.Invitation {
+	return predicate.Invitation(sql.FieldEQ(FieldCustomRoleID, v))
+}
+
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
 func ExpiresAt(v time.Time) predicate.Invitation {
 	return predicate.Invitation(sql.FieldEQ(FieldExpiresAt, v))
@@ -330,6 +335,36 @@ func StatusNotIn(vs ...Status) predicate.Invitation {
 	return predicate.Invitation(sql.FieldNotIn(FieldStatus, vs...))
 }
 
+// CustomRoleIDEQ applies the EQ predicate on the "custom_role_id" field.
+func CustomRoleIDEQ(v int) predicate.Invitation {
+	return predicate.Invitation(sql.FieldEQ(FieldCustomRoleID, v))
+}
+
+// CustomRoleIDNEQ applies the NEQ predicate on the "custom_role_id" field.
+func CustomRoleIDNEQ(v int) predicate.Invitation {
+	return predicate.Invitation(sql.FieldNEQ(FieldCustomRoleID, v))
+}
+
+// CustomRoleIDIn applies the In predicate on the "custom_role_id" field.
+func CustomRoleIDIn(vs ...int) predicate.Invitation {
+	return predicate.Invitation(sql.FieldIn(FieldCustomRoleID, vs...))
+}
+
+// CustomRoleIDNotIn applies the NotIn predicate on the "custom_role_id" field.
+func CustomRoleIDNotIn(vs ...int) predicate.Invitation {
+	return predicate.Invitation(sql.FieldNotIn(FieldCustomRoleID, vs...))
+}
+
+// CustomRoleIDIsNil applies the IsNil predicate on the "custom_role_id" field.
+func CustomRoleIDIsNil() predicate.Invitation {
+	return predicate.Invitation(sql.FieldIsNull(FieldCustomRoleID))
+}
+
+// CustomRoleIDNotNil applies the NotNil predicate on the "custom_role_id" field.
+func CustomRoleIDNotNil() predicate.Invitation {
+	return predicate.Invitation(sql.FieldNotNull(FieldCustomRoleID))
+}
+
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
 func ExpiresAtEQ(v time.Time) predicate.Invitation {
 	return predicate.Invitation(sql.FieldEQ(FieldExpiresAt, v))
@@ -511,6 +546,29 @@ func HasAcceptedUser() predicate.Invitation {
 func HasAcceptedUserWith(preds ...predicate.User) predicate.Invitation {
 	return predicate.Invitation(func(s *sql.Selector) {
 		step := newAcceptedUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCustomRole applies the HasEdge predicate on the "custom_role" edge.
+func HasCustomRole() predicate.Invitation {
+	return predicate.Invitation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CustomRoleTable, CustomRoleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCustomRoleWith applies the HasEdge predicate on the "custom_role" edge with a given conditions (other predicates).
+func HasCustomRoleWith(preds ...predicate.CustomRole) predicate.Invitation {
+	return predicate.Invitation(func(s *sql.Selector) {
+		step := newCustomRoleStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

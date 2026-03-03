@@ -35,6 +35,61 @@ func (m *MemberModel) CountContactsByChurch(ctx context.Context, churchID int) (
 	return q.Count(ctx)
 }
 
+// MemberGrowthItem holds count of new contacts for one calendar month.
+type MemberGrowthItem struct {
+	Month string `json:"month"`
+	Count int    `json:"count"`
+}
+
+// MemberGrowthTrend returns the count of new contacts per month for the last n months.
+func (m *MemberModel) MemberGrowthTrend(ctx context.Context, churchID, months int) ([]MemberGrowthItem, error) {
+	if months <= 0 {
+		months = 12
+	}
+
+	now := time.Now()
+	type slotKey struct {
+		year  int
+		month time.Month
+	}
+
+	result := make([]MemberGrowthItem, months)
+	slotMap := make(map[slotKey]int, months)
+
+	for i := 0; i < months; i++ {
+		t := now.AddDate(0, -(months-1-i), 0)
+		k := slotKey{t.Year(), t.Month()}
+		label := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Format("Jan '06")
+		result[i] = MemberGrowthItem{Month: label}
+		slotMap[k] = i
+	}
+
+	earliestT := now.AddDate(0, -(months-1), 0)
+	earliest := time.Date(earliestT.Year(), earliestT.Month(), 1, 0, 0, 0, 0, time.UTC)
+
+	q := m.Db.Contact.Query().Where(contact.CreatedAtGTE(earliest))
+	if churchID > 0 {
+		q = q.Where(contact.HasChurchWith(church.IDEQ(churchID)))
+	} else {
+		q = q.Where(contact.HasChurchWith())
+	}
+
+	contacts, err := q.All(ctx)
+	if err != nil {
+		return result, nil
+	}
+
+	for _, c := range contacts {
+		k := slotKey{c.CreatedAt.Year(), c.CreatedAt.Month()}
+		idx, ok := slotMap[k]
+		if !ok {
+			continue
+		}
+		result[idx].Count++
+	}
+	return result, nil
+}
+
 // GetContactByID returns a single Contact with spouse and church edges loaded.
 func (m *MemberModel) GetContactByID(ctx context.Context, id int) (*ent.Contact, error) {
 	c, err := m.Db.Contact.Query().

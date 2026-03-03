@@ -278,6 +278,31 @@ var (
 			},
 		},
 	}
+	// CustomRolesColumns holds the columns for the "custom_roles" table.
+	CustomRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "permissions", Type: field.TypeString, Size: 2147483647, Default: "[]"},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "church_id", Type: field.TypeInt},
+	}
+	// CustomRolesTable holds the schema information for the "custom_roles" table.
+	CustomRolesTable = &schema.Table{
+		Name:       "custom_roles",
+		Columns:    CustomRolesColumns,
+		PrimaryKey: []*schema.Column{CustomRolesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "custom_roles_churches_custom_roles",
+				Columns:    []*schema.Column{CustomRolesColumns[7]},
+				RefColumns: []*schema.Column{ChurchesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -462,6 +487,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "church_invitations", Type: field.TypeInt},
+		{Name: "custom_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "user_sent_invitations", Type: field.TypeInt, Nullable: true},
 	}
 	// InvitationsTable holds the schema information for the "invitations" table.
@@ -477,8 +503,14 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "invitations_users_sent_invitations",
+				Symbol:     "invitations_custom_roles_invitations",
 				Columns:    []*schema.Column{InvitationsColumns[10]},
+				RefColumns: []*schema.Column{CustomRolesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "invitations_users_sent_invitations",
+				Columns:    []*schema.Column{InvitationsColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -844,6 +876,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "church_users", Type: field.TypeInt, Nullable: true},
 		{Name: "contact_user", Type: field.TypeInt, Unique: true},
+		{Name: "custom_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "invitation_accepted_user", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
@@ -865,8 +898,14 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "users_invitations_accepted_user",
+				Symbol:     "users_custom_roles_users",
 				Columns:    []*schema.Column{UsersColumns[10]},
+				RefColumns: []*schema.Column{CustomRolesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_invitations_accepted_user",
+				Columns:    []*schema.Column{UsersColumns[11]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -985,6 +1024,7 @@ var (
 		ChurchesTable,
 		CommunicationsTable,
 		ContactsTable,
+		CustomRolesTable,
 		DepartmentsTable,
 		DocumentsTable,
 		EventsTable,
@@ -1020,6 +1060,7 @@ func init() {
 	CommunicationsTable.ForeignKeys[1].RefTable = UsersTable
 	ContactsTable.ForeignKeys[0].RefTable = ChurchesTable
 	ContactsTable.ForeignKeys[1].RefTable = ContactsTable
+	CustomRolesTable.ForeignKeys[0].RefTable = ChurchesTable
 	DepartmentsTable.ForeignKeys[0].RefTable = ChurchesTable
 	DepartmentsTable.ForeignKeys[1].RefTable = ContactsTable
 	DocumentsTable.ForeignKeys[0].RefTable = ChurchesTable
@@ -1030,7 +1071,8 @@ func init() {
 	GroupsTable.ForeignKeys[0].RefTable = ChurchesTable
 	GroupsTable.ForeignKeys[1].RefTable = ContactsTable
 	InvitationsTable.ForeignKeys[0].RefTable = ChurchesTable
-	InvitationsTable.ForeignKeys[1].RefTable = UsersTable
+	InvitationsTable.ForeignKeys[1].RefTable = CustomRolesTable
+	InvitationsTable.ForeignKeys[2].RefTable = UsersTable
 	MilestonesTable.ForeignKeys[0].RefTable = ChurchesTable
 	MilestonesTable.ForeignKeys[1].RefTable = ContactsTable
 	PastoralNotesTable.ForeignKeys[0].RefTable = ChurchesTable
@@ -1049,7 +1091,8 @@ func init() {
 	SermonsTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[0].RefTable = ChurchesTable
 	UsersTable.ForeignKeys[1].RefTable = ContactsTable
-	UsersTable.ForeignKeys[2].RefTable = InvitationsTable
+	UsersTable.ForeignKeys[2].RefTable = CustomRolesTable
+	UsersTable.ForeignKeys[3].RefTable = InvitationsTable
 	VisitorsTable.ForeignKeys[0].RefTable = ChurchesTable
 	DepartmentMembersTable.ForeignKeys[0].RefTable = DepartmentsTable
 	DepartmentMembersTable.ForeignKeys[1].RefTable = ContactsTable

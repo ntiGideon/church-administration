@@ -13,9 +13,7 @@
             <h1 class="page-title-text">{{$dept.Name}}</h1>
             <span class="dept-type-chip">{{deptTypeLabel (enumStr $dept.DepartmentType)}}</span>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+        {{if $.IsAdmin}}
         <div class="action-btns">
             <a href="/departments/{{$dept.ID}}/edit" class="button is-small is-warning is-light">
                 <span class="icon"><i class="fas fa-edit"></i></span><span>Edit</span>
@@ -28,7 +26,7 @@
                 </button>
             </form>
         </div>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -77,9 +75,7 @@
         <!-- Main area: roster + add form -->
         <div class="main-col">
             <!-- Add member form -->
-            {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-            {{$role := $.LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+            {{if $.IsAdmin}}
             <div class="add-member-card">
                 <div class="add-member-title"><i class="fas fa-user-plus"></i> Add Member</div>
                 <form action="/departments/{{$dept.ID}}/members/add" method="POST" class="add-member-form">
@@ -103,7 +99,7 @@
                     </div>
                 </form>
             </div>
-            {{end}}{{end}}{{end}}
+            {{end}}
 
             <!-- Member roster -->
             <div class="roster-card">
@@ -126,15 +122,13 @@
                             </td>
                             <td class="phone-cell">{{if .Phone}}{{.Phone}}{{else}}—{{end}}</td>
                             <td class="action-cell">
-                                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                                {{$role := $.LoggedInUser.Role.String}}
-                                {{if or (eq $role "super_admin") (eq $role "branch_admin")}}
+                                {{if $.IsAdmin}}
                                 <form action="/departments/{{$dept.ID}}/members/{{.ID}}/remove" method="POST"
                                       onsubmit="return confirm('Remove from department?')">
                                     <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                                     <button type="submit" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
                                 </form>
-                                {{end}}{{end}}{{end}}
+                                {{end}}
                             </td>
                         </tr>
                         {{end}}

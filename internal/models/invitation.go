@@ -14,9 +14,15 @@ type InvitationModel struct {
 
 // Create saves a new pending invitation record.
 func (m *InvitationModel) Create(ctx context.Context, churchID, inviterID int, dto *MemberInviteDto, token string, expiresAt time.Time) (*ent.Invitation, error) {
+	// When a custom role is chosen use "member" as the base enum role.
+	roleVal := dto.Role
+	if dto.CustomRoleID > 0 {
+		roleVal = "member"
+	}
+
 	b := m.Db.Invitation.Create().
 		SetInviteeEmail(dto.Email).
-		SetRole(invitation.Role(dto.Role)).
+		SetRole(invitation.Role(roleVal)).
 		SetToken(token).
 		SetChurchID(churchID).
 		SetExpiresAt(expiresAt)
@@ -26,6 +32,9 @@ func (m *InvitationModel) Create(ctx context.Context, churchID, inviterID int, d
 	}
 	if inviterID > 0 {
 		b = b.SetInviterID(inviterID)
+	}
+	if dto.CustomRoleID > 0 {
+		b = b.SetCustomRoleID(dto.CustomRoleID)
 	}
 
 	inv, err := b.Save(ctx)

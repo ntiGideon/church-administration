@@ -15,87 +15,122 @@
         {{if .IsAuthenticated}}
         <!-- Primary Nav Links -->
         <div class="navbar-links" id="navLinks">
+
+            <!-- Dashboard -->
             <a href="/dashboard" class="nav-link">
                 <i class="fas fa-th-large"></i><span>Dashboard</span>
             </a>
-            <a href="/members" class="nav-link">
-                <i class="fas fa-users"></i><span>Members</span>
-            </a>
-            <a href="/events" class="nav-link">
-                <i class="fas fa-calendar-alt"></i><span>Events</span>
-            </a>
-            <a href="/giving/donations" class="nav-link">
-                <i class="fas fa-hand-holding-heart"></i><span>Giving</span>
-            </a>
-            <a href="/budgets" class="nav-link">
-                <i class="fas fa-wallet"></i><span>Budgets</span>
-            </a>
 
-            <!-- Ministry dropdown -->
-            <div class="nav-dropdown" id="ministryDropdown">
-                <button class="nav-link nav-dropdown-trigger" id="ministryTrigger" aria-expanded="false">
-                    <i class="fas fa-church"></i><span>Ministry</span>
+            <!-- People dropdown -->
+            <div class="nav-dropdown" id="peopleDropdown">
+                <button class="nav-link nav-dropdown-trigger" aria-expanded="false">
+                    <i class="fas fa-users"></i><span>People</span>
                     <i class="fas fa-chevron-down nd-caret"></i>
                 </button>
-                <div class="nd-menu" id="ministryMenu">
-                    <a href="/groups"   class="nd-item"><i class="fas fa-users-rectangle"></i>    Groups</a>
-                    <a href="/rosters"  class="nd-item"><i class="fas fa-clipboard-list"></i>     Rosters</a>
-                    <a href="/sermons"  class="nd-item"><i class="fas fa-bible"></i>              Sermons</a>
-                    <a href="/prayer"   class="nd-item"><i class="fas fa-hands-praying"></i>      Prayer</a>
-                    <a href="/pastoral"     class="nd-item"><i class="fas fa-hand-holding-heart"></i> Pastoral Care</a>
-                    <a href="/departments" class="nd-item"><i class="fas fa-layer-group"></i>          Departments</a>
+                <div class="nd-menu">
+                    <a href="/members"   class="nd-item"><i class="fas fa-users"></i>          Members</a>
+                    <a href="/visitors"  class="nd-item"><i class="fas fa-user-friends"></i>   Visitors</a>
+                    <a href="/directory" class="nd-item"><i class="fas fa-address-book"></i>   Directory</a>
+                    <a href="/groups"    class="nd-item"><i class="fas fa-users-rectangle"></i> Groups</a>
+                    <a href="/departments" class="nd-item"><i class="fas fa-layer-group"></i>  Departments</a>
+                    <a href="/birthdays" class="nd-item"><i class="fas fa-cake-candles"></i>   Birthdays</a>
                 </div>
             </div>
 
+            <!-- Worship dropdown -->
+            <div class="nav-dropdown" id="worshipDropdown">
+                <button class="nav-link nav-dropdown-trigger" aria-expanded="false">
+                    <i class="fas fa-church"></i><span>Worship</span>
+                    <i class="fas fa-chevron-down nd-caret"></i>
+                </button>
+                <div class="nd-menu">
+                    <a href="/events"    class="nd-item"><i class="fas fa-calendar-alt"></i>   Events</a>
+                    <a href="/calendar"  class="nd-item"><i class="fas fa-calendar-days"></i>  Calendar</a>
+                    <a href="/sermons"   class="nd-item"><i class="fas fa-bible"></i>           Sermons</a>
+                    <a href="/prayer"    class="nd-item"><i class="fas fa-hands-praying"></i>  Prayer</a>
+                    <a href="/pastoral"  class="nd-item"><i class="fas fa-hand-holding-heart"></i> Pastoral Care</a>
+                    <a href="/rosters"   class="nd-item"><i class="fas fa-clipboard-list"></i> Rosters</a>
+                    <a href="/milestones" class="nd-item"><i class="fas fa-star"></i>           Milestones</a>
+                </div>
+            </div>
+
+            <!-- Finance dropdown — only if user has view_finance or view_budgets -->
+            {{if or (hasPermission .Permissions "view_finance") (hasPermission .Permissions "view_budgets")}}
+            <div class="nav-dropdown" id="financeDropdown">
+                <button class="nav-link nav-dropdown-trigger" aria-expanded="false">
+                    <i class="fas fa-coins"></i><span>Finance</span>
+                    <i class="fas fa-chevron-down nd-caret"></i>
+                </button>
+                <div class="nd-menu">
+                    {{if hasPermission .Permissions "view_finance"}}
+                    <a href="/giving/donations" class="nd-item"><i class="fas fa-hand-holding-heart"></i> Giving</a>
+                    {{end}}
+                    {{if hasPermission .Permissions "view_budgets"}}
+                    <a href="/budgets" class="nd-item"><i class="fas fa-wallet"></i> Budgets</a>
+                    {{end}}
+                    {{if hasPermission .Permissions "view_finance_reports"}}
+                    <a href="/reports/finance" class="nd-item"><i class="fas fa-chart-line"></i> Financial Reports</a>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+
             <!-- Community dropdown -->
             <div class="nav-dropdown" id="communityDropdown">
-                <button class="nav-link nav-dropdown-trigger" id="communityTrigger" aria-expanded="false">
+                <button class="nav-link nav-dropdown-trigger" aria-expanded="false">
                     <i class="fas fa-people-group"></i><span>Community</span>
                     <i class="fas fa-chevron-down nd-caret"></i>
                 </button>
-                <div class="nd-menu" id="communityMenu">
-                    <a href="/calendar"      class="nd-item"><i class="fas fa-calendar-days"></i>  Calendar</a>
-                    <a href="/announcements" class="nd-item"><i class="fas fa-bullhorn"></i>        Notices</a>
-                    <a href="/birthdays"     class="nd-item"><i class="fas fa-cake-candles"></i>   Birthdays</a>
-                    <a href="/visitors"      class="nd-item"><i class="fas fa-user-friends"></i>   Visitors</a>
-                    <a href="/documents"     class="nd-item"><i class="fas fa-folder-open"></i>    Documents</a>
-                    <a href="/milestones"     class="nd-item"><i class="fas fa-star"></i>            Milestones</a>
-                    {{if .LoggedInUser}}
-                        {{$role := .LoggedInUser.Role.String}}
-                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-                    <a href="/communications" class="nd-item"><i class="fas fa-envelope-bulk"></i>  Communications</a>
-                        {{end}}
+                <div class="nd-menu">
+                    <a href="/announcements" class="nd-item"><i class="fas fa-bullhorn"></i>       Announcements</a>
+                    <a href="/documents"     class="nd-item"><i class="fas fa-folder-open"></i>   Documents</a>
+                    {{if .IsAdmin}}
+                    <a href="/communications" class="nd-item"><i class="fas fa-envelope-bulk"></i> Communications</a>
                     {{end}}
                 </div>
             </div>
 
-            <!-- Reports dropdown -->
+            <!-- Reports dropdown — only if user has view_reports -->
+            {{if hasPermission .Permissions "view_reports"}}
             <div class="nav-dropdown" id="reportsDropdown">
-                <button class="nav-link nav-dropdown-trigger" id="reportsTrigger" aria-expanded="false">
+                <button class="nav-link nav-dropdown-trigger" aria-expanded="false">
                     <i class="fas fa-chart-bar"></i><span>Reports</span>
                     <i class="fas fa-chevron-down nd-caret"></i>
                 </button>
-                <div class="nd-menu" id="reportsMenu">
-                    <a href="/reports"         class="nd-item"><i class="fas fa-th-large"></i>   Overview</a>
-                    <a href="/reports/finance" class="nd-item"><i class="fas fa-coins"></i>       Financial</a>
+                <div class="nd-menu">
+                    <a href="/reports" class="nd-item"><i class="fas fa-th-large"></i> Overview</a>
+                    {{if hasPermission .Permissions "view_attendance_reports"}}
+                    <a href="/reports/attendance" class="nd-item"><i class="fas fa-chart-line"></i> Attendance</a>
+                    {{end}}
                 </div>
             </div>
+            {{end}}
+
+            <!-- Workers / Network link -->
             {{if .LoggedInUser}}
                 {{$role := .LoggedInUser.Role.String}}
                 {{if eq $role "super_admin"}}
                 <a href="/admin/churches" class="nav-link">
                     <i class="fas fa-network-wired"></i><span>Network</span>
                 </a>
-                {{else}}
+                {{else if hasPermission .Permissions "view_workers"}}
                 <a href="/workers" class="nav-link">
                     <i class="fas fa-user-tie"></i><span>Workers</span>
                 </a>
                 {{end}}
             {{end}}
+
         </div>
 
         <!-- Right Side -->
         <div class="navbar-right">
+            <!-- Settings gear (admin only) -->
+            {{if .IsAdmin}}
+            <a href="/church/settings" class="settings-gear" title="Church Settings">
+                <i class="fas fa-gear"></i>
+            </a>
+            {{end}}
+
             <!-- User Menu -->
             <div class="user-menu" id="userMenu">
                 <button class="user-trigger" id="userTrigger">
@@ -146,11 +181,9 @@
                     {{end}}
                     <a href="/dashboard" class="dd-item"><i class="fas fa-th-large"></i> Dashboard</a>
                     <a href="/profile" class="dd-item"><i class="fas fa-user-edit"></i> My Profile</a>
-                    {{if .LoggedInUser}}
-                        {{$role := .LoggedInUser.Role.String}}
-                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-                        <a href="/church/settings" class="dd-item"><i class="fas fa-church"></i> Church Settings</a>
-                        {{end}}
+                    {{if .IsAdmin}}
+                    <a href="/church/settings" class="dd-item"><i class="fas fa-church"></i> Church Settings</a>
+                    <a href="/church/settings/roles" class="dd-item"><i class="fas fa-shield-halved"></i> Custom Roles</a>
                     {{end}}
                     <div class="dropdown-divider"></div>
                     <form action="/logout" method="POST" style="margin:0">
@@ -195,7 +228,7 @@ body { padding-top: 64px; }
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 /* Brand */
@@ -232,7 +265,7 @@ body { padding-top: 64px; }
     display: flex;
     align-items: center;
     gap: 7px;
-    padding: 7px 14px;
+    padding: 7px 12px;
     border-radius: 8px;
     color: var(--text-medium);
     text-decoration: none;
@@ -248,7 +281,30 @@ body { padding-top: 64px; }
 .nav-link.active i { color: var(--primary); }
 
 /* Right Side */
-.navbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.navbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* Settings Gear */
+.settings-gear {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--light-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.settings-gear i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+.settings-gear:hover {
+    background: rgba(80,34,45,0.06);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+.settings-gear:hover i { transform: rotate(45deg); }
 
 /* User Menu */
 .user-menu { position: relative; }
@@ -287,7 +343,7 @@ body { padding-top: 64px; }
 .user-caret { font-size: 0.7rem; color: var(--text-light); transition: transform 0.2s; }
 .user-menu.open .user-caret { transform: rotate(180deg); }
 
-/* Dropdown */
+/* User Dropdown */
 .user-dropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -300,14 +356,14 @@ body { padding-top: 64px; }
     padding: 6px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-6px);
-    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+    transform: translateY(-8px) scale(0.97);
+    transition: opacity 0.18s cubic-bezier(0.16,1,0.3,1), transform 0.18s cubic-bezier(0.16,1,0.3,1), visibility 0.18s;
     z-index: 100;
 }
 .user-menu.open .user-dropdown {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-header {
@@ -407,7 +463,7 @@ body { padding-top: 64px; }
     display: flex;
     align-items: center;
     gap: 7px;
-    padding: 7px 14px;
+    padding: 7px 12px;
     border-radius: 8px;
     color: var(--text-medium);
     font-size: 0.875rem;
@@ -426,6 +482,7 @@ body { padding-top: 64px; }
 .nd-caret { font-size: 0.6rem !important; color: var(--text-light) !important; transition: transform 0.2s; margin-left: 2px; }
 .nav-dropdown.open .nd-caret { transform: rotate(180deg); }
 
+/* Dropdown menu — animated */
 .nd-menu {
     position: absolute;
     top: calc(100% + 6px);
@@ -438,15 +495,32 @@ body { padding-top: 64px; }
     padding: 6px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-6px);
-    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+    transform: translateY(-8px) scale(0.97);
+    transition: opacity 0.18s cubic-bezier(0.16,1,0.3,1), transform 0.18s cubic-bezier(0.16,1,0.3,1), visibility 0.18s;
     z-index: 200;
 }
 .nav-dropdown.open .nd-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
+
+/* Staggered item animation */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.nav-dropdown.open .nd-item {
+    animation: fadeSlideIn 0.2s ease forwards;
+}
+.nav-dropdown.open .nd-item:nth-child(1) { animation-delay: 0ms; }
+.nav-dropdown.open .nd-item:nth-child(2) { animation-delay: 30ms; }
+.nav-dropdown.open .nd-item:nth-child(3) { animation-delay: 60ms; }
+.nav-dropdown.open .nd-item:nth-child(4) { animation-delay: 90ms; }
+.nav-dropdown.open .nd-item:nth-child(5) { animation-delay: 120ms; }
+.nav-dropdown.open .nd-item:nth-child(6) { animation-delay: 150ms; }
+.nav-dropdown.open .nd-item:nth-child(7) { animation-delay: 180ms; }
+
 .nd-item {
     display: flex;
     align-items: center;
@@ -462,7 +536,7 @@ body { padding-top: 64px; }
 .nd-item i { width: 16px; text-align: center; font-size: 0.82rem; color: var(--text-light); }
 .nd-item:hover { background: rgba(80,34,45,0.06); color: var(--primary); }
 .nd-item:hover i { color: var(--primary); }
-.nd-item.active { background: rgba(80,34,45,0.07); color: var(--primary); font-weight: 600; }
+.nd-item.active { background: rgba(80,34,45,0.07); color: var(--primary); font-weight: 600; border-left: 3px solid var(--primary); }
 .nd-item.active i { color: var(--primary); }
 
 @media (max-width: 900px) {
@@ -501,7 +575,7 @@ body { padding-top: 64px; }
         display: none;
     }
     .nav-dropdown.open .nd-menu { display: block; }
-    .nd-item { padding: 8px 12px; }
+    .nd-item { padding: 8px 12px; animation: none !important; }
 }
 </style>
 
@@ -532,9 +606,8 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             const parent = this.closest('.nav-dropdown');
             const isOpen = parent.classList.contains('open');
-            // close all dropdowns
             document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-            userMenu.classList.remove('open');
+            if (userMenu) userMenu.classList.remove('open');
             if (!isOpen) parent.classList.add('open');
         });
     });

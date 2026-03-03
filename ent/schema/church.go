@@ -77,6 +77,7 @@ func (Church) Edges() []ent.Edge {
 		edge.To("milestones", Milestone.Type),
 		edge.To("communications", Communication.Type),
 		edge.To("budgets", Budget.Type),
+		edge.To("custom_roles", CustomRole.Type),
 	}
 }
 

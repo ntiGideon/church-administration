@@ -26,6 +26,8 @@ type Tx struct {
 	Communication *CommunicationClient
 	// Contact is the client for interacting with the Contact builders.
 	Contact *ContactClient
+	// CustomRole is the client for interacting with the CustomRole builders.
+	CustomRole *CustomRoleClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
 	// Document is the client for interacting with the Document builders.
@@ -200,6 +202,7 @@ func (tx *Tx) init() {
 	tx.Church = NewChurchClient(tx.config)
 	tx.Communication = NewCommunicationClient(tx.config)
 	tx.Contact = NewContactClient(tx.config)
+	tx.CustomRole = NewCustomRoleClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.Document = NewDocumentClient(tx.config)
 	tx.Event = NewEventClient(tx.config)

@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/pastoralnote"
@@ -108,6 +109,26 @@ func (_u *UserUpdate) SetNillableLastLogin(v *time.Time) *UserUpdate {
 // ClearLastLogin clears the value of the "last_login" field.
 func (_u *UserUpdate) ClearLastLogin() *UserUpdate {
 	_u.mutation.ClearLastLogin()
+	return _u
+}
+
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_u *UserUpdate) SetCustomRoleID(v int) *UserUpdate {
+	_u.mutation.SetCustomRoleID(v)
+	return _u
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableCustomRoleID(v *int) *UserUpdate {
+	if v != nil {
+		_u.SetCustomRoleID(*v)
+	}
+	return _u
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (_u *UserUpdate) ClearCustomRoleID() *UserUpdate {
+	_u.mutation.ClearCustomRoleID()
 	return _u
 }
 
@@ -255,6 +276,11 @@ func (_u *UserUpdate) AddSentCommunications(v ...*Communication) *UserUpdate {
 	return _u.AddSentCommunicationIDs(ids...)
 }
 
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_u *UserUpdate) SetCustomRole(v *CustomRole) *UserUpdate {
+	return _u.SetCustomRoleID(v.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
@@ -381,6 +407,12 @@ func (_u *UserUpdate) RemoveSentCommunications(v ...*Communication) *UserUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSentCommunicationIDs(ids...)
+}
+
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (_u *UserUpdate) ClearCustomRole() *UserUpdate {
+	_u.mutation.ClearCustomRole()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -780,6 +812,35 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.CustomRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CustomRoleTable,
+			Columns: []string{user.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CustomRoleTable,
+			Columns: []string{user.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -873,6 +934,26 @@ func (_u *UserUpdateOne) SetNillableLastLogin(v *time.Time) *UserUpdateOne {
 // ClearLastLogin clears the value of the "last_login" field.
 func (_u *UserUpdateOne) ClearLastLogin() *UserUpdateOne {
 	_u.mutation.ClearLastLogin()
+	return _u
+}
+
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_u *UserUpdateOne) SetCustomRoleID(v int) *UserUpdateOne {
+	_u.mutation.SetCustomRoleID(v)
+	return _u
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableCustomRoleID(v *int) *UserUpdateOne {
+	if v != nil {
+		_u.SetCustomRoleID(*v)
+	}
+	return _u
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (_u *UserUpdateOne) ClearCustomRoleID() *UserUpdateOne {
+	_u.mutation.ClearCustomRoleID()
 	return _u
 }
 
@@ -1020,6 +1101,11 @@ func (_u *UserUpdateOne) AddSentCommunications(v ...*Communication) *UserUpdateO
 	return _u.AddSentCommunicationIDs(ids...)
 }
 
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_u *UserUpdateOne) SetCustomRole(v *CustomRole) *UserUpdateOne {
+	return _u.SetCustomRoleID(v.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
@@ -1146,6 +1232,12 @@ func (_u *UserUpdateOne) RemoveSentCommunications(v ...*Communication) *UserUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSentCommunicationIDs(ids...)
+}
+
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (_u *UserUpdateOne) ClearCustomRole() *UserUpdateOne {
+	_u.mutation.ClearCustomRole()
+	return _u
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -1568,6 +1660,35 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(communication.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CustomRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CustomRoleTable,
+			Columns: []string{user.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CustomRoleTable,
+			Columns: []string{user.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

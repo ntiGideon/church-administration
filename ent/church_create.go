@@ -15,6 +15,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -614,6 +615,21 @@ func (_c *ChurchCreate) AddBudgets(v ...*Budget) *ChurchCreate {
 	return _c.AddBudgetIDs(ids...)
 }
 
+// AddCustomRoleIDs adds the "custom_roles" edge to the CustomRole entity by IDs.
+func (_c *ChurchCreate) AddCustomRoleIDs(ids ...int) *ChurchCreate {
+	_c.mutation.AddCustomRoleIDs(ids...)
+	return _c
+}
+
+// AddCustomRoles adds the "custom_roles" edges to the CustomRole entity.
+func (_c *ChurchCreate) AddCustomRoles(v ...*CustomRole) *ChurchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCustomRoleIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_c *ChurchCreate) Mutation() *ChurchMutation {
 	return _c.mutation
@@ -1152,6 +1168,22 @@ func (_c *ChurchCreate) createSpec() (*Church, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(budget.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CustomRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

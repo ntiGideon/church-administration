@@ -8,14 +8,12 @@
             <h1 class="page-title-text">Sermon Library</h1>
             <p class="page-subtitle">Messages, series, and scripture recordings</p>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/sermons/new" class="button is-primary">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Add Sermon</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -66,14 +64,12 @@
         <i class="fas fa-bible empty-icon"></i>
         <h3>No sermons yet</h3>
         <p>Start building your sermon library by adding your first message.</p>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/sermons/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Add First Sermon</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
     {{end}}
 </div>

@@ -4,13 +4,7 @@
 {{define "main"}}
 {{$summary := index .Data "summary"}}
 {{$budget := $summary.Budget}}
-{{$isAdmin := false}}
-{{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-    {{$role := $.LoggedInUser.Role.String}}
-    {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-        {{$isAdmin = true}}
-    {{end}}
-{{end}}{{end}}
+{{$isAdmin := $.IsAdmin}}
 
 <div class="page-wrapper">
     <div class="page-header-bar">

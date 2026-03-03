@@ -18,6 +18,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -55,6 +56,7 @@ const (
 	TypeChurch        = "Church"
 	TypeCommunication = "Communication"
 	TypeContact       = "Contact"
+	TypeCustomRole    = "CustomRole"
 	TypeDepartment    = "Department"
 	TypeDocument      = "Document"
 	TypeEvent         = "Event"
@@ -3295,6 +3297,9 @@ type ChurchMutation struct {
 	budgets                map[int]struct{}
 	removedbudgets         map[int]struct{}
 	clearedbudgets         bool
+	custom_roles           map[int]struct{}
+	removedcustom_roles    map[int]struct{}
+	clearedcustom_roles    bool
 	done                   bool
 	oldValue               func(context.Context) (*Church, error)
 	predicates             []predicate.Church
@@ -5466,6 +5471,60 @@ func (m *ChurchMutation) ResetBudgets() {
 	m.removedbudgets = nil
 }
 
+// AddCustomRoleIDs adds the "custom_roles" edge to the CustomRole entity by ids.
+func (m *ChurchMutation) AddCustomRoleIDs(ids ...int) {
+	if m.custom_roles == nil {
+		m.custom_roles = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.custom_roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCustomRoles clears the "custom_roles" edge to the CustomRole entity.
+func (m *ChurchMutation) ClearCustomRoles() {
+	m.clearedcustom_roles = true
+}
+
+// CustomRolesCleared reports if the "custom_roles" edge to the CustomRole entity was cleared.
+func (m *ChurchMutation) CustomRolesCleared() bool {
+	return m.clearedcustom_roles
+}
+
+// RemoveCustomRoleIDs removes the "custom_roles" edge to the CustomRole entity by IDs.
+func (m *ChurchMutation) RemoveCustomRoleIDs(ids ...int) {
+	if m.removedcustom_roles == nil {
+		m.removedcustom_roles = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.custom_roles, ids[i])
+		m.removedcustom_roles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCustomRoles returns the removed IDs of the "custom_roles" edge to the CustomRole entity.
+func (m *ChurchMutation) RemovedCustomRolesIDs() (ids []int) {
+	for id := range m.removedcustom_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CustomRolesIDs returns the "custom_roles" edge IDs in the mutation.
+func (m *ChurchMutation) CustomRolesIDs() (ids []int) {
+	for id := range m.custom_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCustomRoles resets all changes to the "custom_roles" edge.
+func (m *ChurchMutation) ResetCustomRoles() {
+	m.custom_roles = nil
+	m.clearedcustom_roles = false
+	m.removedcustom_roles = nil
+}
+
 // Where appends a list predicates to the ChurchMutation builder.
 func (m *ChurchMutation) Where(ps ...predicate.Church) {
 	m.predicates = append(m.predicates, ps...)
@@ -6047,7 +6106,7 @@ func (m *ChurchMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ChurchMutation) AddedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.parent != nil {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -6110,6 +6169,9 @@ func (m *ChurchMutation) AddedEdges() []string {
 	}
 	if m.budgets != nil {
 		edges = append(edges, church.EdgeBudgets)
+	}
+	if m.custom_roles != nil {
+		edges = append(edges, church.EdgeCustomRoles)
 	}
 	return edges
 }
@@ -6242,13 +6304,19 @@ func (m *ChurchMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgeCustomRoles:
+		ids := make([]ent.Value, 0, len(m.custom_roles))
+		for id := range m.custom_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChurchMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.removedchildren != nil {
 		edges = append(edges, church.EdgeChildren)
 	}
@@ -6308,6 +6376,9 @@ func (m *ChurchMutation) RemovedEdges() []string {
 	}
 	if m.removedbudgets != nil {
 		edges = append(edges, church.EdgeBudgets)
+	}
+	if m.removedcustom_roles != nil {
+		edges = append(edges, church.EdgeCustomRoles)
 	}
 	return edges
 }
@@ -6436,13 +6507,19 @@ func (m *ChurchMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case church.EdgeCustomRoles:
+		ids := make([]ent.Value, 0, len(m.removedcustom_roles))
+		for id := range m.removedcustom_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ChurchMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.clearedparent {
 		edges = append(edges, church.EdgeParent)
 	}
@@ -6506,6 +6583,9 @@ func (m *ChurchMutation) ClearedEdges() []string {
 	if m.clearedbudgets {
 		edges = append(edges, church.EdgeBudgets)
 	}
+	if m.clearedcustom_roles {
+		edges = append(edges, church.EdgeCustomRoles)
+	}
 	return edges
 }
 
@@ -6555,6 +6635,8 @@ func (m *ChurchMutation) EdgeCleared(name string) bool {
 		return m.clearedcommunications
 	case church.EdgeBudgets:
 		return m.clearedbudgets
+	case church.EdgeCustomRoles:
+		return m.clearedcustom_roles
 	}
 	return false
 }
@@ -6636,6 +6718,9 @@ func (m *ChurchMutation) ResetEdge(name string) error {
 		return nil
 	case church.EdgeBudgets:
 		m.ResetBudgets()
+		return nil
+	case church.EdgeCustomRoles:
+		m.ResetCustomRoles()
 		return nil
 	}
 	return fmt.Errorf("unknown Church edge %s", name)
@@ -11710,6 +11795,903 @@ func (m *ContactMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Contact edge %s", name)
+}
+
+// CustomRoleMutation represents an operation that mutates the CustomRole nodes in the graph.
+type CustomRoleMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *int
+	name               *string
+	description        *string
+	permissions        *string
+	is_active          *bool
+	created_at         *time.Time
+	updated_at         *time.Time
+	clearedFields      map[string]struct{}
+	church             *int
+	clearedchurch      bool
+	users              map[int]struct{}
+	removedusers       map[int]struct{}
+	clearedusers       bool
+	invitations        map[int]struct{}
+	removedinvitations map[int]struct{}
+	clearedinvitations bool
+	done               bool
+	oldValue           func(context.Context) (*CustomRole, error)
+	predicates         []predicate.CustomRole
+}
+
+var _ ent.Mutation = (*CustomRoleMutation)(nil)
+
+// customroleOption allows management of the mutation configuration using functional options.
+type customroleOption func(*CustomRoleMutation)
+
+// newCustomRoleMutation creates new mutation for the CustomRole entity.
+func newCustomRoleMutation(c config, op Op, opts ...customroleOption) *CustomRoleMutation {
+	m := &CustomRoleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCustomRole,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCustomRoleID sets the ID field of the mutation.
+func withCustomRoleID(id int) customroleOption {
+	return func(m *CustomRoleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CustomRole
+		)
+		m.oldValue = func(ctx context.Context) (*CustomRole, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CustomRole.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCustomRole sets the old CustomRole of the mutation.
+func withCustomRole(node *CustomRole) customroleOption {
+	return func(m *CustomRoleMutation) {
+		m.oldValue = func(context.Context) (*CustomRole, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CustomRoleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CustomRoleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CustomRoleMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CustomRoleMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().CustomRole.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *CustomRoleMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *CustomRoleMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *CustomRoleMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *CustomRoleMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *CustomRoleMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *CustomRoleMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[customrole.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *CustomRoleMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[customrole.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *CustomRoleMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, customrole.FieldDescription)
+}
+
+// SetPermissions sets the "permissions" field.
+func (m *CustomRoleMutation) SetPermissions(s string) {
+	m.permissions = &s
+}
+
+// Permissions returns the value of the "permissions" field in the mutation.
+func (m *CustomRoleMutation) Permissions() (r string, exists bool) {
+	v := m.permissions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPermissions returns the old "permissions" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldPermissions(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPermissions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPermissions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPermissions: %w", err)
+	}
+	return oldValue.Permissions, nil
+}
+
+// ResetPermissions resets all changes to the "permissions" field.
+func (m *CustomRoleMutation) ResetPermissions() {
+	m.permissions = nil
+}
+
+// SetIsActive sets the "is_active" field.
+func (m *CustomRoleMutation) SetIsActive(b bool) {
+	m.is_active = &b
+}
+
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *CustomRoleMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsActive returns the old "is_active" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+	}
+	return oldValue.IsActive, nil
+}
+
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *CustomRoleMutation) ResetIsActive() {
+	m.is_active = nil
+}
+
+// SetChurchID sets the "church_id" field.
+func (m *CustomRoleMutation) SetChurchID(i int) {
+	m.church = &i
+}
+
+// ChurchID returns the value of the "church_id" field in the mutation.
+func (m *CustomRoleMutation) ChurchID() (r int, exists bool) {
+	v := m.church
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChurchID returns the old "church_id" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldChurchID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChurchID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChurchID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChurchID: %w", err)
+	}
+	return oldValue.ChurchID, nil
+}
+
+// ResetChurchID resets all changes to the "church_id" field.
+func (m *CustomRoleMutation) ResetChurchID() {
+	m.church = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CustomRoleMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CustomRoleMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CustomRoleMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *CustomRoleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *CustomRoleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the CustomRole entity.
+// If the CustomRole object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CustomRoleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *CustomRoleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// ClearChurch clears the "church" edge to the Church entity.
+func (m *CustomRoleMutation) ClearChurch() {
+	m.clearedchurch = true
+	m.clearedFields[customrole.FieldChurchID] = struct{}{}
+}
+
+// ChurchCleared reports if the "church" edge to the Church entity was cleared.
+func (m *CustomRoleMutation) ChurchCleared() bool {
+	return m.clearedchurch
+}
+
+// ChurchIDs returns the "church" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ChurchID instead. It exists only for internal usage by the builders.
+func (m *CustomRoleMutation) ChurchIDs() (ids []int) {
+	if id := m.church; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetChurch resets all changes to the "church" edge.
+func (m *CustomRoleMutation) ResetChurch() {
+	m.church = nil
+	m.clearedchurch = false
+}
+
+// AddUserIDs adds the "users" edge to the User entity by ids.
+func (m *CustomRoleMutation) AddUserIDs(ids ...int) {
+	if m.users == nil {
+		m.users = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.users[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUsers clears the "users" edge to the User entity.
+func (m *CustomRoleMutation) ClearUsers() {
+	m.clearedusers = true
+}
+
+// UsersCleared reports if the "users" edge to the User entity was cleared.
+func (m *CustomRoleMutation) UsersCleared() bool {
+	return m.clearedusers
+}
+
+// RemoveUserIDs removes the "users" edge to the User entity by IDs.
+func (m *CustomRoleMutation) RemoveUserIDs(ids ...int) {
+	if m.removedusers == nil {
+		m.removedusers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.users, ids[i])
+		m.removedusers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
+func (m *CustomRoleMutation) RemovedUsersIDs() (ids []int) {
+	for id := range m.removedusers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UsersIDs returns the "users" edge IDs in the mutation.
+func (m *CustomRoleMutation) UsersIDs() (ids []int) {
+	for id := range m.users {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUsers resets all changes to the "users" edge.
+func (m *CustomRoleMutation) ResetUsers() {
+	m.users = nil
+	m.clearedusers = false
+	m.removedusers = nil
+}
+
+// AddInvitationIDs adds the "invitations" edge to the Invitation entity by ids.
+func (m *CustomRoleMutation) AddInvitationIDs(ids ...int) {
+	if m.invitations == nil {
+		m.invitations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.invitations[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInvitations clears the "invitations" edge to the Invitation entity.
+func (m *CustomRoleMutation) ClearInvitations() {
+	m.clearedinvitations = true
+}
+
+// InvitationsCleared reports if the "invitations" edge to the Invitation entity was cleared.
+func (m *CustomRoleMutation) InvitationsCleared() bool {
+	return m.clearedinvitations
+}
+
+// RemoveInvitationIDs removes the "invitations" edge to the Invitation entity by IDs.
+func (m *CustomRoleMutation) RemoveInvitationIDs(ids ...int) {
+	if m.removedinvitations == nil {
+		m.removedinvitations = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.invitations, ids[i])
+		m.removedinvitations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInvitations returns the removed IDs of the "invitations" edge to the Invitation entity.
+func (m *CustomRoleMutation) RemovedInvitationsIDs() (ids []int) {
+	for id := range m.removedinvitations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InvitationsIDs returns the "invitations" edge IDs in the mutation.
+func (m *CustomRoleMutation) InvitationsIDs() (ids []int) {
+	for id := range m.invitations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInvitations resets all changes to the "invitations" edge.
+func (m *CustomRoleMutation) ResetInvitations() {
+	m.invitations = nil
+	m.clearedinvitations = false
+	m.removedinvitations = nil
+}
+
+// Where appends a list predicates to the CustomRoleMutation builder.
+func (m *CustomRoleMutation) Where(ps ...predicate.CustomRole) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CustomRoleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CustomRoleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.CustomRole, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CustomRoleMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CustomRoleMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (CustomRole).
+func (m *CustomRoleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CustomRoleMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.name != nil {
+		fields = append(fields, customrole.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, customrole.FieldDescription)
+	}
+	if m.permissions != nil {
+		fields = append(fields, customrole.FieldPermissions)
+	}
+	if m.is_active != nil {
+		fields = append(fields, customrole.FieldIsActive)
+	}
+	if m.church != nil {
+		fields = append(fields, customrole.FieldChurchID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, customrole.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, customrole.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CustomRoleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case customrole.FieldName:
+		return m.Name()
+	case customrole.FieldDescription:
+		return m.Description()
+	case customrole.FieldPermissions:
+		return m.Permissions()
+	case customrole.FieldIsActive:
+		return m.IsActive()
+	case customrole.FieldChurchID:
+		return m.ChurchID()
+	case customrole.FieldCreatedAt:
+		return m.CreatedAt()
+	case customrole.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CustomRoleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case customrole.FieldName:
+		return m.OldName(ctx)
+	case customrole.FieldDescription:
+		return m.OldDescription(ctx)
+	case customrole.FieldPermissions:
+		return m.OldPermissions(ctx)
+	case customrole.FieldIsActive:
+		return m.OldIsActive(ctx)
+	case customrole.FieldChurchID:
+		return m.OldChurchID(ctx)
+	case customrole.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case customrole.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown CustomRole field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CustomRoleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case customrole.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case customrole.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case customrole.FieldPermissions:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPermissions(v)
+		return nil
+	case customrole.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
+	case customrole.FieldChurchID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChurchID(v)
+		return nil
+	case customrole.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case customrole.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CustomRole field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CustomRoleMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CustomRoleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CustomRoleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CustomRole numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CustomRoleMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(customrole.FieldDescription) {
+		fields = append(fields, customrole.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CustomRoleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CustomRoleMutation) ClearField(name string) error {
+	switch name {
+	case customrole.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown CustomRole nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CustomRoleMutation) ResetField(name string) error {
+	switch name {
+	case customrole.FieldName:
+		m.ResetName()
+		return nil
+	case customrole.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case customrole.FieldPermissions:
+		m.ResetPermissions()
+		return nil
+	case customrole.FieldIsActive:
+		m.ResetIsActive()
+		return nil
+	case customrole.FieldChurchID:
+		m.ResetChurchID()
+		return nil
+	case customrole.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case customrole.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown CustomRole field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CustomRoleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.church != nil {
+		edges = append(edges, customrole.EdgeChurch)
+	}
+	if m.users != nil {
+		edges = append(edges, customrole.EdgeUsers)
+	}
+	if m.invitations != nil {
+		edges = append(edges, customrole.EdgeInvitations)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CustomRoleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case customrole.EdgeChurch:
+		if id := m.church; id != nil {
+			return []ent.Value{*id}
+		}
+	case customrole.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.users))
+		for id := range m.users {
+			ids = append(ids, id)
+		}
+		return ids
+	case customrole.EdgeInvitations:
+		ids := make([]ent.Value, 0, len(m.invitations))
+		for id := range m.invitations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CustomRoleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedusers != nil {
+		edges = append(edges, customrole.EdgeUsers)
+	}
+	if m.removedinvitations != nil {
+		edges = append(edges, customrole.EdgeInvitations)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CustomRoleMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case customrole.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.removedusers))
+		for id := range m.removedusers {
+			ids = append(ids, id)
+		}
+		return ids
+	case customrole.EdgeInvitations:
+		ids := make([]ent.Value, 0, len(m.removedinvitations))
+		for id := range m.removedinvitations {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CustomRoleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedchurch {
+		edges = append(edges, customrole.EdgeChurch)
+	}
+	if m.clearedusers {
+		edges = append(edges, customrole.EdgeUsers)
+	}
+	if m.clearedinvitations {
+		edges = append(edges, customrole.EdgeInvitations)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CustomRoleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case customrole.EdgeChurch:
+		return m.clearedchurch
+	case customrole.EdgeUsers:
+		return m.clearedusers
+	case customrole.EdgeInvitations:
+		return m.clearedinvitations
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CustomRoleMutation) ClearEdge(name string) error {
+	switch name {
+	case customrole.EdgeChurch:
+		m.ClearChurch()
+		return nil
+	}
+	return fmt.Errorf("unknown CustomRole unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CustomRoleMutation) ResetEdge(name string) error {
+	switch name {
+	case customrole.EdgeChurch:
+		m.ResetChurch()
+		return nil
+	case customrole.EdgeUsers:
+		m.ResetUsers()
+		return nil
+	case customrole.EdgeInvitations:
+		m.ResetInvitations()
+		return nil
+	}
+	return fmt.Errorf("unknown CustomRole edge %s", name)
 }
 
 // DepartmentMutation represents an operation that mutates the Department nodes in the graph.
@@ -16841,6 +17823,8 @@ type InvitationMutation struct {
 	clearedinviter       bool
 	accepted_user        *int
 	clearedaccepted_user bool
+	custom_role          *int
+	clearedcustom_role   bool
 	done                 bool
 	oldValue             func(context.Context) (*Invitation, error)
 	predicates           []predicate.Invitation
@@ -17137,6 +18121,55 @@ func (m *InvitationMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetCustomRoleID sets the "custom_role_id" field.
+func (m *InvitationMutation) SetCustomRoleID(i int) {
+	m.custom_role = &i
+}
+
+// CustomRoleID returns the value of the "custom_role_id" field in the mutation.
+func (m *InvitationMutation) CustomRoleID() (r int, exists bool) {
+	v := m.custom_role
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCustomRoleID returns the old "custom_role_id" field's value of the Invitation entity.
+// If the Invitation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvitationMutation) OldCustomRoleID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCustomRoleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCustomRoleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCustomRoleID: %w", err)
+	}
+	return oldValue.CustomRoleID, nil
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (m *InvitationMutation) ClearCustomRoleID() {
+	m.custom_role = nil
+	m.clearedFields[invitation.FieldCustomRoleID] = struct{}{}
+}
+
+// CustomRoleIDCleared returns if the "custom_role_id" field was cleared in this mutation.
+func (m *InvitationMutation) CustomRoleIDCleared() bool {
+	_, ok := m.clearedFields[invitation.FieldCustomRoleID]
+	return ok
+}
+
+// ResetCustomRoleID resets all changes to the "custom_role_id" field.
+func (m *InvitationMutation) ResetCustomRoleID() {
+	m.custom_role = nil
+	delete(m.clearedFields, invitation.FieldCustomRoleID)
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (m *InvitationMutation) SetExpiresAt(t time.Time) {
 	m.expires_at = &t
@@ -17362,6 +18395,33 @@ func (m *InvitationMutation) ResetAcceptedUser() {
 	m.clearedaccepted_user = false
 }
 
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (m *InvitationMutation) ClearCustomRole() {
+	m.clearedcustom_role = true
+	m.clearedFields[invitation.FieldCustomRoleID] = struct{}{}
+}
+
+// CustomRoleCleared reports if the "custom_role" edge to the CustomRole entity was cleared.
+func (m *InvitationMutation) CustomRoleCleared() bool {
+	return m.CustomRoleIDCleared() || m.clearedcustom_role
+}
+
+// CustomRoleIDs returns the "custom_role" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CustomRoleID instead. It exists only for internal usage by the builders.
+func (m *InvitationMutation) CustomRoleIDs() (ids []int) {
+	if id := m.custom_role; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCustomRole resets all changes to the "custom_role" edge.
+func (m *InvitationMutation) ResetCustomRole() {
+	m.custom_role = nil
+	m.clearedcustom_role = false
+}
+
 // Where appends a list predicates to the InvitationMutation builder.
 func (m *InvitationMutation) Where(ps ...predicate.Invitation) {
 	m.predicates = append(m.predicates, ps...)
@@ -17396,7 +18456,7 @@ func (m *InvitationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *InvitationMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.invitee_email != nil {
 		fields = append(fields, invitation.FieldInviteeEmail)
 	}
@@ -17411,6 +18471,9 @@ func (m *InvitationMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, invitation.FieldStatus)
+	}
+	if m.custom_role != nil {
+		fields = append(fields, invitation.FieldCustomRoleID)
 	}
 	if m.expires_at != nil {
 		fields = append(fields, invitation.FieldExpiresAt)
@@ -17439,6 +18502,8 @@ func (m *InvitationMutation) Field(name string) (ent.Value, bool) {
 		return m.Token()
 	case invitation.FieldStatus:
 		return m.Status()
+	case invitation.FieldCustomRoleID:
+		return m.CustomRoleID()
 	case invitation.FieldExpiresAt:
 		return m.ExpiresAt()
 	case invitation.FieldCreatedAt:
@@ -17464,6 +18529,8 @@ func (m *InvitationMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldToken(ctx)
 	case invitation.FieldStatus:
 		return m.OldStatus(ctx)
+	case invitation.FieldCustomRoleID:
+		return m.OldCustomRoleID(ctx)
 	case invitation.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
 	case invitation.FieldCreatedAt:
@@ -17514,6 +18581,13 @@ func (m *InvitationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
+	case invitation.FieldCustomRoleID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCustomRoleID(v)
+		return nil
 	case invitation.FieldExpiresAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -17542,13 +18616,16 @@ func (m *InvitationMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *InvitationMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *InvitationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -17568,6 +18645,9 @@ func (m *InvitationMutation) ClearedFields() []string {
 	if m.FieldCleared(invitation.FieldInviteeName) {
 		fields = append(fields, invitation.FieldInviteeName)
 	}
+	if m.FieldCleared(invitation.FieldCustomRoleID) {
+		fields = append(fields, invitation.FieldCustomRoleID)
+	}
 	return fields
 }
 
@@ -17584,6 +18664,9 @@ func (m *InvitationMutation) ClearField(name string) error {
 	switch name {
 	case invitation.FieldInviteeName:
 		m.ClearInviteeName()
+		return nil
+	case invitation.FieldCustomRoleID:
+		m.ClearCustomRoleID()
 		return nil
 	}
 	return fmt.Errorf("unknown Invitation nullable field %s", name)
@@ -17608,6 +18691,9 @@ func (m *InvitationMutation) ResetField(name string) error {
 	case invitation.FieldStatus:
 		m.ResetStatus()
 		return nil
+	case invitation.FieldCustomRoleID:
+		m.ResetCustomRoleID()
+		return nil
 	case invitation.FieldExpiresAt:
 		m.ResetExpiresAt()
 		return nil
@@ -17623,7 +18709,7 @@ func (m *InvitationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvitationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.church != nil {
 		edges = append(edges, invitation.EdgeChurch)
 	}
@@ -17632,6 +18718,9 @@ func (m *InvitationMutation) AddedEdges() []string {
 	}
 	if m.accepted_user != nil {
 		edges = append(edges, invitation.EdgeAcceptedUser)
+	}
+	if m.custom_role != nil {
+		edges = append(edges, invitation.EdgeCustomRole)
 	}
 	return edges
 }
@@ -17652,13 +18741,17 @@ func (m *InvitationMutation) AddedIDs(name string) []ent.Value {
 		if id := m.accepted_user; id != nil {
 			return []ent.Value{*id}
 		}
+	case invitation.EdgeCustomRole:
+		if id := m.custom_role; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvitationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	return edges
 }
 
@@ -17670,7 +18763,7 @@ func (m *InvitationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvitationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedchurch {
 		edges = append(edges, invitation.EdgeChurch)
 	}
@@ -17679,6 +18772,9 @@ func (m *InvitationMutation) ClearedEdges() []string {
 	}
 	if m.clearedaccepted_user {
 		edges = append(edges, invitation.EdgeAcceptedUser)
+	}
+	if m.clearedcustom_role {
+		edges = append(edges, invitation.EdgeCustomRole)
 	}
 	return edges
 }
@@ -17693,6 +18789,8 @@ func (m *InvitationMutation) EdgeCleared(name string) bool {
 		return m.clearedinviter
 	case invitation.EdgeAcceptedUser:
 		return m.clearedaccepted_user
+	case invitation.EdgeCustomRole:
+		return m.clearedcustom_role
 	}
 	return false
 }
@@ -17710,6 +18808,9 @@ func (m *InvitationMutation) ClearEdge(name string) error {
 	case invitation.EdgeAcceptedUser:
 		m.ClearAcceptedUser()
 		return nil
+	case invitation.EdgeCustomRole:
+		m.ClearCustomRole()
+		return nil
 	}
 	return fmt.Errorf("unknown Invitation unique edge %s", name)
 }
@@ -17726,6 +18827,9 @@ func (m *InvitationMutation) ResetEdge(name string) error {
 		return nil
 	case invitation.EdgeAcceptedUser:
 		m.ResetAcceptedUser()
+		return nil
+	case invitation.EdgeCustomRole:
+		m.ResetCustomRole()
 		return nil
 	}
 	return fmt.Errorf("unknown Invitation edge %s", name)
@@ -26364,6 +27468,8 @@ type UserMutation struct {
 	sent_communications            map[int]struct{}
 	removedsent_communications     map[int]struct{}
 	clearedsent_communications     bool
+	custom_role                    *int
+	clearedcustom_role             bool
 	done                           bool
 	oldValue                       func(context.Context) (*User, error)
 	predicates                     []predicate.User
@@ -26658,6 +27764,55 @@ func (m *UserMutation) LastLoginCleared() bool {
 func (m *UserMutation) ResetLastLogin() {
 	m.last_login = nil
 	delete(m.clearedFields, user.FieldLastLogin)
+}
+
+// SetCustomRoleID sets the "custom_role_id" field.
+func (m *UserMutation) SetCustomRoleID(i int) {
+	m.custom_role = &i
+}
+
+// CustomRoleID returns the value of the "custom_role_id" field in the mutation.
+func (m *UserMutation) CustomRoleID() (r int, exists bool) {
+	v := m.custom_role
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCustomRoleID returns the old "custom_role_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldCustomRoleID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCustomRoleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCustomRoleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCustomRoleID: %w", err)
+	}
+	return oldValue.CustomRoleID, nil
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (m *UserMutation) ClearCustomRoleID() {
+	m.custom_role = nil
+	m.clearedFields[user.FieldCustomRoleID] = struct{}{}
+}
+
+// CustomRoleIDCleared returns if the "custom_role_id" field was cleared in this mutation.
+func (m *UserMutation) CustomRoleIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldCustomRoleID]
+	return ok
+}
+
+// ResetCustomRoleID resets all changes to the "custom_role_id" field.
+func (m *UserMutation) ResetCustomRoleID() {
+	m.custom_role = nil
+	delete(m.clearedFields, user.FieldCustomRoleID)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -27119,6 +28274,33 @@ func (m *UserMutation) ResetSentCommunications() {
 	m.removedsent_communications = nil
 }
 
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (m *UserMutation) ClearCustomRole() {
+	m.clearedcustom_role = true
+	m.clearedFields[user.FieldCustomRoleID] = struct{}{}
+}
+
+// CustomRoleCleared reports if the "custom_role" edge to the CustomRole entity was cleared.
+func (m *UserMutation) CustomRoleCleared() bool {
+	return m.CustomRoleIDCleared() || m.clearedcustom_role
+}
+
+// CustomRoleIDs returns the "custom_role" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CustomRoleID instead. It exists only for internal usage by the builders.
+func (m *UserMutation) CustomRoleIDs() (ids []int) {
+	if id := m.custom_role; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCustomRole resets all changes to the "custom_role" edge.
+func (m *UserMutation) ResetCustomRole() {
+	m.custom_role = nil
+	m.clearedcustom_role = false
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -27153,7 +28335,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
@@ -27168,6 +28350,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.last_login != nil {
 		fields = append(fields, user.FieldLastLogin)
+	}
+	if m.custom_role != nil {
+		fields = append(fields, user.FieldCustomRoleID)
 	}
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -27193,6 +28378,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.IsActive()
 	case user.FieldLastLogin:
 		return m.LastLogin()
+	case user.FieldCustomRoleID:
+		return m.CustomRoleID()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	case user.FieldUpdatedAt:
@@ -27216,6 +28403,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldIsActive(ctx)
 	case user.FieldLastLogin:
 		return m.OldLastLogin(ctx)
+	case user.FieldCustomRoleID:
+		return m.OldCustomRoleID(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case user.FieldUpdatedAt:
@@ -27264,6 +28453,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLastLogin(v)
 		return nil
+	case user.FieldCustomRoleID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCustomRoleID(v)
+		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -27285,13 +28481,16 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -27311,6 +28510,9 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldLastLogin) {
 		fields = append(fields, user.FieldLastLogin)
 	}
+	if m.FieldCleared(user.FieldCustomRoleID) {
+		fields = append(fields, user.FieldCustomRoleID)
+	}
 	return fields
 }
 
@@ -27327,6 +28529,9 @@ func (m *UserMutation) ClearField(name string) error {
 	switch name {
 	case user.FieldLastLogin:
 		m.ClearLastLogin()
+		return nil
+	case user.FieldCustomRoleID:
+		m.ClearCustomRoleID()
 		return nil
 	}
 	return fmt.Errorf("unknown User nullable field %s", name)
@@ -27351,6 +28556,9 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldLastLogin:
 		m.ResetLastLogin()
 		return nil
+	case user.FieldCustomRoleID:
+		m.ResetCustomRoleID()
+		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
@@ -27363,7 +28571,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.church != nil {
 		edges = append(edges, user.EdgeChurch)
 	}
@@ -27387,6 +28595,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.sent_communications != nil {
 		edges = append(edges, user.EdgeSentCommunications)
+	}
+	if m.custom_role != nil {
+		edges = append(edges, user.EdgeCustomRole)
 	}
 	return edges
 }
@@ -27437,13 +28648,17 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeCustomRole:
+		if id := m.custom_role; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.removedfinance_records != nil {
 		edges = append(edges, user.EdgeFinanceRecords)
 	}
@@ -27502,7 +28717,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.clearedchurch {
 		edges = append(edges, user.EdgeChurch)
 	}
@@ -27527,6 +28742,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	if m.clearedsent_communications {
 		edges = append(edges, user.EdgeSentCommunications)
 	}
+	if m.clearedcustom_role {
+		edges = append(edges, user.EdgeCustomRole)
+	}
 	return edges
 }
 
@@ -27550,6 +28768,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedpastoral_notes_recorded
 	case user.EdgeSentCommunications:
 		return m.clearedsent_communications
+	case user.EdgeCustomRole:
+		return m.clearedcustom_role
 	}
 	return false
 }
@@ -27566,6 +28786,9 @@ func (m *UserMutation) ClearEdge(name string) error {
 		return nil
 	case user.EdgeAcceptedInvitation:
 		m.ClearAcceptedInvitation()
+		return nil
+	case user.EdgeCustomRole:
+		m.ClearCustomRole()
 		return nil
 	}
 	return fmt.Errorf("unknown User unique edge %s", name)
@@ -27598,6 +28821,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeSentCommunications:
 		m.ResetSentCommunications()
+		return nil
+	case user.EdgeCustomRole:
+		m.ResetCustomRole()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

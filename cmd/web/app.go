@@ -41,4 +41,5 @@ type application struct {
 	relationshipModel    *models.RelationshipModel
 	communicationModel   *models.CommunicationModel
 	budgetModel          *models.BudgetModel
+	customRoleModel      *models.CustomRoleModel
 }

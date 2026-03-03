@@ -25,6 +25,8 @@ const (
 	FieldToken = "token"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldCustomRoleID holds the string denoting the custom_role_id field in the database.
+	FieldCustomRoleID = "custom_role_id"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -37,6 +39,8 @@ const (
 	EdgeInviter = "inviter"
 	// EdgeAcceptedUser holds the string denoting the accepted_user edge name in mutations.
 	EdgeAcceptedUser = "accepted_user"
+	// EdgeCustomRole holds the string denoting the custom_role edge name in mutations.
+	EdgeCustomRole = "custom_role"
 	// Table holds the table name of the invitation in the database.
 	Table = "invitations"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -60,6 +64,13 @@ const (
 	AcceptedUserInverseTable = "users"
 	// AcceptedUserColumn is the table column denoting the accepted_user relation/edge.
 	AcceptedUserColumn = "invitation_accepted_user"
+	// CustomRoleTable is the table that holds the custom_role relation/edge.
+	CustomRoleTable = "invitations"
+	// CustomRoleInverseTable is the table name for the CustomRole entity.
+	// It exists in this package in order to avoid circular dependency with the "customrole" package.
+	CustomRoleInverseTable = "custom_roles"
+	// CustomRoleColumn is the table column denoting the custom_role relation/edge.
+	CustomRoleColumn = "custom_role_id"
 )
 
 // Columns holds all SQL columns for invitation fields.
@@ -70,6 +81,7 @@ var Columns = []string{
 	FieldRole,
 	FieldToken,
 	FieldStatus,
+	FieldCustomRoleID,
 	FieldExpiresAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -194,6 +206,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
+// ByCustomRoleID orders the results by the custom_role_id field.
+func ByCustomRoleID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCustomRoleID, opts...).ToFunc()
+}
+
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
@@ -229,6 +246,13 @@ func ByAcceptedUserField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newAcceptedUserStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCustomRoleField orders the results by custom_role field.
+func ByCustomRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCustomRoleStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newChurchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -248,5 +272,12 @@ func newAcceptedUserStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AcceptedUserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, AcceptedUserTable, AcceptedUserColumn),
+	)
+}
+func newCustomRoleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CustomRoleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CustomRoleTable, CustomRoleColumn),
 	)
 }

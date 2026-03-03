@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -30,6 +31,8 @@ func (User) Fields() []ent.Field {
 		field.Bool("is_active").Default(true),
 		field.Time("last_login").Optional(),
 
+		field.Int("custom_role_id").Optional(),
+
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
@@ -57,6 +60,12 @@ func (User) Edges() []ent.Edge {
 			Unique(),
 		edge.To("pastoral_notes_recorded", PastoralNote.Type),
 		edge.To("sent_communications", Communication.Type),
+
+		edge.From("custom_role", CustomRole.Type).
+			Ref("users").
+			Field("custom_role_id").
+			Unique().
+			Annotations(entsql.Annotation{OnDelete: entsql.SetNull}),
 	}
 }
 

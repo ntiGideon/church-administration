@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ntiGideon/ui"
 	"html/template"
 	"io/fs"
 	"math"
@@ -11,6 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/ntiGideon/internal/models"
+	"github.com/ntiGideon/internal/permissions"
+	"github.com/ntiGideon/ui"
 )
 
 func newTemplateCache() (map[string]*template.Template, error) {
@@ -99,6 +102,9 @@ func toJSON(v interface{}) string {
 }
 
 var functions = template.FuncMap{
+	"hasPermission":    func(perms map[string]bool, key string) bool { return perms[key] },
+	"permissionGroups": func() []permissions.PermissionGroup { return permissions.PermissionGroups },
+	"ParsePermissions": models.ParsePermissions,
 	"formatDate":       formatDate,
 	"formatMoney":      formatMoney,
 	"multiply":         func(a, b int) int { return a * b },

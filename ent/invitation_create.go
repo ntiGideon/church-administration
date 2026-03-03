@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/user"
 )
@@ -64,6 +65,20 @@ func (_c *InvitationCreate) SetStatus(v invitation.Status) *InvitationCreate {
 func (_c *InvitationCreate) SetNillableStatus(v *invitation.Status) *InvitationCreate {
 	if v != nil {
 		_c.SetStatus(*v)
+	}
+	return _c
+}
+
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_c *InvitationCreate) SetCustomRoleID(v int) *InvitationCreate {
+	_c.mutation.SetCustomRoleID(v)
+	return _c
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_c *InvitationCreate) SetNillableCustomRoleID(v *int) *InvitationCreate {
+	if v != nil {
+		_c.SetCustomRoleID(*v)
 	}
 	return _c
 }
@@ -149,6 +164,11 @@ func (_c *InvitationCreate) SetNillableAcceptedUserID(id *int) *InvitationCreate
 // SetAcceptedUser sets the "accepted_user" edge to the User entity.
 func (_c *InvitationCreate) SetAcceptedUser(v *User) *InvitationCreate {
 	return _c.SetAcceptedUserID(v.ID)
+}
+
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_c *InvitationCreate) SetCustomRole(v *CustomRole) *InvitationCreate {
+	return _c.SetCustomRoleID(v.ID)
 }
 
 // Mutation returns the InvitationMutation object of the builder.
@@ -342,6 +362,23 @@ func (_c *InvitationCreate) createSpec() (*Invitation, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitation.CustomRoleTable,
+			Columns: []string{invitation.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CustomRoleID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

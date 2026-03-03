@@ -99,6 +99,8 @@ const (
 	EdgeCommunications = "communications"
 	// EdgeBudgets holds the string denoting the budgets edge name in mutations.
 	EdgeBudgets = "budgets"
+	// EdgeCustomRoles holds the string denoting the custom_roles edge name in mutations.
+	EdgeCustomRoles = "custom_roles"
 	// Table holds the table name of the church in the database.
 	Table = "churches"
 	// ParentTable is the table that holds the parent relation/edge.
@@ -242,6 +244,13 @@ const (
 	BudgetsInverseTable = "budgets"
 	// BudgetsColumn is the table column denoting the budgets relation/edge.
 	BudgetsColumn = "church_id"
+	// CustomRolesTable is the table that holds the custom_roles relation/edge.
+	CustomRolesTable = "custom_roles"
+	// CustomRolesInverseTable is the table name for the CustomRole entity.
+	// It exists in this package in order to avoid circular dependency with the "customrole" package.
+	CustomRolesInverseTable = "custom_roles"
+	// CustomRolesColumn is the table column denoting the custom_roles relation/edge.
+	CustomRolesColumn = "church_id"
 )
 
 // Columns holds all SQL columns for church fields.
@@ -723,6 +732,20 @@ func ByBudgets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newBudgetsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCustomRolesCount orders the results by custom_roles count.
+func ByCustomRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCustomRolesStep(), opts...)
+	}
+}
+
+// ByCustomRoles orders the results by custom_roles terms.
+func ByCustomRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCustomRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -868,5 +891,12 @@ func newBudgetsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BudgetsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, BudgetsTable, BudgetsColumn),
+	)
+}
+func newCustomRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CustomRolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CustomRolesTable, CustomRolesColumn),
 	)
 }

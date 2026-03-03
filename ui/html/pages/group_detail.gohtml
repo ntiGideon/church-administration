@@ -15,9 +15,7 @@
             <h1 class="page-title-text">{{if $g}}{{$g.Name}}{{end}}</h1>
         </div>
         <div class="header-actions">
-            {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-            {{$role := $.LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+            {{if $.IsAdmin}}
             <a href="/groups/{{$g.ID}}/edit" class="button is-outlined">
                 <span class="icon"><i class="fas fa-edit"></i></span>
                 <span>Edit</span>
@@ -30,7 +28,7 @@
                     <span>Delete</span>
                 </button>
             </form>
-            {{end}}{{end}}{{end}}
+            {{end}}
             <a href="/groups" class="button is-light">
                 <span class="icon"><i class="fas fa-arrow-left"></i></span>
                 <span>Back</span>
@@ -64,9 +62,7 @@
                 </div>
 
                 <!-- Add member form (admin only) -->
-                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                {{$role := $.LoggedInUser.Role.String}}
-                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                {{if $.IsAdmin}}
                 {{if $available}}
                 <div class="add-member-bar">
                     <form action="/groups/{{$g.ID}}/members/add" method="POST" class="add-member-form">
@@ -86,7 +82,7 @@
                     </form>
                 </div>
                 {{end}}
-                {{end}}{{end}}{{end}}
+                {{end}}
 
                 <!-- Member list -->
                 {{if $g.Edges.Members}}
@@ -104,9 +100,7 @@
                             <span class="member-name">{{.FirstName}} {{.LastName}}</span>
                             {{if .Phone}}<span class="member-meta"><i class="fas fa-phone"></i> {{.Phone}}</span>{{end}}
                         </div>
-                        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                        {{$role := $.LoggedInUser.Role.String}}
-                        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                        {{if $.IsAdmin}}
                         <form action="/groups/{{$g.ID}}/members/{{.ID}}/remove" method="POST" class="remove-form">
                             <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                             <button type="submit" class="button is-light is-small remove-btn"
@@ -114,7 +108,7 @@
                                 <span class="icon is-small"><i class="fas fa-times"></i></span>
                             </button>
                         </form>
-                        {{end}}{{end}}{{end}}
+                        {{end}}
                     </div>
                     {{end}}
                 </div>

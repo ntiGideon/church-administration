@@ -25,9 +25,7 @@
                 {{end}}
             </div>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <div class="ph-actions">
             <a href="/prayer/{{$pr.ID}}/edit" class="button is-light">
                 <span class="icon"><i class="fas fa-edit"></i></span>
@@ -42,7 +40,7 @@
                 </button>
             </form>
         </div>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}

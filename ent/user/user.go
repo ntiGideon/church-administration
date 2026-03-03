@@ -25,6 +25,8 @@ const (
 	FieldIsActive = "is_active"
 	// FieldLastLogin holds the string denoting the last_login field in the database.
 	FieldLastLogin = "last_login"
+	// FieldCustomRoleID holds the string denoting the custom_role_id field in the database.
+	FieldCustomRoleID = "custom_role_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -45,6 +47,8 @@ const (
 	EdgePastoralNotesRecorded = "pastoral_notes_recorded"
 	// EdgeSentCommunications holds the string denoting the sent_communications edge name in mutations.
 	EdgeSentCommunications = "sent_communications"
+	// EdgeCustomRole holds the string denoting the custom_role edge name in mutations.
+	EdgeCustomRole = "custom_role"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// ChurchTable is the table that holds the church relation/edge.
@@ -103,6 +107,13 @@ const (
 	SentCommunicationsInverseTable = "communications"
 	// SentCommunicationsColumn is the table column denoting the sent_communications relation/edge.
 	SentCommunicationsColumn = "user_sent_communications"
+	// CustomRoleTable is the table that holds the custom_role relation/edge.
+	CustomRoleTable = "users"
+	// CustomRoleInverseTable is the table name for the CustomRole entity.
+	// It exists in this package in order to avoid circular dependency with the "customrole" package.
+	CustomRoleInverseTable = "custom_roles"
+	// CustomRoleColumn is the table column denoting the custom_role relation/edge.
+	CustomRoleColumn = "custom_role_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -113,6 +124,7 @@ var Columns = []string{
 	FieldRole,
 	FieldIsActive,
 	FieldLastLogin,
+	FieldCustomRoleID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -215,6 +227,11 @@ func ByLastLogin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastLogin, opts...).ToFunc()
 }
 
+// ByCustomRoleID orders the results by the custom_role_id field.
+func ByCustomRoleID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCustomRoleID, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -315,6 +332,13 @@ func BySentCommunications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOptio
 		sqlgraph.OrderByNeighborTerms(s, newSentCommunicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCustomRoleField orders the results by custom_role field.
+func ByCustomRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCustomRoleStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newChurchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -369,5 +393,12 @@ func newSentCommunicationsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SentCommunicationsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SentCommunicationsTable, SentCommunicationsColumn),
+	)
+}
+func newCustomRoleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CustomRoleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CustomRoleTable, CustomRoleColumn),
 	)
 }

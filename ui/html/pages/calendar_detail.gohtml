@@ -156,9 +156,7 @@
 
         <!-- Sidebar -->
         <div class="detail-sidebar">
-            {{if .IsAuthenticated}}{{if .LoggedInUser}}
-                {{$role := .LoggedInUser.Role.String}}
-                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+            {{if .IsAdmin}}
                 <div class="sidebar-card">
                     <h4>Actions</h4>
                     <div class="action-list">
@@ -173,8 +171,7 @@
                         <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                     </form>
                 </div>
-                {{end}}
-            {{end}}{{end}}
+            {{end}}
 
             <div class="sidebar-card">
                 <h4>Program Info</h4>

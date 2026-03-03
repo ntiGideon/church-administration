@@ -17,4 +17,5 @@ var (
 	ErrInvitationAccepted  = errors.New("models: invitation already accepted")
 	ErrRecordNotFound         = errors.New("models: record not found")
 	ErrDuplicateRelationship  = errors.New("models: relationship already exists for this pair")
+	ErrCustomRoleNotFound     = errors.New("models: custom role not found")
 )

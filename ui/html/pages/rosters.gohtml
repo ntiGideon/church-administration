@@ -8,14 +8,12 @@
             <h1 class="page-title-text">Duty Rosters</h1>
             <p class="page-subtitle">Volunteer schedules and service assignments</p>
         </div>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/rosters/new" class="button is-primary">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>New Roster</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -54,14 +52,12 @@
         <i class="fas fa-clipboard-list empty-icon"></i>
         <h3>No rosters yet</h3>
         <p>Create a duty roster to start assigning volunteers to service roles.</p>
-        {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-        {{$role := $.LoggedInUser.Role.String}}
-        {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+        {{if $.IsAdmin}}
         <a href="/rosters/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Create Roster</span>
         </a>
-        {{end}}{{end}}{{end}}
+        {{end}}
     </div>
     {{end}}
 </div>

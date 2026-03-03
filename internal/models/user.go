@@ -43,12 +43,13 @@ func (m *UserModel) Authenticate(ctx context.Context, email, password string) (*
 	return u, nil
 }
 
-// GetByID fetches a user with their contact and church edges loaded.
+// GetByID fetches a user with their contact, church, and custom_role edges loaded.
 func (m *UserModel) GetByID(ctx context.Context, id int) (*ent.User, error) {
 	u, err := m.Db.User.Query().
 		Where(user.IDEQ(id), user.IsActiveEQ(true)).
 		WithContact().
 		WithChurch().
+		WithCustomRole().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

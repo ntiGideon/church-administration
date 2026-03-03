@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/user"
 )
@@ -29,6 +30,8 @@ type Invitation struct {
 	Token string `json:"token,omitempty"`
 	// Status holds the value of the "status" field.
 	Status invitation.Status `json:"status,omitempty"`
+	// CustomRoleID holds the value of the "custom_role_id" field.
+	CustomRoleID int `json:"custom_role_id,omitempty"`
 	// ExpiresAt holds the value of the "expires_at" field.
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -51,9 +54,11 @@ type InvitationEdges struct {
 	Inviter *User `json:"inviter,omitempty"`
 	// AcceptedUser holds the value of the accepted_user edge.
 	AcceptedUser *User `json:"accepted_user,omitempty"`
+	// CustomRole holds the value of the custom_role edge.
+	CustomRole *CustomRole `json:"custom_role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // ChurchOrErr returns the Church value or an error if the edge
@@ -89,12 +94,23 @@ func (e InvitationEdges) AcceptedUserOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "accepted_user"}
 }
 
+// CustomRoleOrErr returns the CustomRole value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvitationEdges) CustomRoleOrErr() (*CustomRole, error) {
+	if e.CustomRole != nil {
+		return e.CustomRole, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: customrole.Label}
+	}
+	return nil, &NotLoadedError{edge: "custom_role"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Invitation) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case invitation.FieldID:
+		case invitation.FieldID, invitation.FieldCustomRoleID:
 			values[i] = new(sql.NullInt64)
 		case invitation.FieldInviteeEmail, invitation.FieldInviteeName, invitation.FieldRole, invitation.FieldToken, invitation.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -154,6 +170,12 @@ func (_m *Invitation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				_m.Status = invitation.Status(value.String)
+			}
+		case invitation.FieldCustomRoleID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field custom_role_id", values[i])
+			} else if value.Valid {
+				_m.CustomRoleID = int(value.Int64)
 			}
 		case invitation.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -215,6 +237,11 @@ func (_m *Invitation) QueryAcceptedUser() *UserQuery {
 	return NewInvitationClient(_m.config).QueryAcceptedUser(_m)
 }
 
+// QueryCustomRole queries the "custom_role" edge of the Invitation entity.
+func (_m *Invitation) QueryCustomRole() *CustomRoleQuery {
+	return NewInvitationClient(_m.config).QueryCustomRole(_m)
+}
+
 // Update returns a builder for updating this Invitation.
 // Note that you need to call Invitation.Unwrap() before calling this method if this Invitation
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -252,6 +279,9 @@ func (_m *Invitation) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))
+	builder.WriteString(", ")
+	builder.WriteString("custom_role_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.CustomRoleID))
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
 	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))

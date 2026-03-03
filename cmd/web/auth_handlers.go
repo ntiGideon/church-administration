@@ -217,6 +217,11 @@ func (app *application) inviteAcceptPost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// Assign custom role if the invitation had one
+	if inv.CustomRoleID != 0 {
+		_ = app.db.User.UpdateOneID(userID).SetCustomRoleID(inv.CustomRoleID).Exec(r.Context())
+	}
+
 	// Mark the invitation as accepted
 	_ = app.invitationModel.MarkAccepted(r.Context(), inv.ID, userID)
 

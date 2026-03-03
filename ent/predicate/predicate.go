@@ -27,6 +27,9 @@ type Communication func(*sql.Selector)
 // Contact is the predicate function for contact builders.
 type Contact func(*sql.Selector)
 
+// CustomRole is the predicate function for customrole builders.
+type CustomRole func(*sql.Selector)
+
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
 

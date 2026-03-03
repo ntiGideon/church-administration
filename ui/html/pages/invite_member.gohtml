@@ -59,19 +59,76 @@
 
                     <div class="field">
                         <label class="label">Role *</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select name="role" required>
-                                    <option value="">Select a role...</option>
-                                    <option value="pastor">Pastor</option>
-                                    <option value="secretary">Secretary</option>
-                                    <option value="records_keeper">Records Keeper</option>
-                                    <option value="finance_officer">Finance Officer</option>
-                                    <option value="member">Member</option>
-                                </select>
-                            </div>
+                        {{with .Form}}{{with index .FieldErrors "role"}}<p class="help is-danger mb-2">{{.}}</p>{{end}}{{end}}
+
+                        <p class="role-section-label">Built-in Roles</p>
+                        <div class="role-radio-grid" id="builtinRoles">
+                            <label class="role-radio-card">
+                                <input type="radio" name="role" value="pastor" class="role-builtin-radio"
+                                       {{with .Form}}{{if eq .Role "pastor"}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon"><i class="fas fa-cross"></i></div>
+                                    <div class="rrc-name">Pastor</div>
+                                    <div class="rrc-desc">Sermon, prayer, pastoral care access</div>
+                                </div>
+                            </label>
+                            <label class="role-radio-card">
+                                <input type="radio" name="role" value="secretary" class="role-builtin-radio"
+                                       {{with .Form}}{{if eq .Role "secretary"}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon"><i class="fas fa-file-alt"></i></div>
+                                    <div class="rrc-name">Secretary</div>
+                                    <div class="rrc-desc">Members, events, calendar management</div>
+                                </div>
+                            </label>
+                            <label class="role-radio-card">
+                                <input type="radio" name="role" value="records_keeper" class="role-builtin-radio"
+                                       {{with .Form}}{{if eq .Role "records_keeper"}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon"><i class="fas fa-archive"></i></div>
+                                    <div class="rrc-name">Records Keeper</div>
+                                    <div class="rrc-desc">Member records and documents</div>
+                                </div>
+                            </label>
+                            <label class="role-radio-card">
+                                <input type="radio" name="role" value="finance_officer" class="role-builtin-radio"
+                                       {{with .Form}}{{if eq .Role "finance_officer"}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon"><i class="fas fa-coins"></i></div>
+                                    <div class="rrc-name">Finance Officer</div>
+                                    <div class="rrc-desc">Giving, budgets, financial reports</div>
+                                </div>
+                            </label>
+                            <label class="role-radio-card">
+                                <input type="radio" name="role" value="member" class="role-builtin-radio"
+                                       {{with .Form}}{{if eq .Role "member"}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon"><i class="fas fa-user"></i></div>
+                                    <div class="rrc-name">Member</div>
+                                    <div class="rrc-desc">Basic read-only access</div>
+                                </div>
+                            </label>
                         </div>
-                        {{with .Form}}{{with index .FieldErrors "role"}}<p class="help is-danger">{{.}}</p>{{end}}{{end}}
+
+                        {{$customRoles := index .Data "customRoles"}}
+                        {{if $customRoles}}
+                        <p class="role-section-label mt-4">Custom Roles</p>
+                        <div class="role-radio-grid" id="customRoles">
+                            {{range $customRoles}}
+                            {{$perms := ParsePermissions .Permissions}}
+                            {{$roleID := .ID}}
+                            <label class="role-radio-card custom-role-card">
+                                <input type="radio" name="custom_role_id" value="{{$roleID}}" class="role-custom-radio"
+                                       {{with $.Form}}{{if eq .CustomRoleID $roleID}}checked{{end}}{{end}}>
+                                <div class="rrc-inner">
+                                    <div class="rrc-icon custom"><i class="fas fa-shield-halved"></i></div>
+                                    <div class="rrc-name">{{.Name}}</div>
+                                    <div class="rrc-desc">{{if .Description}}{{.Description}}{{else}}{{len $perms}} permissions{{end}}</div>
+                                </div>
+                            </label>
+                            {{end}}
+                        </div>
+                        {{end}}
                     </div>
 
                     <div class="field mt-5">
@@ -137,5 +194,64 @@
 .step-text { font-size: 0.82rem; color: var(--text-medium); padding-top: 4px; }
 
 @media (max-width: 768px) { .form-layout { flex-direction: column; } .form-sidebar { width: 100%; } .page-wrapper { padding: 1rem; } }
+
+.role-section-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-light); margin-bottom: 0.6rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+
+.role-radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+
+.role-radio-card {
+    position: relative;
+    cursor: pointer;
+    display: block;
+}
+.role-radio-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+}
+.rrc-inner {
+    border: 2px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.role-radio-card input:checked + .rrc-inner {
+    border-color: var(--primary);
+    background: rgba(80,34,45,0.04);
+    box-shadow: 0 0 0 3px rgba(80,34,45,0.1);
+}
+.rrc-inner:hover { border-color: rgba(80,34,45,0.4); }
+.rrc-icon { font-size: 1.25rem; color: var(--text-light); margin-bottom: 6px; }
+.rrc-icon.custom { color: #7C3AED; }
+.role-radio-card input:checked + .rrc-inner .rrc-icon { color: var(--primary); }
+.rrc-name { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); }
+.rrc-desc { font-size: 0.72rem; color: var(--text-light); margin-top: 3px; line-height: 1.4; }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Mutual exclusivity between built-in and custom role radio groups
+    const builtinRadios = document.querySelectorAll('.role-builtin-radio');
+    const customRadios = document.querySelectorAll('.role-custom-radio');
+
+    builtinRadios.forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (this.checked) {
+                customRadios.forEach(c => { c.checked = false; });
+            }
+        });
+    });
+
+    customRadios.forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (this.checked) {
+                builtinRadios.forEach(b => { b.checked = false; });
+            }
+        });
+    });
+});
+</script>
 {{end}}

@@ -31,10 +31,12 @@
                 <span class="icon"><i class="fas fa-file-csv"></i></span>
                 <span>Export CSV</span>
             </a>
+            {{if $.IsAdmin}}
             <a href="/giving/new" class="button is-primary btn-record">
                 <span class="icon"><i class="fas fa-plus"></i></span>
                 <span>Record Transaction</span>
             </a>
+            {{end}}
         </div>
         {{end}}
     </div>
@@ -307,7 +309,9 @@
             {{else}}
             <h3>No transactions yet</h3>
             <p>Start recording tithes, offerings and expenses.</p>
+            {{if $.IsAdmin}}
             <a href="/giving/new" class="button is-primary mt-4">Record First Transaction</a>
+            {{end}}
             {{end}}
         </div>
         {{end}}

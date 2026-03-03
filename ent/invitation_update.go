@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ntiGideon/ent/church"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/predicate"
 	"github.com/ntiGideon/ent/user"
@@ -106,6 +107,26 @@ func (_u *InvitationUpdate) SetNillableStatus(v *invitation.Status) *InvitationU
 	return _u
 }
 
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_u *InvitationUpdate) SetCustomRoleID(v int) *InvitationUpdate {
+	_u.mutation.SetCustomRoleID(v)
+	return _u
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_u *InvitationUpdate) SetNillableCustomRoleID(v *int) *InvitationUpdate {
+	if v != nil {
+		_u.SetCustomRoleID(*v)
+	}
+	return _u
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (_u *InvitationUpdate) ClearCustomRoleID() *InvitationUpdate {
+	_u.mutation.ClearCustomRoleID()
+	return _u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_u *InvitationUpdate) SetExpiresAt(v time.Time) *InvitationUpdate {
 	_u.mutation.SetExpiresAt(v)
@@ -189,6 +210,11 @@ func (_u *InvitationUpdate) SetAcceptedUser(v *User) *InvitationUpdate {
 	return _u.SetAcceptedUserID(v.ID)
 }
 
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_u *InvitationUpdate) SetCustomRole(v *CustomRole) *InvitationUpdate {
+	return _u.SetCustomRoleID(v.ID)
+}
+
 // Mutation returns the InvitationMutation object of the builder.
 func (_u *InvitationUpdate) Mutation() *InvitationMutation {
 	return _u.mutation
@@ -209,6 +235,12 @@ func (_u *InvitationUpdate) ClearInviter() *InvitationUpdate {
 // ClearAcceptedUser clears the "accepted_user" edge to the User entity.
 func (_u *InvitationUpdate) ClearAcceptedUser() *InvitationUpdate {
 	_u.mutation.ClearAcceptedUser()
+	return _u
+}
+
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (_u *InvitationUpdate) ClearCustomRole() *InvitationUpdate {
+	_u.mutation.ClearCustomRole()
 	return _u
 }
 
@@ -392,6 +424,35 @@ func (_u *InvitationUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.CustomRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitation.CustomRoleTable,
+			Columns: []string{invitation.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitation.CustomRoleTable,
+			Columns: []string{invitation.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invitation.Label}
@@ -488,6 +549,26 @@ func (_u *InvitationUpdateOne) SetNillableStatus(v *invitation.Status) *Invitati
 	return _u
 }
 
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_u *InvitationUpdateOne) SetCustomRoleID(v int) *InvitationUpdateOne {
+	_u.mutation.SetCustomRoleID(v)
+	return _u
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_u *InvitationUpdateOne) SetNillableCustomRoleID(v *int) *InvitationUpdateOne {
+	if v != nil {
+		_u.SetCustomRoleID(*v)
+	}
+	return _u
+}
+
+// ClearCustomRoleID clears the value of the "custom_role_id" field.
+func (_u *InvitationUpdateOne) ClearCustomRoleID() *InvitationUpdateOne {
+	_u.mutation.ClearCustomRoleID()
+	return _u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_u *InvitationUpdateOne) SetExpiresAt(v time.Time) *InvitationUpdateOne {
 	_u.mutation.SetExpiresAt(v)
@@ -571,6 +652,11 @@ func (_u *InvitationUpdateOne) SetAcceptedUser(v *User) *InvitationUpdateOne {
 	return _u.SetAcceptedUserID(v.ID)
 }
 
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_u *InvitationUpdateOne) SetCustomRole(v *CustomRole) *InvitationUpdateOne {
+	return _u.SetCustomRoleID(v.ID)
+}
+
 // Mutation returns the InvitationMutation object of the builder.
 func (_u *InvitationUpdateOne) Mutation() *InvitationMutation {
 	return _u.mutation
@@ -591,6 +677,12 @@ func (_u *InvitationUpdateOne) ClearInviter() *InvitationUpdateOne {
 // ClearAcceptedUser clears the "accepted_user" edge to the User entity.
 func (_u *InvitationUpdateOne) ClearAcceptedUser() *InvitationUpdateOne {
 	_u.mutation.ClearAcceptedUser()
+	return _u
+}
+
+// ClearCustomRole clears the "custom_role" edge to the CustomRole entity.
+func (_u *InvitationUpdateOne) ClearCustomRole() *InvitationUpdateOne {
+	_u.mutation.ClearCustomRole()
 	return _u
 }
 
@@ -797,6 +889,35 @@ func (_u *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CustomRoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitation.CustomRoleTable,
+			Columns: []string{invitation.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitation.CustomRoleTable,
+			Columns: []string{invitation.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

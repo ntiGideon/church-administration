@@ -50,7 +50,7 @@
                         </div>
                         {{end}}
                     </div>
-                    {{if $.IsAuthenticated}}
+                    {{if $.IsAdmin}}
                     <form action="/members/{{$member.ID}}/avatar" method="POST"
                           enctype="multipart/form-data" class="avatar-upload-form">
                         <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
@@ -239,7 +239,7 @@
                                                 {{if .Notes}}<div class="ft-card-notes">{{.Notes}}</div>{{end}}
                                             </div>
                                         </a>
-                                        {{if $.IsAuthenticated}}
+                                        {{if $.IsAdmin}}
                                         <form action="/members/{{$member.ID}}/relationships/{{.RelationshipID}}/delete" method="POST"
                                               class="ft-del-form"
                                               onsubmit="return confirm('Remove this relationship?')">
@@ -259,7 +259,7 @@
                     <p class="ms-empty">No relationships recorded yet.</p>
                     {{end}}
 
-                    {{if $.IsAuthenticated}}
+                    {{if $.IsAdmin}}
                     <details class="ms-add-details" style="margin-top:1rem">
                         <summary class="ms-add-toggle"><i class="fas fa-plus"></i> Add Relationship</summary>
                         <form action="/members/{{$member.ID}}/relationships/new" method="POST" class="ms-add-form">
@@ -324,7 +324,7 @@
                                 {{if .OfficiatedBy}}<div class="ms-by">By {{.OfficiatedBy}}</div>{{end}}
                                 {{if .Description}}<div class="ms-desc">{{.Description}}</div>{{end}}
                             </div>
-                            {{if $.IsAuthenticated}}
+                            {{if $.IsAdmin}}
                             <form action="/members/{{$member.ID}}/milestones/{{.ID}}/delete" method="POST" class="ms-del-form"
                                   onsubmit="return confirm('Remove this milestone?')">
                                 <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
@@ -338,7 +338,7 @@
                     <p class="ms-empty">No milestones recorded yet.</p>
                     {{end}}
 
-                    {{if $.IsAuthenticated}}
+                    {{if $.IsAdmin}}
                     <details class="ms-add-details">
                         <summary class="ms-add-toggle"><i class="fas fa-plus"></i> Add Milestone</summary>
                         <form action="/members/{{$member.ID}}/milestones/new" method="POST" class="ms-add-form">
@@ -382,7 +382,7 @@
 
             <div class="profile-status">
                 <div class="status-row">
-                    {{if $.IsAuthenticated}}
+                    {{if $.IsAdmin}}
                     <a href="/members/{{$member.ID}}/edit" class="button is-info is-small is-outlined">
                         <span class="icon"><i class="fas fa-edit"></i></span>
                         <span>Edit Details</span>

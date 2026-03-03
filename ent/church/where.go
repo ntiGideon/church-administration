@@ -1818,6 +1818,29 @@ func HasBudgetsWith(preds ...predicate.Budget) predicate.Church {
 	})
 }
 
+// HasCustomRoles applies the HasEdge predicate on the "custom_roles" edge.
+func HasCustomRoles() predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CustomRolesTable, CustomRolesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCustomRolesWith applies the HasEdge predicate on the "custom_roles" edge with a given conditions (other predicates).
+func HasCustomRolesWith(preds ...predicate.CustomRole) predicate.Church {
+	return predicate.Church(func(s *sql.Selector) {
+		step := newCustomRolesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Church) predicate.Church {
 	return predicate.Church(sql.AndPredicates(predicates...))

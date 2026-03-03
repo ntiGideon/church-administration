@@ -12,6 +12,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -144,6 +145,26 @@ func init() {
 	contact.DefaultUpdatedAt = contactDescUpdatedAt.Default.(func() time.Time)
 	// contact.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	contact.UpdateDefaultUpdatedAt = contactDescUpdatedAt.UpdateDefault.(func() time.Time)
+	customroleFields := schema.CustomRole{}.Fields()
+	_ = customroleFields
+	// customroleDescPermissions is the schema descriptor for permissions field.
+	customroleDescPermissions := customroleFields[2].Descriptor()
+	// customrole.DefaultPermissions holds the default value on creation for the permissions field.
+	customrole.DefaultPermissions = customroleDescPermissions.Default.(string)
+	// customroleDescIsActive is the schema descriptor for is_active field.
+	customroleDescIsActive := customroleFields[3].Descriptor()
+	// customrole.DefaultIsActive holds the default value on creation for the is_active field.
+	customrole.DefaultIsActive = customroleDescIsActive.Default.(bool)
+	// customroleDescCreatedAt is the schema descriptor for created_at field.
+	customroleDescCreatedAt := customroleFields[5].Descriptor()
+	// customrole.DefaultCreatedAt holds the default value on creation for the created_at field.
+	customrole.DefaultCreatedAt = customroleDescCreatedAt.Default.(func() time.Time)
+	// customroleDescUpdatedAt is the schema descriptor for updated_at field.
+	customroleDescUpdatedAt := customroleFields[6].Descriptor()
+	// customrole.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	customrole.DefaultUpdatedAt = customroleDescUpdatedAt.Default.(func() time.Time)
+	// customrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	customrole.UpdateDefaultUpdatedAt = customroleDescUpdatedAt.UpdateDefault.(func() time.Time)
 	departmentFields := schema.Department{}.Fields()
 	_ = departmentFields
 	// departmentDescIsActive is the schema descriptor for is_active field.
@@ -205,11 +226,11 @@ func init() {
 	invitationFields := schema.Invitation{}.Fields()
 	_ = invitationFields
 	// invitationDescCreatedAt is the schema descriptor for created_at field.
-	invitationDescCreatedAt := invitationFields[6].Descriptor()
+	invitationDescCreatedAt := invitationFields[7].Descriptor()
 	// invitation.DefaultCreatedAt holds the default value on creation for the created_at field.
 	invitation.DefaultCreatedAt = invitationDescCreatedAt.Default.(func() time.Time)
 	// invitationDescUpdatedAt is the schema descriptor for updated_at field.
-	invitationDescUpdatedAt := invitationFields[7].Descriptor()
+	invitationDescUpdatedAt := invitationFields[8].Descriptor()
 	// invitation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	invitation.DefaultUpdatedAt = invitationDescUpdatedAt.Default.(func() time.Time)
 	// invitation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -341,11 +362,11 @@ func init() {
 	// user.DefaultIsActive holds the default value on creation for the is_active field.
 	user.DefaultIsActive = userDescIsActive.Default.(bool)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[5].Descriptor()
+	userDescCreatedAt := userFields[6].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[6].Descriptor()
+	userDescUpdatedAt := userFields[7].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -160,6 +160,30 @@ func (app *application) errorPages(next http.Handler) http.Handler {
 	})
 }
 
+// requirePermission returns middleware that allows only users with the given permission key.
+// Admin roles (super_admin, branch_admin) always pass.
+func (app *application) requirePermission(perm string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			u := app.getAuthenticatedUser(r)
+			if u == nil {
+				app.clientError(w, http.StatusForbidden)
+				return
+			}
+			if u.Role == user.RoleSuperAdmin || u.Role == user.RoleBranchAdmin {
+				next.ServeHTTP(w, r)
+				return
+			}
+			perms := resolvePermissions(u)
+			if !perms[perm] {
+				app.clientError(w, http.StatusForbidden)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 // requireAdmin allows super_admin and branch_admin roles.
 func (app *application) requireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

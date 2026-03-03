@@ -25,14 +25,11 @@
             <h1 class="page-title-text">Church Calendar</h1>
         </div>
         <div class="cal-header-actions">
-            {{if .IsAuthenticated}}{{if .LoggedInUser}}
-                {{$role := .LoggedInUser.Role.String}}
-                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-                <a href="/calendar/new" class="btn-add-program">
-                    <i class="fas fa-plus"></i> Add Program
-                </a>
-                {{end}}
-            {{end}}{{end}}
+            {{if .IsAdmin}}
+            <a href="/calendar/new" class="btn-add-program">
+                <i class="fas fa-plus"></i> Add Program
+            </a>
+            {{end}}
         </div>
     </div>
 
@@ -76,7 +73,8 @@
                 <div class="cal-cell empty"></div>
                 {{else}}
                 <div class="cal-cell {{if .IsToday}}today{{end}} {{if .Entries}}has-entries{{end}}"
-                     onclick="window.location='/calendar/new?date={{$year}}-{{printf "%02d" $month}}-{{printf "%02d" .Day}}'">
+                     {{if $.IsAdmin}}onclick="window.location='/calendar/new?date={{$year}}-{{printf "%02d" $month}}-{{printf "%02d" .Day}}'"{{end}}
+                     style="{{if not $.IsAdmin}}cursor:default{{end}}">
                     <span class="cal-day-num {{if .IsToday}}today-num{{end}}">{{.Day}}</span>
                     {{if .Entries}}
                     <div class="cal-entries">
@@ -149,12 +147,9 @@
             <div class="empty-programs">
                 <i class="fas fa-calendar-times"></i>
                 <p>No programs scheduled for {{$monthName}} {{$year}}</p>
-                {{if .IsAuthenticated}}{{if .LoggedInUser}}
-                    {{$role := .LoggedInUser.Role.String}}
-                    {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
-                    <a href="/calendar/new" class="btn-add-program-sm">Add First Program</a>
-                    {{end}}
-                {{end}}{{end}}
+                {{if .IsAdmin}}
+                <a href="/calendar/new" class="btn-add-program-sm">Add First Program</a>
+                {{end}}
             </div>
             {{end}}
         </div>

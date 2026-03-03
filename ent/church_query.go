@@ -17,6 +17,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -63,6 +64,7 @@ type ChurchQuery struct {
 	withMilestones     *MilestoneQuery
 	withCommunications *CommunicationQuery
 	withBudgets        *BudgetQuery
+	withCustomRoles    *CustomRoleQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -561,6 +563,28 @@ func (_q *ChurchQuery) QueryBudgets() *BudgetQuery {
 	return query
 }
 
+// QueryCustomRoles chains the current query on the "custom_roles" edge.
+func (_q *ChurchQuery) QueryCustomRoles() *CustomRoleQuery {
+	query := (&CustomRoleClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, selector),
+			sqlgraph.To(customrole.Table, customrole.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.CustomRolesTable, church.CustomRolesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Church entity from the query.
 // Returns a *NotFoundError when no Church was found.
 func (_q *ChurchQuery) First(ctx context.Context) (*Church, error) {
@@ -774,6 +798,7 @@ func (_q *ChurchQuery) Clone() *ChurchQuery {
 		withMilestones:     _q.withMilestones.Clone(),
 		withCommunications: _q.withCommunications.Clone(),
 		withBudgets:        _q.withBudgets.Clone(),
+		withCustomRoles:    _q.withCustomRoles.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -1011,6 +1036,17 @@ func (_q *ChurchQuery) WithBudgets(opts ...func(*BudgetQuery)) *ChurchQuery {
 	return _q
 }
 
+// WithCustomRoles tells the query-builder to eager-load the nodes that are connected to
+// the "custom_roles" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ChurchQuery) WithCustomRoles(opts ...func(*CustomRoleQuery)) *ChurchQuery {
+	query := (&CustomRoleClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCustomRoles = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -1089,7 +1125,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 	var (
 		nodes       = []*Church{}
 		_spec       = _q.querySpec()
-		loadedTypes = [21]bool{
+		loadedTypes = [22]bool{
 			_q.withParent != nil,
 			_q.withChildren != nil,
 			_q.withUsers != nil,
@@ -1111,6 +1147,7 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 			_q.withMilestones != nil,
 			_q.withCommunications != nil,
 			_q.withBudgets != nil,
+			_q.withCustomRoles != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1274,6 +1311,13 @@ func (_q *ChurchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Churc
 		if err := _q.loadBudgets(ctx, query, nodes,
 			func(n *Church) { n.Edges.Budgets = []*Budget{} },
 			func(n *Church, e *Budget) { n.Edges.Budgets = append(n.Edges.Budgets, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCustomRoles; query != nil {
+		if err := _q.loadCustomRoles(ctx, query, nodes,
+			func(n *Church) { n.Edges.CustomRoles = []*CustomRole{} },
+			func(n *Church, e *CustomRole) { n.Edges.CustomRoles = append(n.Edges.CustomRoles, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1901,6 +1945,36 @@ func (_q *ChurchQuery) loadBudgets(ctx context.Context, query *BudgetQuery, node
 	}
 	query.Where(predicate.Budget(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(church.BudgetsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChurchID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "church_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ChurchQuery) loadCustomRoles(ctx context.Context, query *CustomRoleQuery, nodes []*Church, init func(*Church), assign func(*Church, *CustomRole)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Church)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(customrole.FieldChurchID)
+	}
+	query.Where(predicate.CustomRole(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(church.CustomRolesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

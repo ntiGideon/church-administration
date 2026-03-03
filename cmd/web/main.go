@@ -116,6 +116,7 @@ func main() {
 		relationshipModel:  &models.RelationshipModel{Db: db},
 		communicationModel: &models.CommunicationModel{Db: db},
 		budgetModel:        &models.BudgetModel{Db: db},
+		customRoleModel:    &models.CustomRoleModel{Db: db},
 	}
 
 	server := &http.Server{

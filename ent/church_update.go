@@ -16,6 +16,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -725,6 +726,21 @@ func (_u *ChurchUpdate) AddBudgets(v ...*Budget) *ChurchUpdate {
 	return _u.AddBudgetIDs(ids...)
 }
 
+// AddCustomRoleIDs adds the "custom_roles" edge to the CustomRole entity by IDs.
+func (_u *ChurchUpdate) AddCustomRoleIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.AddCustomRoleIDs(ids...)
+	return _u
+}
+
+// AddCustomRoles adds the "custom_roles" edges to the CustomRole entity.
+func (_u *ChurchUpdate) AddCustomRoles(v ...*CustomRole) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCustomRoleIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdate) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -1154,6 +1170,27 @@ func (_u *ChurchUpdate) RemoveBudgets(v ...*Budget) *ChurchUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveBudgetIDs(ids...)
+}
+
+// ClearCustomRoles clears all "custom_roles" edges to the CustomRole entity.
+func (_u *ChurchUpdate) ClearCustomRoles() *ChurchUpdate {
+	_u.mutation.ClearCustomRoles()
+	return _u
+}
+
+// RemoveCustomRoleIDs removes the "custom_roles" edge to CustomRole entities by IDs.
+func (_u *ChurchUpdate) RemoveCustomRoleIDs(ids ...int) *ChurchUpdate {
+	_u.mutation.RemoveCustomRoleIDs(ids...)
+	return _u
+}
+
+// RemoveCustomRoles removes "custom_roles" edges to CustomRole entities.
+func (_u *ChurchUpdate) RemoveCustomRoles(v ...*CustomRole) *ChurchUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCustomRoleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -2242,6 +2279,51 @@ func (_u *ChurchUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.CustomRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCustomRolesIDs(); len(nodes) > 0 && !_u.mutation.CustomRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{church.Label}
@@ -2940,6 +3022,21 @@ func (_u *ChurchUpdateOne) AddBudgets(v ...*Budget) *ChurchUpdateOne {
 	return _u.AddBudgetIDs(ids...)
 }
 
+// AddCustomRoleIDs adds the "custom_roles" edge to the CustomRole entity by IDs.
+func (_u *ChurchUpdateOne) AddCustomRoleIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.AddCustomRoleIDs(ids...)
+	return _u
+}
+
+// AddCustomRoles adds the "custom_roles" edges to the CustomRole entity.
+func (_u *ChurchUpdateOne) AddCustomRoles(v ...*CustomRole) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCustomRoleIDs(ids...)
+}
+
 // Mutation returns the ChurchMutation object of the builder.
 func (_u *ChurchUpdateOne) Mutation() *ChurchMutation {
 	return _u.mutation
@@ -3369,6 +3466,27 @@ func (_u *ChurchUpdateOne) RemoveBudgets(v ...*Budget) *ChurchUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveBudgetIDs(ids...)
+}
+
+// ClearCustomRoles clears all "custom_roles" edges to the CustomRole entity.
+func (_u *ChurchUpdateOne) ClearCustomRoles() *ChurchUpdateOne {
+	_u.mutation.ClearCustomRoles()
+	return _u
+}
+
+// RemoveCustomRoleIDs removes the "custom_roles" edge to CustomRole entities by IDs.
+func (_u *ChurchUpdateOne) RemoveCustomRoleIDs(ids ...int) *ChurchUpdateOne {
+	_u.mutation.RemoveCustomRoleIDs(ids...)
+	return _u
+}
+
+// RemoveCustomRoles removes "custom_roles" edges to CustomRole entities.
+func (_u *ChurchUpdateOne) RemoveCustomRoles(v ...*CustomRole) *ChurchUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCustomRoleIDs(ids...)
 }
 
 // Where appends a list predicates to the ChurchUpdate builder.
@@ -4480,6 +4598,51 @@ func (_u *ChurchUpdateOne) sqlSave(ctx context.Context) (_node *Church, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(budget.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CustomRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCustomRolesIDs(); len(nodes) > 0 && !_u.mutation.CustomRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CustomRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   church.CustomRolesTable,
+			Columns: []string{church.CustomRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -13,6 +13,7 @@
                 <span class="icon"><i class="fas fa-file-csv"></i></span>
                 <span>Export CSV</span>
             </a>
+            {{if .IsAdmin}}
             <a href="/members/import" class="button is-light export-btn">
                 <span class="icon"><i class="fas fa-file-import"></i></span>
                 <span>Import CSV</span>
@@ -21,6 +22,7 @@
                 <span class="icon"><i class="fas fa-user-plus"></i></span>
                 <span>Add Member</span>
             </a>
+            {{end}}
         </div>
     </div>
 
@@ -74,10 +76,12 @@
         <div class="empty-icon"><i class="fas fa-users"></i></div>
         <h3>No congregation records yet</h3>
         <p>Start adding congregation members to build your church directory.</p>
+        {{if .IsAdmin}}
         <a href="/members/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-user-plus"></i></span>
             <span>Add First Member</span>
         </a>
+        {{end}}
     </div>
     {{end}}
 </div>

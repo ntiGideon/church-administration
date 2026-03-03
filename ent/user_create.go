@@ -14,6 +14,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/finance"
 	"github.com/ntiGideon/ent/invitation"
 	"github.com/ntiGideon/ent/pastoralnote"
@@ -77,6 +78,20 @@ func (_c *UserCreate) SetLastLogin(v time.Time) *UserCreate {
 func (_c *UserCreate) SetNillableLastLogin(v *time.Time) *UserCreate {
 	if v != nil {
 		_c.SetLastLogin(*v)
+	}
+	return _c
+}
+
+// SetCustomRoleID sets the "custom_role_id" field.
+func (_c *UserCreate) SetCustomRoleID(v int) *UserCreate {
+	_c.mutation.SetCustomRoleID(v)
+	return _c
+}
+
+// SetNillableCustomRoleID sets the "custom_role_id" field if the given value is not nil.
+func (_c *UserCreate) SetNillableCustomRoleID(v *int) *UserCreate {
+	if v != nil {
+		_c.SetCustomRoleID(*v)
 	}
 	return _c
 }
@@ -231,6 +246,11 @@ func (_c *UserCreate) AddSentCommunications(v ...*Communication) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddSentCommunicationIDs(ids...)
+}
+
+// SetCustomRole sets the "custom_role" edge to the CustomRole entity.
+func (_c *UserCreate) SetCustomRole(v *CustomRole) *UserCreate {
+	return _c.SetCustomRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -497,6 +517,23 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CustomRoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.CustomRoleTable,
+			Columns: []string{user.CustomRoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customrole.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CustomRoleID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

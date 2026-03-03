@@ -84,3 +84,36 @@ func (m *EventModel) SetPublished(ctx context.Context, id int, published bool) e
 	_, err := m.Db.Event.UpdateOneID(id).SetIsPublished(published).Save(ctx)
 	return err
 }
+
+// EventTypeTotal holds a labelled attendance total for one event type.
+type EventTypeTotal struct {
+	Label string `json:"label"`
+	Count int    `json:"count"`
+}
+
+// EventTypeBreakdown returns total attendance_count grouped by event_type for a church.
+func (m *EventModel) EventTypeBreakdown(ctx context.Context, churchID int) ([]EventTypeTotal, error) {
+	events, err := m.List(ctx, churchID)
+	if err != nil {
+		return nil, err
+	}
+
+	totals := map[string]int{
+		"service":    0,
+		"meeting":    0,
+		"conference": 0,
+		"outreach":   0,
+		"training":   0,
+	}
+	for _, e := range events {
+		totals[string(e.EventType)] += e.AttendanceCount
+	}
+
+	return []EventTypeTotal{
+		{Label: "Service", Count: totals["service"]},
+		{Label: "Meeting", Count: totals["meeting"]},
+		{Label: "Conference", Count: totals["conference"]},
+		{Label: "Outreach", Count: totals["outreach"]},
+		{Label: "Training", Count: totals["training"]},
+	}, nil
+}

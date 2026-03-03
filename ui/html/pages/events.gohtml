@@ -8,12 +8,14 @@
             <h1 class="page-title-text"><i class="fas fa-calendar-alt mr-2 has-text-primary"></i>Events</h1>
             <p class="page-subtitle-text">Schedule and manage all church events</p>
         </div>
+        {{if .IsAdmin}}
         <div class="header-actions">
             <a href="/events/new" class="button is-primary">
                 <span class="icon"><i class="fas fa-plus"></i></span>
                 <span>Create Event</span>
             </a>
         </div>
+        {{end}}
     </div>
 
     {{if .Flash}}
@@ -78,10 +80,12 @@
         <div class="empty-icon"><i class="fas fa-calendar-plus"></i></div>
         <h3>No events scheduled</h3>
         <p>Create your first event to get started.</p>
+        {{if .IsAdmin}}
         <a href="/events/new" class="button is-primary mt-4">
             <span class="icon"><i class="fas fa-plus"></i></span>
             <span>Create First Event</span>
         </a>
+        {{end}}
     </div>
     {{end}}
 </div>

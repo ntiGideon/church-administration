@@ -22,6 +22,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -61,6 +62,8 @@ type Client struct {
 	Communication *CommunicationClient
 	// Contact is the client for interacting with the Contact builders.
 	Contact *ContactClient
+	// CustomRole is the client for interacting with the CustomRole builders.
+	CustomRole *CustomRoleClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
 	// Document is the client for interacting with the Document builders.
@@ -115,6 +118,7 @@ func (c *Client) init() {
 	c.Church = NewChurchClient(c.config)
 	c.Communication = NewCommunicationClient(c.config)
 	c.Contact = NewContactClient(c.config)
+	c.CustomRole = NewCustomRoleClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
 	c.Document = NewDocumentClient(c.config)
 	c.Event = NewEventClient(c.config)
@@ -232,6 +236,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Church:        NewChurchClient(cfg),
 		Communication: NewCommunicationClient(cfg),
 		Contact:       NewContactClient(cfg),
+		CustomRole:    NewCustomRoleClient(cfg),
 		Department:    NewDepartmentClient(cfg),
 		Document:      NewDocumentClient(cfg),
 		Event:         NewEventClient(cfg),
@@ -276,6 +281,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Church:        NewChurchClient(cfg),
 		Communication: NewCommunicationClient(cfg),
 		Contact:       NewContactClient(cfg),
+		CustomRole:    NewCustomRoleClient(cfg),
 		Department:    NewDepartmentClient(cfg),
 		Document:      NewDocumentClient(cfg),
 		Event:         NewEventClient(cfg),
@@ -324,10 +330,10 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Announcement, c.Attendance, c.Budget, c.BudgetLine, c.Church, c.Communication,
-		c.Contact, c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
-		c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest, c.ProgramEntry,
-		c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
-		c.Visitor,
+		c.Contact, c.CustomRole, c.Department, c.Document, c.Event, c.Finance, c.Group,
+		c.Invitation, c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest,
+		c.ProgramEntry, c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session,
+		c.User, c.Visitor,
 	} {
 		n.Use(hooks...)
 	}
@@ -338,10 +344,10 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Announcement, c.Attendance, c.Budget, c.BudgetLine, c.Church, c.Communication,
-		c.Contact, c.Department, c.Document, c.Event, c.Finance, c.Group, c.Invitation,
-		c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest, c.ProgramEntry,
-		c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session, c.User,
-		c.Visitor,
+		c.Contact, c.CustomRole, c.Department, c.Document, c.Event, c.Finance, c.Group,
+		c.Invitation, c.Milestone, c.PastoralNote, c.Pledge, c.PrayerRequest,
+		c.ProgramEntry, c.Relationship, c.Roster, c.RosterEntry, c.Sermon, c.Session,
+		c.User, c.Visitor,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -364,6 +370,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Communication.mutate(ctx, m)
 	case *ContactMutation:
 		return c.Contact.mutate(ctx, m)
+	case *CustomRoleMutation:
+		return c.CustomRole.mutate(ctx, m)
 	case *DepartmentMutation:
 		return c.Department.mutate(ctx, m)
 	case *DocumentMutation:
@@ -1493,6 +1501,22 @@ func (c *ChurchClient) QueryBudgets(_m *Church) *BudgetQuery {
 	return query
 }
 
+// QueryCustomRoles queries the custom_roles edge of a Church.
+func (c *ChurchClient) QueryCustomRoles(_m *Church) *CustomRoleQuery {
+	query := (&CustomRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(church.Table, church.FieldID, id),
+			sqlgraph.To(customrole.Table, customrole.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, church.CustomRolesTable, church.CustomRolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ChurchClient) Hooks() []Hook {
 	return c.hooks.Church
@@ -2085,6 +2109,187 @@ func (c *ContactClient) mutate(ctx context.Context, m *ContactMutation) (Value, 
 		return (&ContactDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Contact mutation op: %q", m.Op())
+	}
+}
+
+// CustomRoleClient is a client for the CustomRole schema.
+type CustomRoleClient struct {
+	config
+}
+
+// NewCustomRoleClient returns a client for the CustomRole from the given config.
+func NewCustomRoleClient(c config) *CustomRoleClient {
+	return &CustomRoleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `customrole.Hooks(f(g(h())))`.
+func (c *CustomRoleClient) Use(hooks ...Hook) {
+	c.hooks.CustomRole = append(c.hooks.CustomRole, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `customrole.Intercept(f(g(h())))`.
+func (c *CustomRoleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CustomRole = append(c.inters.CustomRole, interceptors...)
+}
+
+// Create returns a builder for creating a CustomRole entity.
+func (c *CustomRoleClient) Create() *CustomRoleCreate {
+	mutation := newCustomRoleMutation(c.config, OpCreate)
+	return &CustomRoleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CustomRole entities.
+func (c *CustomRoleClient) CreateBulk(builders ...*CustomRoleCreate) *CustomRoleCreateBulk {
+	return &CustomRoleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CustomRoleClient) MapCreateBulk(slice any, setFunc func(*CustomRoleCreate, int)) *CustomRoleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CustomRoleCreateBulk{err: fmt.Errorf("calling to CustomRoleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CustomRoleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CustomRoleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CustomRole.
+func (c *CustomRoleClient) Update() *CustomRoleUpdate {
+	mutation := newCustomRoleMutation(c.config, OpUpdate)
+	return &CustomRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CustomRoleClient) UpdateOne(_m *CustomRole) *CustomRoleUpdateOne {
+	mutation := newCustomRoleMutation(c.config, OpUpdateOne, withCustomRole(_m))
+	return &CustomRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CustomRoleClient) UpdateOneID(id int) *CustomRoleUpdateOne {
+	mutation := newCustomRoleMutation(c.config, OpUpdateOne, withCustomRoleID(id))
+	return &CustomRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CustomRole.
+func (c *CustomRoleClient) Delete() *CustomRoleDelete {
+	mutation := newCustomRoleMutation(c.config, OpDelete)
+	return &CustomRoleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CustomRoleClient) DeleteOne(_m *CustomRole) *CustomRoleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CustomRoleClient) DeleteOneID(id int) *CustomRoleDeleteOne {
+	builder := c.Delete().Where(customrole.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CustomRoleDeleteOne{builder}
+}
+
+// Query returns a query builder for CustomRole.
+func (c *CustomRoleClient) Query() *CustomRoleQuery {
+	return &CustomRoleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCustomRole},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CustomRole entity by its id.
+func (c *CustomRoleClient) Get(ctx context.Context, id int) (*CustomRole, error) {
+	return c.Query().Where(customrole.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CustomRoleClient) GetX(ctx context.Context, id int) *CustomRole {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChurch queries the church edge of a CustomRole.
+func (c *CustomRoleClient) QueryChurch(_m *CustomRole) *ChurchQuery {
+	query := (&ChurchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(customrole.Table, customrole.FieldID, id),
+			sqlgraph.To(church.Table, church.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, customrole.ChurchTable, customrole.ChurchColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUsers queries the users edge of a CustomRole.
+func (c *CustomRoleClient) QueryUsers(_m *CustomRole) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(customrole.Table, customrole.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, customrole.UsersTable, customrole.UsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInvitations queries the invitations edge of a CustomRole.
+func (c *CustomRoleClient) QueryInvitations(_m *CustomRole) *InvitationQuery {
+	query := (&InvitationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(customrole.Table, customrole.FieldID, id),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, customrole.InvitationsTable, customrole.InvitationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CustomRoleClient) Hooks() []Hook {
+	return c.hooks.CustomRole
+}
+
+// Interceptors returns the client interceptors.
+func (c *CustomRoleClient) Interceptors() []Interceptor {
+	return c.inters.CustomRole
+}
+
+func (c *CustomRoleClient) mutate(ctx context.Context, m *CustomRoleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CustomRoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CustomRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CustomRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CustomRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CustomRole mutation op: %q", m.Op())
 	}
 }
 
@@ -3094,6 +3299,22 @@ func (c *InvitationClient) QueryAcceptedUser(_m *Invitation) *UserQuery {
 			sqlgraph.From(invitation.Table, invitation.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, invitation.AcceptedUserTable, invitation.AcceptedUserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCustomRole queries the custom_role edge of a Invitation.
+func (c *InvitationClient) QueryCustomRole(_m *Invitation) *CustomRoleQuery {
+	query := (&CustomRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitation.Table, invitation.FieldID, id),
+			sqlgraph.To(customrole.Table, customrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitation.CustomRoleTable, invitation.CustomRoleColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4964,6 +5185,22 @@ func (c *UserClient) QuerySentCommunications(_m *User) *CommunicationQuery {
 	return query
 }
 
+// QueryCustomRole queries the custom_role edge of a User.
+func (c *UserClient) QueryCustomRole(_m *User) *CustomRoleQuery {
+	query := (&CustomRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(customrole.Table, customrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, user.CustomRoleTable, user.CustomRoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -5142,13 +5379,13 @@ func (c *VisitorClient) mutate(ctx context.Context, m *VisitorMutation) (Value, 
 type (
 	hooks struct {
 		Announcement, Attendance, Budget, BudgetLine, Church, Communication, Contact,
-		Department, Document, Event, Finance, Group, Invitation, Milestone,
+		CustomRole, Department, Document, Event, Finance, Group, Invitation, Milestone,
 		PastoralNote, Pledge, PrayerRequest, ProgramEntry, Relationship, Roster,
 		RosterEntry, Sermon, Session, User, Visitor []ent.Hook
 	}
 	inters struct {
 		Announcement, Attendance, Budget, BudgetLine, Church, Communication, Contact,
-		Department, Document, Event, Finance, Group, Invitation, Milestone,
+		CustomRole, Department, Document, Event, Finance, Group, Invitation, Milestone,
 		PastoralNote, Pledge, PrayerRequest, ProgramEntry, Relationship, Roster,
 		RosterEntry, Sermon, Session, User, Visitor []ent.Interceptor
 	}

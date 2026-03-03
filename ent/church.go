@@ -109,9 +109,11 @@ type ChurchEdges struct {
 	Communications []*Communication `json:"communications,omitempty"`
 	// Budgets holds the value of the budgets edge.
 	Budgets []*Budget `json:"budgets,omitempty"`
+	// CustomRoles holds the value of the custom_roles edge.
+	CustomRoles []*CustomRole `json:"custom_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [21]bool
+	loadedTypes [22]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -303,6 +305,15 @@ func (e ChurchEdges) BudgetsOrErr() ([]*Budget, error) {
 		return e.Budgets, nil
 	}
 	return nil, &NotLoadedError{edge: "budgets"}
+}
+
+// CustomRolesOrErr returns the CustomRoles value or an error if the edge
+// was not loaded in eager-loading.
+func (e ChurchEdges) CustomRolesOrErr() ([]*CustomRole, error) {
+	if e.loadedTypes[21] {
+		return e.CustomRoles, nil
+	}
+	return nil, &NotLoadedError{edge: "custom_roles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -584,6 +595,11 @@ func (_m *Church) QueryCommunications() *CommunicationQuery {
 // QueryBudgets queries the "budgets" edge of the Church entity.
 func (_m *Church) QueryBudgets() *BudgetQuery {
 	return NewChurchClient(_m.config).QueryBudgets(_m)
+}
+
+// QueryCustomRoles queries the "custom_roles" edge of the Church entity.
+func (_m *Church) QueryCustomRoles() *CustomRoleQuery {
+	return NewChurchClient(_m.config).QueryCustomRoles(_m)
 }
 
 // Update returns a builder for updating this Church.

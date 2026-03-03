@@ -19,6 +19,7 @@ import (
 	"github.com/ntiGideon/ent/church"
 	"github.com/ntiGideon/ent/communication"
 	"github.com/ntiGideon/ent/contact"
+	"github.com/ntiGideon/ent/customrole"
 	"github.com/ntiGideon/ent/department"
 	"github.com/ntiGideon/ent/document"
 	"github.com/ntiGideon/ent/event"
@@ -104,6 +105,7 @@ func checkColumn(t, c string) error {
 			church.Table:        church.ValidColumn,
 			communication.Table: communication.ValidColumn,
 			contact.Table:       contact.ValidColumn,
+			customrole.Table:    customrole.ValidColumn,
 			department.Table:    department.ValidColumn,
 			document.Table:      document.ValidColumn,
 			event.Table:         event.ValidColumn,

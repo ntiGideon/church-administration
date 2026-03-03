@@ -100,10 +100,7 @@
                 </div>
 
                 <!-- Check-In Form (admin only) -->
-                {{if $.IsAuthenticated}}
-                {{if $.LoggedInUser}}
-                {{$role := $.LoggedInUser.Role.String}}
-                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                {{if $.IsAdmin}}
                 <div class="att-checkin-card">
                     <h5 class="att-checkin-title"><i class="fas fa-user-plus"></i> Check In Member</h5>
                     <form action="/events/{{$event.ID}}/checkin" method="POST" class="att-checkin-form">
@@ -156,8 +153,6 @@
                     </form>
                 </div>
                 {{end}}
-                {{end}}
-                {{end}}
 
                 <!-- Attendance Roster -->
                 {{if $attendances}}
@@ -169,11 +164,9 @@
                                 <th>Status</th>
                                 <th>Check-In Time</th>
                                 <th>Notes</th>
-                                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                                {{$role := $.LoggedInUser.Role.String}}
-                                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                                {{if $.IsAdmin}}
                                 <th></th>
-                                {{end}}{{end}}{{end}}
+                                {{end}}
                             </tr>
                         </thead>
                         <tbody>
@@ -208,9 +201,7 @@
                                 <td class="att-notes">
                                     {{if $a.Notes}}{{$a.Notes}}{{else}}<span class="has-text-grey">—</span>{{end}}
                                 </td>
-                                {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                                {{$role := $.LoggedInUser.Role.String}}
-                                {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                                {{if $.IsAdmin}}
                                 <td class="att-actions">
                                     <form action="/events/{{$event.ID}}/attendance/{{$a.ID}}/remove" method="POST">
                                         <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
@@ -220,7 +211,7 @@
                                         </button>
                                     </form>
                                 </td>
-                                {{end}}{{end}}{{end}}
+                                {{end}}
                             </tr>
                             {{end}}
                         </tbody>
@@ -230,11 +221,9 @@
                 <div class="att-empty">
                     <i class="fas fa-users att-empty-icon"></i>
                     <p>No attendance records yet.</p>
-                    {{if $.IsAuthenticated}}{{if $.LoggedInUser}}
-                    {{$role := $.LoggedInUser.Role.String}}
-                    {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+                    {{if $.IsAdmin}}
                     <p class="att-empty-hint">Use the form above to check in members.</p>
-                    {{end}}{{end}}{{end}}
+                    {{end}}
                 </div>
                 {{end}}
             </div>
@@ -242,10 +231,7 @@
 
         <!-- ── Sidebar ─────────────────────────────────────────── -->
         <div class="detail-sidebar">
-            {{if $.IsAuthenticated}}
-            {{if $.LoggedInUser}}
-            {{$role := $.LoggedInUser.Role.String}}
-            {{if or (eq $role "super_admin") (eq $role "branch_admin") (eq $role "secretary") (eq $role "pastor")}}
+            {{if $.IsAdmin}}
             <div class="sidebar-card mb-3">
                 <h4>Publish Status</h4>
                 <div class="publish-status mb-3">
@@ -293,8 +279,6 @@
                 <p class="has-text-grey is-size-7">No attendees yet.</p>
                 {{end}}
             </div>
-            {{end}}
-            {{end}}
             {{end}}
         </div>
     </div>
